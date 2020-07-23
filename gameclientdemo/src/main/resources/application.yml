@@ -1,0 +1,10 @@
+#logging.level.root=info
+#logging.level.org.springframework.web=debug
+#logging.file.path=/home/output/mmodemo/logs
+##logging.file.name=demo.log
+#读取日志配置文件
+logging:
+  config: classpath:logback-spring.xml
+  #日志输出路径
+  file:
+    path: D:/nmyslog/nmys
