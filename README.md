@@ -1,4 +1,4 @@
-# mmorpg
+# mmo demo
 A game server for mmorpg game based on Netty, SpringBoot, MyBatis.
 
 ## 简介
