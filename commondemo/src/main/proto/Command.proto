@@ -1,0 +1,7 @@
+syntax = "proto3";//协议版本  3
+option java_outer_classname = "CommandProto";//生成的外部类名，同时也是生成的Xxx.java 的文件名
+//protobuf使用message的方式管理
+message Command{//会在CommandProto外部类生成一个内部类Command，它是真正发送的POJO对象
+  int32 index=1;//Command类中有一个属性 名字为index  类型为int32(Protobuf类型)  1表示属性的序号，不是值
+  string content=2;
+}
