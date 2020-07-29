@@ -1,4 +1,4 @@
-package com.example.gameservicedemo.tcpprotocol;
+package com.example.gameservicedemo.server.adapter;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import io.netty.buffer.ByteBuf;
@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author: hang hang
  * @Date: 2020/07/28/16:11
- * @Description:
+ * @Description:对客户端发起的命令的解码处理器
  * 1.解析并验证协议开头标志位0x58
  * 2.解析出类名长度len1和数据组长度len2
  * 3.根据剩余可读位数和len1+len2+1大小处理粘包/拆包

@@ -12,7 +12,7 @@ import lombok.Data;
  * @Description:创建角色
  */
 @Data
-public class RoleCreate {
+public class RoleCreate extends BaseCommand{
     @Protobuf(fieldType = FieldType.INT32, order=1, required = true)
     int serviceCode =9001;
     @Protobuf(fieldType = FieldType.STRING, order=2, required = true)

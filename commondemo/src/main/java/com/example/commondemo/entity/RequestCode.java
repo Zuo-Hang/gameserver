@@ -1,0 +1,49 @@
+package com.example.commondemo.entity;
+
+/**
+ * Created with IntelliJ IDEA.
+ *
+ * @author: hang hang
+ * @Date: 2020/07/29/15:27
+ * @Description:自定义请求码
+ */
+public enum RequestCode {
+
+    SUCCESS(200, "OK"),
+
+    BAD_REQUEST(400, "Bad Request"),
+    //找不到
+    NOT_FOUND(404, "Not Found"),
+    //未知内部错误
+    INTERNAL_SERVER_ERROR(500, "Unknown Internal Error"),
+    //无效的参数
+    NOT_VALID_PARAM(40005, "Not valid Params"),
+    //操作不被支持
+    NOT_SUPPORTED_OPERATION(40006, "Operation not supported"),
+    //未登录
+    NOT_LOGIN(50000, "Not Login");
+
+    private int code;
+    private String standardMessage;
+
+    RequestCode(int code, String standardMessage) {
+        this.code = code;
+        this.standardMessage = standardMessage;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getStandardMessage() {
+        return standardMessage;
+    }
+
+    public void setStandardMessage(String standardMessage) {
+        this.standardMessage = standardMessage;
+    }
+}

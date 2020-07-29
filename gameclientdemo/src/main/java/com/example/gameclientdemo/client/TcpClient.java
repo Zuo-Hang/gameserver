@@ -1,7 +1,8 @@
 package com.example.gameclientdemo.client;
 
-import com.example.gameclientdemo.client.handler.EchoHandler;
+import com.example.gameclientdemo.client.handler.ClientBusinessHandler;
 import com.example.gameclientdemo.client.handler.EncoderHandler;
+import com.example.gameclientdemo.client.handler.ProDecoderHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -32,8 +33,9 @@ public class TcpClient {
                 @Override
                 protected void initChannel(Channel ch) throws Exception {
                     ch.pipeline().addLast("logging",new LoggingHandler("DEBUG"));
-                    ch.pipeline().addLast(new EncoderHandler());
-                    ch.pipeline().addLast(new EchoHandler());
+                    ch.pipeline().addLast("encode",new EncoderHandler());
+                    ch.pipeline().addLast("decode",new ProDecoderHandler());
+                    ch.pipeline().addLast(new ClientBusinessHandler());
                 }
             });
             bootstrap.remoteAddress(ip,port);

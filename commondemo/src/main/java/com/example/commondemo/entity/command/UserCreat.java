@@ -12,7 +12,7 @@ import lombok.Data;
  * @Description:创建用户
  */
 @Data
-public class UserCreat {
+public class UserCreat extends BaseCommand{
     @Protobuf(fieldType = FieldType.INT32, order=1, required = true)
     int serviceCode =900;
     @Protobuf(fieldType = FieldType.STRING, order=2, required = true)

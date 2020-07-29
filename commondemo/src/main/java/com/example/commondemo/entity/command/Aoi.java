@@ -12,7 +12,7 @@ import lombok.Data;
  * @Description:显示场景内各种游戏对象
  */
 @Data
-public class Aoi {
+public class Aoi extends BaseCommand{
     @Protobuf(fieldType = FieldType.INT32, order=1, required = true)
     int serviceCode =3002;
 }

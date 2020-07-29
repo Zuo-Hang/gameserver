@@ -12,7 +12,7 @@ import lombok.Data;
  * @Description:用户登录
  */
 @Data
-public class UserLogin {
+public class UserLogin extends BaseCommand{
     @Protobuf(fieldType = FieldType.INT32, order=1, required = true)
     int serviceCode =1001;
     @Protobuf(fieldType = FieldType.STRING, order=2, required = true)

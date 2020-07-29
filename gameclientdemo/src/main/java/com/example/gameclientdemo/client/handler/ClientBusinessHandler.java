@@ -2,12 +2,15 @@ package com.example.gameclientdemo.client.handler;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 //import com.example.commondemo.entity.ReturnUser;
+import com.example.commondemo.entity.Message;
 import com.example.commondemo.entity.TcpProtocol;
 import com.example.commondemo.entity.command.UserCreat;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,7 +19,8 @@ import java.util.ArrayList;
  * @Date: 2020/07/28/16:18
  * @Description:客户端处理器
  */
-public class EchoHandler extends ChannelInboundHandlerAdapter {
+@Slf4j
+public class ClientBusinessHandler extends ChannelInboundHandlerAdapter {
     /**
      * 连接成功后发送消息测试
      * @param ctx
@@ -37,20 +41,13 @@ public class EchoHandler extends ChannelInboundHandlerAdapter {
         //由于设置了编码器，这里直接传入自定义的对象
         ctx.write(protocol);
         ctx.flush();
-//        ReturnUser returnUser = new ReturnUser();
-//        returnUser.setId(1);
-//        returnUser.setName("kkkkk");
-//        ArrayList<String> objects = new ArrayList<>();
-//        objects.add("喜羊羊");
-//        objects.add("懒洋洋");
-//        returnUser.setStringList(objects);
-//        byte[] encode1 = ProtobufProxy.create(ReturnUser.class).encode(returnUser);
-//        TcpProtocol protocol1=new TcpProtocol();
-//        protocol1.setClassLen((byte)returnUser.getClass().getName().getBytes().length);
-//        protocol1.setLen(encode1.length);
-//        protocol1.setClassName(returnUser.getClass().getName().getBytes());
-//        protocol1.setData(encode1);
-//        ctx.write(protocol1);
-//        ctx.flush();
     }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if(msg instanceof Message){
+            log.info("服务器返回了:{}",((Message) msg).getMessage());
+        }
+    }
+
 }
