@@ -37,7 +37,7 @@ public class ControllerManager {
      * 执行任务
      * @param controller    要执行的任务
      * @param ctx   上下文
-     * @param msg 信息
+     * @param msg 信息对象
      */
     public void execute(BaseController controller, ChannelHandlerContext ctx, BaseCommand msg) {
         //Player player = playerDataService.getPlayerByCtx(ctx);

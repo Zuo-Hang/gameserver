@@ -1,0 +1,42 @@
+package com.example.gamedatademo.bean;
+
+import lombok.Data;
+
+import java.util.Date;
+
+/**
+ * Created with IntelliJ IDEA.
+ *
+ * @author: hang hang
+ * @Date: 2020/07/30/17:00
+ * @Description:用户实体类
+ */
+@Data
+public class User {
+    /**
+     * 用户Id
+     */
+    private int userId;
+    /**
+     * 用户昵称
+     */
+    private String nickName;
+    /**
+     * 用户密码
+     */
+    private String password;
+    /**
+     * 用户手机号
+     */
+    private String phoneNumber;
+    /**
+     * 账号是否被禁用
+     */
+    private int disable;
+    private Date creatTime;
+    private Date lastLoginTime;
+    /**
+     * MD5加密：加密后的长度是固定的，而且长度都为32
+     * String md5Str = DigestUtils.md5DigestAsHex("原串".getBytes());
+     */
+}
