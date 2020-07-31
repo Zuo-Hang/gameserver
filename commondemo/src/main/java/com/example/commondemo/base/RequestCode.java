@@ -1,4 +1,4 @@
-package com.example.commondemo.entity;
+package com.example.commondemo.base;
 
 /**
  * Created with IntelliJ IDEA.

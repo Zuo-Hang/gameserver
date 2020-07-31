@@ -2,15 +2,12 @@ package com.example.gameclientdemo.client.handler;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 //import com.example.commondemo.entity.ReturnUser;
-import com.example.commondemo.entity.Message;
-import com.example.commondemo.entity.TcpProtocol;
-import com.example.commondemo.entity.command.UserCreat;
+import com.example.commondemo.message.Message;
+import com.example.commondemo.base.TcpProtocol;
+import com.example.commondemo.command.UserCreat;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,10 +31,9 @@ public class ClientBusinessHandler extends ChannelInboundHandlerAdapter {
         userCreat.setPhoneNumber("15389425034");
         byte[] encode = ProtobufProxy.create(UserCreat.class).encode(userCreat);
         TcpProtocol protocol=new TcpProtocol();
-        protocol.setClassLen((byte)userCreat.getClass().getName().getBytes().length);
-        protocol.setLen(encode.length);
-        protocol.setClassName(userCreat.getClass().getName().getBytes());
+        protocol.setServiceCode(userCreat.getServiceCode());
         protocol.setData(encode);
+        protocol.setLen(encode.length+4);
         //由于设置了编码器，这里直接传入自定义的对象
         ctx.write(protocol);
         ctx.flush();

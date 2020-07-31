@@ -40,11 +40,22 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- protouf序列化  -->
+<!--        &lt;!&ndash; protouf序列化  &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.google.protobuf</groupId>-->
+<!--            <artifactId>protobuf-java</artifactId>-->
+<!--            <version>3.6.1</version>-->
+<!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/com.baidu/jprotobuf -->
         <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>3.6.1</version>
+            <groupId>com.baidu</groupId>
+            <artifactId>jprotobuf</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.42.Final</version>
         </dependency>
     </dependencies>
 

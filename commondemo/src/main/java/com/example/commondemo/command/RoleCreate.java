@@ -1,4 +1,4 @@
-package com.example.commondemo.entity.command;
+package com.example.commondemo.command;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
@@ -8,15 +8,15 @@ import lombok.Data;
  * Created with IntelliJ IDEA.
  *
  * @author: hang hang
- * @Date: 2020/07/28/21:18
- * @Description:用户登录
+ * @Date: 2020/07/28/21:12
+ * @Description:创建角色
  */
 @Data
-public class UserLogin extends BaseCommand{
+public class RoleCreate extends BaseCommand{
     @Protobuf(fieldType = FieldType.INT32, order=1, required = true)
-    int serviceCode =1001;
+    int serviceCode =9001;
     @Protobuf(fieldType = FieldType.STRING, order=2, required = true)
-    private String userName;
-    @Protobuf(fieldType = FieldType.STRING, order=3, required = true)
-    private String passWord;
+    private String roleName;
+    @Protobuf(fieldType = FieldType.INT32, order=3, required = true)
+    private int occupationCode;
 }

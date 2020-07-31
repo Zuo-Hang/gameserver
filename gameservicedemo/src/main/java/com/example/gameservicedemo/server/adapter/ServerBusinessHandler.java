@@ -1,9 +1,10 @@
 package com.example.gameservicedemo.server.adapter;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-import com.example.commondemo.entity.Message;
-import com.example.commondemo.entity.RequestCode;
-import com.example.commondemo.entity.command.BaseCommand;
+import com.example.commondemo.base.TcpProtocol;
+import com.example.commondemo.message.Message;
+import com.example.commondemo.base.RequestCode;
+import com.example.commondemo.command.BaseCommand;
 import com.example.gameservicedemo.base.BaseController;
 import com.example.gameservicedemo.base.ControllerManager;
 import com.example.gameservicedemo.base.ErrorController;
@@ -30,7 +31,12 @@ public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.info("客户端: " + ctx.channel().id() + " 加入连接");
         Message message = new Message(RequestCode.SUCCESS.getCode(),"服务器连接成功！");
-        ctx.writeAndFlush(message);
+        byte[] encode = ProtobufProxy.create(Message.class).encode(message);
+        TcpProtocol protocol = new TcpProtocol();
+        protocol.setServiceCode(message.getRequestCode());
+        protocol.setData(encode);
+        protocol.setLen(encode.length+4);
+        ctx.writeAndFlush(protocol);
     }
 
     /**

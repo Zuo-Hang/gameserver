@@ -1,4 +1,4 @@
-package com.example.commondemo.entity.command;
+package com.example.commondemo.command;
 
 import lombok.Data;
 

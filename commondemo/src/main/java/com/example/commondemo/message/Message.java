@@ -1,4 +1,4 @@
-package com.example.commondemo.entity;
+package com.example.commondemo.message;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;

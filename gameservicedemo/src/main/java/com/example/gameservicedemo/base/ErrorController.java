@@ -1,12 +1,10 @@
 package com.example.gameservicedemo.base;
 
-import com.example.commondemo.entity.command.BaseCommand;
+import com.example.commondemo.command.BaseCommand;
 import com.example.gameservicedemo.manager.NotificationManager;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.text.MessageFormat;
 
 /**
  * @author gonefuture  gonefuture@qq.com

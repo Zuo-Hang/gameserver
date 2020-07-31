@@ -1,6 +1,6 @@
 package com.example.gameservicedemo.base;
 
-import com.example.commondemo.entity.command.BaseCommand;
+import com.example.commondemo.command.BaseCommand;
 import io.netty.channel.ChannelHandlerContext;
 
 /**

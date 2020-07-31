@@ -1,4 +1,4 @@
-package com.example.commondemo.entity.command;
+package com.example.commondemo.command;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
@@ -8,11 +8,11 @@ import lombok.Data;
  * Created with IntelliJ IDEA.
  *
  * @author: hang hang
- * @Date: 2020/07/29/17:57
- * @Description:心跳
+ * @Date: 2020/07/28/21:33
+ * @Description:显示场景内各种游戏对象
  */
 @Data
-public class HeartBeat extends BaseCommand{
+public class Aoi extends BaseCommand{
     @Protobuf(fieldType = FieldType.INT32, order=1, required = true)
-    int serviceCode =0;
+    int serviceCode =3002;
 }
