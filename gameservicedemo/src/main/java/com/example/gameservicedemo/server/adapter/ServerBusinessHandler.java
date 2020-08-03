@@ -47,19 +47,21 @@ public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        int serviceCode = ((BaseCommand) msg).getServiceCode();
+        BaseCommand baseCommand=(BaseCommand) msg;
+        int serviceCode = baseCommand.getServiceCode();
         // 如果发送的是心跳，直接无视
         if(serviceCode==0){
             return;
         }
         log.info("这是一个{}对象",msg.getClass().getName());
         log.info("这个对象是{}",msg);
+        //获取到处理业务的controller，注意这里会把当初放进去的方法封装成一个BaseController返回。当要执行此方法时，直接调用接口中定义的方法即可。
         BaseController controller = new ControllerManager().getController(serviceCode);
         //如果没有对应的controller
         if (controller == null) {
-            new ErrorController().handle(ctx,(BaseCommand) msg);
+            new ErrorController().handle(ctx,baseCommand);
         } else {
-            new ControllerManager().execute(controller,ctx,(BaseCommand) msg);
+            new ControllerManager().execute(controller,ctx,baseCommand);
         }
     }
 

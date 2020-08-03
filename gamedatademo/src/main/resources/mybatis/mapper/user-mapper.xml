@@ -5,12 +5,12 @@
 <mapper namespace="com.example.gamedatademo.mapper.UserMapper">
     <select id="selectByUserId" resultType="com.example.gamedatademo.bean.User">
     select * from user where user_id = #{id}
-  </select>
+    </select>
 
     <insert id="insert" parameterType="com.example.gamedatademo.bean.User">
---     INSERT INTO user
---     (name, sex, phone_number,password,create_time)
---     VALUES
---     (#{name},#{sex}, #{phoneNumber},#{password}, NOW());
+    INSERT INTO user
+    (nick_Name, password,disable,creat_Time,last_Login_Time)
+    VALUES
+    (#{nickName},#{password}, #{phoneNumber},#{disable}, NOW(),NOW());
     </insert>
 </mapper>

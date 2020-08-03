@@ -19,7 +19,7 @@ public class TcpProtocol {
      */
     private int len;
     /**
-     * 类名
+     * 服务码
      */
     private int serviceCode;
     /**

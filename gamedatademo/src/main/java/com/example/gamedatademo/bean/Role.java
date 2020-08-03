@@ -1,5 +1,7 @@
 package com.example.gamedatademo.bean;
 
+import lombok.Data;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -7,6 +9,7 @@ package com.example.gamedatademo.bean;
  * @Date: 2020/07/30/17:13
  * @Description:
  */
+@Data
 public class Role {
     /**
      * 角色id
@@ -20,5 +23,10 @@ public class Role {
      * 角色状态
      */
     private int state;
+    /**
+     * 所属的地图
+     */
+    private int belongTo;
+
 
 }

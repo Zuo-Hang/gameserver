@@ -34,7 +34,7 @@ public class ControllerManager {
     }
 
     /**
-     * 执行任务
+     * 执行任务，在这里会将任务由一个单例线程池顺序执行。
      * @param controller    要执行的任务
      * @param ctx   上下文
      * @param msg 信息对象
