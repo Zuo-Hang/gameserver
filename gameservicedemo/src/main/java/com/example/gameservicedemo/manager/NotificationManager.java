@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.manager;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
+import com.example.commondemo.base.RequestCode;
 import com.example.commondemo.base.TcpProtocol;
 import com.example.commondemo.message.Message;
 import io.netty.channel.ChannelHandlerContext;
@@ -28,7 +29,7 @@ public class NotificationManager {
     public static  <E> void notifyByCtx(ChannelHandlerContext ctx, E e){
         Message message = new Message();
         message.setMessage(e.toString()+"\n");
-        message.setRequestCode(900);
+        message.setRequestCode(RequestCode.NOT_SUPPORTED_OPERATION.getCode());
         byte[] encode = new byte[0];
         try {
             encode = ProtobufProxy.create(Message.class).encode(message);
@@ -36,9 +37,8 @@ public class NotificationManager {
             ioException.printStackTrace();
         }
         TcpProtocol protocol = new TcpProtocol();
-        protocol.setServiceCode(200);
         protocol.setData(encode);
-        protocol.setLen(encode.length+4);
+        protocol.setLen(encode.length);
         ctx.writeAndFlush(protocol);
     }
 }

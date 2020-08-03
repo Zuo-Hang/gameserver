@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.game.controller;
 
-import com.example.commondemo.command.BaseCommand;
+
+import com.example.commondemo.message.Message;
 import com.example.gameservicedemo.base.ControllerManager;
 import io.netty.channel.ChannelHandlerContext;
 import org.springframework.stereotype.Controller;
@@ -24,9 +25,9 @@ public class UserController{
     /**
      * 用户注册的控制器
      * @param ctx
-     * @param command
+     * @param message
      */
-    public void registerUser(ChannelHandlerContext ctx, BaseCommand command){
+    public void registerUser(ChannelHandlerContext ctx, Message message){
 
     }
 }

@@ -1,7 +1,7 @@
 package com.example.commondemo.code;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-import com.example.commondemo.base.CommandCode;
+import com.example.commondemo.message.Message;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -25,7 +25,6 @@ public class DecoderHandler extends ByteToMessageDecoder {
      *
      */
     private static int MIN_DATA_LEN = 4;
-    private CommandCode commandCode=new CommandCode();
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
@@ -37,21 +36,16 @@ public class DecoderHandler extends ByteToMessageDecoder {
             //读取长度
             int len = in.readInt();
             if (len <= in.readableBytes()) {
-                //读取服务码
-                int serviceCode = in.readInt();
-                byte[] data = new byte[len - 4];
+                byte[] data = new byte[len];
                 in.readBytes(data);
                 try {
-                    //根据serviceCode获取到类型
-                    String s = commandCode.CLASS_MAP.get(serviceCode);
-                    Class<?> aClass = Class.forName(s);
-                    Object decode = ProtobufProxy.create(aClass).decode(data);
+                    Object decode = ProtobufProxy.create(Message.class).decode(data);
                     out.add(decode);
                 } catch (Exception e) {
-
+                    log.info("解码时出现异常");
+                    log.error(e.getMessage());
                 }
                 //如果out有值，且in仍然可读，将继续调用decode方法再次解码in中的内容，以此解决粘包问题
-
             } else {
                 log.debug(String.format("数据长度不够，数据协议len长度为：%1$d,数据包实际可读内容为：%2$d。正在等待处理拆包……", len, in.readableBytes()));
                 in.resetReaderIndex();

@@ -1,10 +1,9 @@
 package com.example.gameclientdemo.client.handler;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-//import com.example.commondemo.entity.ReturnUser;
+import com.example.commondemo.base.Command;
 import com.example.commondemo.message.Message;
 import com.example.commondemo.base.TcpProtocol;
-import com.example.commondemo.command.UserCreat;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +24,13 @@ public class ClientBusinessHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        UserCreat userCreat=new UserCreat();
-        userCreat.setNickName("hang hang");
-        userCreat.setPassword("123456");
-        userCreat.setPhoneNumber("15389425034");
-        byte[] encode = ProtobufProxy.create(UserCreat.class).encode(userCreat);
+        Message message = new Message();
+        message.setRequestCode(Command.USER_CREATE.getMsgId());
+        message.setMessage("hanghang "+"123456 "+"15389425034");
+        byte[] encode = ProtobufProxy.create(Message.class).encode(message);
         TcpProtocol protocol=new TcpProtocol();
-        protocol.setServiceCode(userCreat.getServiceCode());
         protocol.setData(encode);
-        protocol.setLen(encode.length+4);
+        protocol.setLen(encode.length);
         //由于设置了编码器，这里直接传入自定义的对象
         ctx.write(protocol);
         ctx.flush();

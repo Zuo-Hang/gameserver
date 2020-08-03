@@ -8,9 +8,9 @@ import lombok.Data;
  * @author: hang hang
  * @Date: 2020/07/28/14:49
  * @Description:传输协议的定义
- *  |------------|-----------|----------|
- *  |   len      |serviceCode|    data  |
- *  |------------|-----------|----------|
+ *  |------------|----------|
+ *  |   len      |    data  |
+ *  |------------|----------|
  */
 @Data
 public class TcpProtocol {
@@ -18,10 +18,6 @@ public class TcpProtocol {
      * 包长度
      */
     private int len;
-    /**
-     * 服务码
-     */
-    private int serviceCode;
     /**
      * 数据
      */

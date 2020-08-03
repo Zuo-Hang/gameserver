@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.base;
 
-import com.example.commondemo.command.BaseCommand;
+
+import com.example.commondemo.message.Message;
 import com.example.gameservicedemo.manager.NotificationManager;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +17,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ErrorController implements BaseController {
     @Override
-    public void handle(ChannelHandlerContext ctx, BaseCommand command) {
-        log.debug("请求的服务不存在,命令码为 {}",command.getServiceCode());
+    public void handle(ChannelHandlerContext ctx, Message message) {
+        log.debug("请求的服务不存在,命令码为 {}",message.getRequestCode());
         NotificationManager.notifyByCtx(ctx,"你请求的服务不存在..");
     }
 }

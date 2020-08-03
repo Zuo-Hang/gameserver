@@ -4,7 +4,6 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.example.commondemo.base.TcpProtocol;
 import com.example.commondemo.message.Message;
 import com.example.commondemo.base.RequestCode;
-import com.example.commondemo.command.BaseCommand;
 import com.example.gameservicedemo.base.BaseController;
 import com.example.gameservicedemo.base.ControllerManager;
 import com.example.gameservicedemo.base.ErrorController;
@@ -33,9 +32,8 @@ public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
         Message message = new Message(RequestCode.SUCCESS.getCode(),"服务器连接成功！");
         byte[] encode = ProtobufProxy.create(Message.class).encode(message);
         TcpProtocol protocol = new TcpProtocol();
-        protocol.setServiceCode(message.getRequestCode());
         protocol.setData(encode);
-        protocol.setLen(encode.length+4);
+        protocol.setLen(encode.length);
         ctx.writeAndFlush(protocol);
     }
 
@@ -47,21 +45,23 @@ public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        BaseCommand baseCommand=(BaseCommand) msg;
-        int serviceCode = baseCommand.getServiceCode();
+
+        Message message=(Message) msg;
+        int requestCode = message.getRequestCode();
+        //int serviceCode = baseCommand.getServiceCode();
         // 如果发送的是心跳，直接无视
-        if(serviceCode==0){
+        if(requestCode==0){
             return;
         }
-        log.info("这是一个{}对象",msg.getClass().getName());
-        log.info("这个对象是{}",msg);
+        log.info("这是一个{}对象",message.getClass().getName());
+        log.info("这个对象是{}",message);
         //获取到处理业务的controller，注意这里会把当初放进去的方法封装成一个BaseController返回。当要执行此方法时，直接调用接口中定义的方法即可。
-        BaseController controller = new ControllerManager().getController(serviceCode);
+        BaseController controller = new ControllerManager().getController(message.getRequestCode());
         //如果没有对应的controller
         if (controller == null) {
-            new ErrorController().handle(ctx,baseCommand);
+            new ErrorController().handle(ctx,message);
         } else {
-            new ControllerManager().execute(controller,ctx,baseCommand);
+            new ControllerManager().execute(controller,ctx,message);
         }
     }
 

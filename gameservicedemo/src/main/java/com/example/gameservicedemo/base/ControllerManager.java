@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.base;
 
-import com.example.commondemo.command.BaseCommand;
+
+import com.example.commondemo.message.Message;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.Map;
@@ -37,9 +38,9 @@ public class ControllerManager {
      * 执行任务，在这里会将任务由一个单例线程池顺序执行。
      * @param controller    要执行的任务
      * @param ctx   上下文
-     * @param msg 信息对象
+     * @param message 信息对象
      */
-    public void execute(BaseController controller, ChannelHandlerContext ctx, BaseCommand msg) {
+    public void execute(BaseController controller, ChannelHandlerContext ctx, Message message) {
         //Player player = playerDataService.getPlayerByCtx(ctx);
 
         // 玩家在场景内则用场景的执行器执行

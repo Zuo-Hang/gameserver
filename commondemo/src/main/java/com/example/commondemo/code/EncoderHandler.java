@@ -20,7 +20,6 @@ public class EncoderHandler extends MessageToByteEncoder {
         if (msg instanceof TcpProtocol){
             TcpProtocol protocol = (TcpProtocol) msg;
             out.writeInt(protocol.getLen());
-            out.writeInt(protocol.getServiceCode());
             out.writeBytes(protocol.getData());
             log.debug("数据编码成功："+out);
         }else {
