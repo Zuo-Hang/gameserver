@@ -13,4 +13,11 @@
     VALUES
     (#{nickName},#{password}, #{phoneNumber},#{disable}, NOW(),NOW());
     </insert>
+    <delete id="deleteByUserId">
+        DELETE from user WHERE user_Id = #{userId};
+    </delete>
+
+    <update id="updateByUserId" >
+
+    </update>
 </mapper>

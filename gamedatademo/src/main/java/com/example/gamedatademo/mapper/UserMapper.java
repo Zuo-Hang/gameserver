@@ -7,7 +7,7 @@ import com.example.gamedatademo.bean.User;
  *
  * @author: hang hang
  * @Date: 2020/07/30/17:24
- * @Description:
+ * @Description: 用户相关的 mybatis mapper接口
  */
 public interface UserMapper {
     /**

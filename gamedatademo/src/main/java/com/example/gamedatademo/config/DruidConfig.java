@@ -21,7 +21,7 @@ import java.util.Map;
  *
  * @author: hang hang
  * @Date: 2020/08/03/15:08
- * @Description:
+ * @Description: 数据库连接池的配置类
  */
 @Slf4j
 @Configuration

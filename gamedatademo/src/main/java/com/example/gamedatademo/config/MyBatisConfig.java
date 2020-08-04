@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
  *
  * @author: hang hang
  * @Date: 2020/08/03/15:07
- * @Description:
+ * @Description: mybatis的配置类
  */
 @org.springframework.context.annotation.Configuration
 @MapperScan(basePackages = {"com.example.gamedatademo.mapper"})
@@ -18,9 +18,9 @@ public class MyBatisConfig {
     @Bean
     public ConfigurationCustomizer configurationCustomizer(){
         return new ConfigurationCustomizer(){
-
             @Override
             public void customize(Configuration configuration) {
+                //设置自动转成驼峰
                 configuration.setMapUnderscoreToCamelCase(true);
             }
         };
