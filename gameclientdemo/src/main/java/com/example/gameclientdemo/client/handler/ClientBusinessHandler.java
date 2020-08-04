@@ -25,8 +25,8 @@ public class ClientBusinessHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         Message message = new Message();
-        message.setRequestCode(Command.USER_CREATE.getMsgId());
-        message.setMessage("hanghang "+"123456 "+"15389425034");
+        message.setRequestCode(Command.USER_LOGIN.getMsgId());
+        message.setMessage("login "+"1 "+"12345");
         byte[] encode = ProtobufProxy.create(Message.class).encode(message);
         TcpProtocol protocol=new TcpProtocol();
         protocol.setData(encode);

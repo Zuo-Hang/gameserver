@@ -2,6 +2,7 @@ package com.example.gameservicedemo.base;
 
 
 import com.example.commondemo.message.Message;
+import com.example.gameservicedemo.manager.NotificationManager;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.Map;
@@ -36,13 +37,19 @@ public class ControllerManager {
 
     /**
      * 执行任务，在这里会将任务由一个单例线程池顺序执行。
-     * @param controller    要执行的任务
-     * @param ctx   上下文
-     * @param message 信息对象
+     *
+     * @param controller 要执行的任务
+     * @param ctx        上下文
+     * @param message    信息对象
      */
     public void execute(BaseController controller, ChannelHandlerContext ctx, Message message) {
         //Player player = playerDataService.getPlayerByCtx(ctx);
-
+        try {
+            controller.handle(ctx, message);
+        } catch (Exception e) {
+            NotificationManager.notifyByCtx(ctx, "这个功能暂时无法使用，请忽略本功能");
+            e.printStackTrace();
+        }
         // 玩家在场景内则用场景的执行器执行
 //        Optional.ofNullable(player).map(Player::getCurrentScene).ifPresent(
 //                scene -> scene.getSingleThreadSchedule().execute(
@@ -61,5 +68,5 @@ public class ControllerManager {
 //        // 如果用户尚未加载角色
 //        if (Objects.isNull(player) || Objects.isNull(player.getCurrentScene())) {
 //            controller.handle(ctx,msg);
-        }
+    }
 }

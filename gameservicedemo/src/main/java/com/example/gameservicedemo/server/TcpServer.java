@@ -7,6 +7,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
@@ -19,6 +20,7 @@ import javax.annotation.Resource;
  * @Description:
  */
 @Slf4j
+@Component
 public class TcpServer {
     @Resource
     ServerSocketChannelInitializer serverSocketChannelInitializer;
@@ -56,11 +58,15 @@ public class TcpServer {
         }
     }
 
-    public static void main(String[] args) {
+    public void start() {
         new TcpServer(8779).init();
 
     }
+
     public TcpServer(int port) {
         this.port = port;
+    }
+
+    public TcpServer() {
     }
 }
