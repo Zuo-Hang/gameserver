@@ -22,4 +22,6 @@ public class DeptController {
     public User getRole(Integer id){
         return userMapper.selectByUserId(id);
     }
+
+
 }

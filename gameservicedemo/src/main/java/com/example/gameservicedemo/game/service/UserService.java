@@ -3,6 +3,7 @@ package com.example.gameservicedemo.game.service;
 import com.example.gamedatademo.bean.User;
 import com.example.gamedatademo.mapper.UserMapper;
 import com.example.gameservicedemo.game.cache.UserCache;
+import com.example.gameservicedemo.game.service.bean.UserBeCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
-import javax.annotation.Resource;
 import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,10 +35,14 @@ public class UserService {
      * @return
      */
     public void registerUser(ChannelHandlerContext ctx, User user){
+        String password = user.getPassword();
+        String md5Str = DigestUtils.md5DigestAsHex(password.getBytes());
+        user.setPassword(md5Str);
         //信息校验
         Integer insert = userMapper.insert(user);
+        log.info(user.toString());
         //通知用户
-        NotificationManager.notifyByCtx(ctx,"你已成功注册！你的登录账号是："+insert);
+        NotificationManager.notifyByCtx(ctx,"你已成功注册！你的登录账号是："+user.getUserId()+"，快使用userLogin命令去登录吧");
     }
 
     /**
@@ -77,8 +81,8 @@ public class UserService {
             return ;
         }
         //将密码加密，//对密码加密，后匹配数据库中的密码
-        //String md5Str = DigestUtils.md5DigestAsHex(password.getBytes());
-        if(!userBeCache1.getPassword().equals(password)){
+        String md5Str = DigestUtils.md5DigestAsHex(password.getBytes());
+        if(!userBeCache1.getPassword().equals(md5Str)){
             NotificationManager.notifyByCtx(ctx,"密码或用户名错误");
             return ;
         }
@@ -103,5 +107,10 @@ public class UserService {
 //        }
 
     }
-
+    /**
+     *  通过连接上下文找到用户
+     */
+    public UserBeCache getUserByCxt(ChannelHandlerContext ctx) {
+        return UserCache.getUserByCtx(ctx);
+    }
 }

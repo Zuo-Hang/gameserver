@@ -1,6 +1,6 @@
 package com.example.gameservicedemo.game.cache;
 
-import com.example.gameservicedemo.game.service.UserBeCache;
+import com.example.gameservicedemo.game.service.bean.UserBeCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

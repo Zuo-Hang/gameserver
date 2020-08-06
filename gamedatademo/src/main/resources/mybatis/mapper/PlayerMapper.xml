@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.gamedatademo.mapper.PlayerMapper">
+
+    <select id="selectByPlayerId" resultType="com.example.gamedatademo.bean.Player">
+    select * from player where player_id = #{playerId};
+    </select>
+
+    <insert id="insert" parameterType="com.example.gamedatademo.bean.Player" useGeneratedKeys="true" keyProperty="playerId">
+    INSERT INTO player
+    (player_name, user_id,now_at)
+    VALUES
+    (#{playerName},#{userId}, #{nowAt});
+    </insert>
+
+</mapper>

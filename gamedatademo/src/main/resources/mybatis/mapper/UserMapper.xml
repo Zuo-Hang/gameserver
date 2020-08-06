@@ -7,9 +7,9 @@
     select * from user where user_Id = #{userId};
     </select>
 
-    <insert id="insert" parameterType="com.example.gamedatademo.bean.User">
+    <insert id="insert" parameterType="com.example.gamedatademo.bean.User" useGeneratedKeys="true" keyProperty="userId">
     INSERT INTO user
-    (nick_Name, password,disable,creat_Time,last_Login_Time)
+    (nick_Name, password,phone_Number,disable,creat_Time,last_Login_Time)
     VALUES
     (#{nickName},#{password}, #{phoneNumber},#{disable}, NOW(),NOW());
     </insert>

@@ -16,6 +16,10 @@ public class Role {
      */
     private int roleId;
     /**
+     * 实体角色的名字
+     */
+    private String roleName;
+    /**
      * 角色类型
      */
     private int roleType;
@@ -24,9 +28,10 @@ public class Role {
      */
     private int state;
     /**
-     * 所属的地图
+     * 角色描述
      */
-    private int belongTo;
+    private String roleDescribe;
+
 
 
 }

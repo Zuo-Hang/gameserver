@@ -41,8 +41,4 @@ public class User {
      * 最后一次登录时间
      */
     private Date lastLoginTime;
-    /**
-     * MD5加密：加密后的长度是固定的，而且长度都为32
-     * String md5Str = DigestUtils.md5DigestAsHex("原串".getBytes());
-     */
 }
