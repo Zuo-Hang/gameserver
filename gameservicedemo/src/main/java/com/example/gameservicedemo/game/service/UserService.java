@@ -4,7 +4,7 @@ import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.bean.User;
 import com.example.gamedatademo.mapper.PlayerMapper;
 import com.example.gamedatademo.mapper.UserMapper;
-import com.example.gameservicedemo.game.cache.UserCache;
+import com.example.gameservicedemo.cache.UserCache;
 import com.example.gameservicedemo.game.service.bean.UserBeCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import io.netty.channel.ChannelHandlerContext;

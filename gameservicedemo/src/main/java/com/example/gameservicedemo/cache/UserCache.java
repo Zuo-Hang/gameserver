@@ -1,4 +1,4 @@
-package com.example.gameservicedemo.game.cache;
+package com.example.gameservicedemo.cache;
 
 import com.example.gameservicedemo.game.service.bean.UserBeCache;
 import com.example.gameservicedemo.manager.NotificationManager;

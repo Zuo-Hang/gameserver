@@ -1,11 +1,11 @@
 package com.example.gameservicedemo.manager;
 
-import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.example.commondemo.base.RequestCode;
 import com.example.commondemo.base.TcpProtocol;
+import com.example.commondemo.code.GetCoder;
 import com.example.commondemo.message.Message;
 import com.example.gamedatademo.bean.Player;
-import com.example.gameservicedemo.game.cache.PlayerCache;
+import com.example.gameservicedemo.cache.PlayerCache;
 import com.example.gameservicedemo.game.service.SceneService;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ public class NotificationManager {
         message.setRequestCode(RequestCode.NOT_SUPPORTED_OPERATION.getCode());
         byte[] encode = new byte[0];
         try {
-            encode = ProtobufProxy.create(Message.class).encode(message);
+            encode = GetCoder.getCoder().encode(message);
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }

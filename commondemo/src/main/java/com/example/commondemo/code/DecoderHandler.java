@@ -1,7 +1,5 @@
 package com.example.commondemo.code;
 
-import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-import com.example.commondemo.message.Message;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -39,7 +37,7 @@ public class DecoderHandler extends ByteToMessageDecoder {
                 byte[] data = new byte[len];
                 in.readBytes(data);
                 try {
-                    Object decode = ProtobufProxy.create(Message.class).decode(data);
+                    Object decode = GetCoder.getCoder().decode(data);
                     out.add(decode);
                 } catch (Exception e) {
                     log.info("解码时出现异常");
