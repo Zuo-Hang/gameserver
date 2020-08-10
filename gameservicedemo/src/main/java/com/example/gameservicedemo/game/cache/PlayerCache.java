@@ -1,12 +1,12 @@
 package com.example.gameservicedemo.game.cache;
 
-import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.game.service.bean.PlayerBeCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -22,11 +22,13 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class PlayerCache {
+@Autowired
+    NotificationManager notificationManager;
 
     /**
      * 以上下文为键，玩家信息为值的缓存
      */
-    private static Cache<ChannelHandlerContext, PlayerBeCache> ctxPlayerCache = CacheBuilder.newBuilder()
+    private  Cache<ChannelHandlerContext, PlayerBeCache> ctxPlayerCache = CacheBuilder.newBuilder()
             // 设置并发级别，最多8个线程同时写
             .concurrencyLevel(10)
 
@@ -42,19 +44,19 @@ public class PlayerCache {
      * 以玩家化身id为键，上下文为值的缓存
      * 其目的是实现单点登录
      */
-    private static Cache<Long, ChannelHandlerContext> IdCtxCache = CacheBuilder.newBuilder().build();
+    private  Cache<Integer, ChannelHandlerContext> IdCtxCache = CacheBuilder.newBuilder().build();
 
     /**
      *  键为channel id
      */
 
-    public Player getPlayerByCtx(ChannelHandlerContext ctx) {
+    public PlayerBeCache getPlayerByCtx(ChannelHandlerContext ctx) {
         return ctxPlayerCache.getIfPresent(ctx);
     }
 
 
     /**
-     *  值为玩家
+     *  ctx为键  值为玩家
      */
     public void putCtxPlayer(ChannelHandlerContext ctx, PlayerBeCache playerBeCache) {
         //获取老的上下文信息
@@ -62,7 +64,7 @@ public class PlayerCache {
         Optional.ofNullable(old).ifPresent(o -> {
                     ctxPlayerCache.invalidate(o);
                     if (!old.equals(ctx)) {
-                        NotificationManager.notifyByCtx(old,"角色在其他敌方登陆，你已不能进行正常角色操作，除非重新登陆用户加载角色");
+                        notificationManager.notifyByCtx(old,"角色在其他敌方登陆，你已不能进行正常角色操作，除非重新登陆用户加载角色");
                     }
                 }
         );
@@ -82,7 +84,7 @@ public class PlayerCache {
     /**
      * 玩家id来保存ChannelHandlerContext
      */
-    public void savePlayerCtx(long playerId, ChannelHandlerContext cxt) {
+    public void savePlayerCtx(Integer playerId, ChannelHandlerContext cxt) {
         IdCtxCache.put(playerId, cxt);
     }
 
@@ -91,7 +93,7 @@ public class PlayerCache {
      *  根据玩家id获取ChannelHandlerContext
      * @param playerId 玩家id
      */
-    public ChannelHandlerContext getCxtByPlayerId(long playerId) {
+    public ChannelHandlerContext getCxtByPlayerId(Integer playerId) {
         return IdCtxCache.getIfPresent(playerId);
     }
 
@@ -99,7 +101,7 @@ public class PlayerCache {
      * 移除
      * @param playerId
      */
-    public  void removePlayerCxt(long playerId) {
+    public  void removePlayerCxt(Integer playerId) {
         IdCtxCache.invalidate(playerId);
     }
 

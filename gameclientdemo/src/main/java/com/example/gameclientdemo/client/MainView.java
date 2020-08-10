@@ -1,5 +1,11 @@
 package com.example.gameclientdemo.client;
 
+import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
+import com.example.commondemo.base.Command;
+import com.example.commondemo.base.TcpProtocol;
+import com.example.commondemo.message.Message;
+import lombok.SneakyThrows;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -49,52 +55,30 @@ public class MainView extends JFrame {
                 // NOOP
             }
 
+            @SneakyThrows
             @Override
             public void keyPressed(KeyEvent e) {
+                int key = e.getKeyCode();
+                if (key == '\n') {
+                    String text = INPUT.getText().replaceAll("\n", "");
+                    OUTPUT.append(text + "\n");
+                    System.out.println("客户端输入： " + text);
+                    String[] array = text.split("\\s+");
+                    Command byCommand = Command.findByCommand(array[0], Command.UNKNOWN);
+                    Message message = new Message();
+                    message.setRequestCode(byCommand.getRequestCode());
+                    message.setMessage(text);
+                    System.out.println(message.toString());
+                    byte[] encode = ProtobufProxy.create(Message.class).encode(message);
+                    TcpProtocol protocol=new TcpProtocol();
+                    protocol.setData(encode);
+                    protocol.setLen(encode.length);
+                    TcpClient.channel.writeAndFlush(protocol);
+                    //GameClient.channel.writeAndFlush(cmd);
+                    INPUT.setText("");
 
+                }
             }
-
-//            @Override
-//            public void keyPressed(KeyEvent e) {
-//                int key = e.getKeyCode();
-//                if (key == '\n') {
-//                    String text = INPUT.getText().replaceAll("\n", "");
-//                    OUTPUT.append(text + "\n");
-//
-//                    System.out.println("客户端输入： "+text);
-//                    String[] array = text.split("\\s+");
-//                    Cmd msgId = Cmd.findByCommand(array[0], Cmd.UNKNOWN);
-//
-//                    CmdProto.Cmd cmd = CmdProto.Cmd.newBuilder()
-//                            .setMgsId(msgId.getMsgId())
-//                            .setContent(text).build();
-//
-//                    GameClient.channel.writeAndFlush(cmd);
-//                    INPUT.setText("");
-//
-//                    // 刷新武器栏和登陆栏
-//                    CmdProto.Cmd informationCmd  = CmdProto.Cmd.newBuilder()
-//                            .setMgsId(Cmd.SHOW_PLAYER.getMsgId())
-//                            .setContent("player").build();
-//                    GameClient.channel.writeAndFlush(informationCmd);
-//
-//                    // 刷新玩家位置
-//                    CmdProto.Cmd locationCmd  = CmdProto.Cmd.newBuilder()
-//                            .setMgsId(Cmd.LOCATION.getMsgId())
-//                            .setContent("location").build();
-//                    GameClient.channel.writeAndFlush(locationCmd);
-//
-//                    CmdProto.Cmd equipmentCmd  = CmdProto.Cmd.newBuilder()
-//                            .setMgsId(Cmd.SHOW_EQUIPMENT_BAR.getMsgId())
-//                            .setContent("equip_bar").build();
-//                    GameClient.channel.writeAndFlush(equipmentCmd);
-//
-//                    CmdProto.Cmd bagsCmd  = CmdProto.Cmd.newBuilder()
-//                            .setMgsId(Cmd.SHOW_BAGS.getMsgId())
-//                            .setContent("bags").build();
-//                    GameClient.channel.writeAndFlush(bagsCmd);
-//                }
-//            }
 
             @Override
             public void keyReleased(KeyEvent e) {

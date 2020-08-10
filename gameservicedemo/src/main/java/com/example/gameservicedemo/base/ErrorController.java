@@ -5,6 +5,7 @@ import com.example.commondemo.message.Message;
 import com.example.gameservicedemo.manager.NotificationManager;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,9 +17,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class ErrorController implements BaseController {
+    @Autowired
+    NotificationManager notificationManager;
     @Override
     public void handle(ChannelHandlerContext ctx, Message message) {
         log.debug("请求的服务不存在,命令码为 {}",message.getRequestCode());
-        NotificationManager.notifyByCtx(ctx,"你请求的服务不存在..");
+        notificationManager.notifyByCtx(ctx,"你请求的服务不存在..");
     }
 }

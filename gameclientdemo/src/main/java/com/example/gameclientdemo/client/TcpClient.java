@@ -20,9 +20,13 @@ import io.netty.handler.logging.LoggingHandler;
  * @Description:
  */
 public class TcpClient {
-    private String ip;
-    private int port;
-    public  void init() throws InterruptedException {
+    private static String ip;
+    private static int port;
+    public static Channel channel;
+    static  {
+        MainView mainView = new MainView();
+    }
+    public static void init() throws InterruptedException {
         NioEventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap();
@@ -40,7 +44,7 @@ public class TcpClient {
             });
             bootstrap.remoteAddress(ip,port);
             ChannelFuture future = bootstrap.connect().sync();
-
+            channel = future.channel();
             future.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -49,12 +53,13 @@ public class TcpClient {
         }
     }
 
-    public TcpClient(String ip, int port) {
-        this.ip = ip;
-        this.port = port;
+    public static void setTcpClient(String ip, int port) {
+        TcpClient.ip = ip;
+        TcpClient.port = port;
     }
 
     public static void main(String[] args) throws InterruptedException {
-        new TcpClient("127.0.0.1",8779).init();
+        TcpClient.setTcpClient("127.0.0.1",8779);
+        TcpClient.init();
     }
 }

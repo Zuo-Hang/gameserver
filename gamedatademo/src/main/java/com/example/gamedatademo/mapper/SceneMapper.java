@@ -20,22 +20,29 @@ public interface SceneMapper {
 
     /**
      * 按照场景id查找场景
-     * @param roleId
+     * @param sceneId
      * @return
      */
-    Role selectBySceneId(Integer roleId);
+    Scene selectBySceneId(Integer sceneId);
+
+    /**
+     * 按照场景名称进行查询
+     * @param sceneName
+     * @return
+     */
+    Scene selectBySceneName(String sceneName);
 
     /**
      * 按照场景id删除
-     * @param roleId
+     * @param sceneId
      * @return
      */
-    Integer deleteBySceneId(Integer roleId);
+    Integer deleteBySceneId(Integer sceneId);
 
     /**
      * 按照场景id更新
-     * @param roleId
+     * @param scene
      * @return
      */
-    Integer updateBySceneId(Integer roleId);
+    Integer updateBySceneId(Scene scene);
 }

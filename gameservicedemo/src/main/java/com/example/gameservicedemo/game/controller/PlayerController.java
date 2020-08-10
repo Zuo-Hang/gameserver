@@ -10,6 +10,7 @@ import com.example.gameservicedemo.manager.NotificationManager;
 import com.example.gameservicedemo.util.CheckParametersUtil;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -29,10 +30,16 @@ public class PlayerController {
     PlayerService playerService;
     @Resource
     UserService userService;
+    @Autowired
+    NotificationManager notificationManager;
 
     {
         ControllerManager.add(Command.PLAYER_CREATE.getRequestCode(), this::playerCreate);
         ControllerManager.add(Command.PLAYER_LOGIN.getRequestCode(), this::playerLogin);
+        ControllerManager.add(Command.PLAYER_EXIT.getRequestCode(), this::playerExit);
+        ControllerManager.add(Command.AOI.getRequestCode(), this::aoi);
+        ControllerManager.add(Command.CAM_MOVE.getRequestCode(), this::canMove);
+        ControllerManager.add(Command.MOVE.getRequestCode(), this::Move);
     }
 
     /**
@@ -44,7 +51,7 @@ public class PlayerController {
     public void playerCreate(ChannelHandlerContext ctx, Message message) {
         UserBeCache userByCxt = userService.getUserByCxt(ctx);
         if (Objects.isNull(userByCxt)) {
-            NotificationManager.notifyByCtx(ctx, "创建角色前需要登陆账号");
+            notificationManager.notifyByCtx(ctx, "创建角色前需要登陆账号");
             return;
         }
         //指令 化身名称
@@ -61,12 +68,58 @@ public class PlayerController {
     public void playerLogin(ChannelHandlerContext ctx, Message message) {
         //指令 化身id
         String[] array = CheckParametersUtil.checkParameter(ctx, message, 2);
-        try {
-            int id = Integer.parseInt(array[1]);
-            //判断当前用户是否在线、当前用户是否拥有待登录角色、登录成功后应当返回当前角色的状态（位置）
+        int id = Integer.valueOf(array[1]);
+        //判断当前用户是否在线、当前用户是否拥有待登录角色、登录成功后应当返回当前角色的状态（位置）
+        if (userService.isUserOnline(ctx) && playerService.hasPlayer(ctx, id)) {
+            log.info("playerLogin over");
             playerService.playerLogin(ctx, id);
-        } catch (Exception e) {
-            NotificationManager.notifyByCtx(ctx, "输入的id错误");
+        } else {
+            notificationManager.notifyByCtx(ctx, "输入的id错误");
         }
+    }
+
+    /**
+     * 玩家退出
+     *
+     * @param ctx
+     * @param message
+     */
+    public void playerExit(ChannelHandlerContext ctx, Message message) {
+        //判断是否已登录，已加载化身
+        //……
+        playerService.logoutScene(ctx);
+    }
+
+    /**
+     * AOI(Area Of Interest)，即感兴趣区域
+     *
+     * @param ctx
+     * @param message
+     */
+    public void aoi(ChannelHandlerContext ctx, Message message) {
+        playerService.aoi(ctx);
+    }
+
+    /**
+     * 获取可移动的范围
+     *
+     * @param ctx
+     * @param message
+     */
+    public void canMove(ChannelHandlerContext ctx, Message message) {
+        playerService.canMove(ctx);
+    }
+
+    /**
+     * 玩家移动
+     *
+     * @param context
+     * @param message
+     */
+    public void Move(ChannelHandlerContext context, Message message) {
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
+        String sceneName = strings[1];
+        playerService.move(context, sceneName);
+
     }
 }

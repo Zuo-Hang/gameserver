@@ -6,6 +6,8 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -18,11 +20,14 @@ import java.util.concurrent.TimeUnit;
  * @Description: 用户信息的缓存管理类
  */
 @Slf4j
+@Component
 public class UserCache {
+    @Autowired
+    NotificationManager notificationManager;
     /**
      * 以上下文为key，以用户实例为值的缓存实例
      */
-    private static Cache<ChannelHandlerContext, UserBeCache> ctxUserCache = CacheBuilder.newBuilder()
+    private  Cache<ChannelHandlerContext, UserBeCache> ctxUserCache = CacheBuilder.newBuilder()
             // 设置并发级别，最多8个线程同时写
             .concurrencyLevel(10)
             // 设置写缓存后，三小时过期
@@ -39,7 +44,7 @@ public class UserCache {
     /**
      * 以user id 为键，ChannelHandlerContext上下文为值
      */
-    private static Cache<Integer,ChannelHandlerContext> userIdCtxCache = CacheBuilder.newBuilder()
+    private  Cache<Integer,ChannelHandlerContext> userIdCtxCache = CacheBuilder.newBuilder()
             // 设置写缓存后，三小时过期
             .expireAfterWrite(3, TimeUnit.HOURS)
             .build();
@@ -49,14 +54,14 @@ public class UserCache {
      * @param ctx   上下文
      * @param user  用户
      */
-    public static void putCtxUser(ChannelHandlerContext ctx, UserBeCache user) {
+    public void putCtxUser(ChannelHandlerContext ctx, UserBeCache user) {
         ChannelHandlerContext old = getCtxByUserId(user.getUserId());
         // 移除之前客户端登陆的用户
 
         Optional.ofNullable(old).ifPresent( o -> {
                     ctxUserCache.invalidate(o);
                     if (!old.equals(ctx)) {
-                        NotificationManager.notifyByCtx(old,"你在另一个登陆，除非你在此从新登陆");
+                        notificationManager.notifyByCtx(old,"你在另一个登陆，除非你在此从新登陆");
                     }
                 }
         );
@@ -68,7 +73,7 @@ public class UserCache {
     /**
      * 以Player id 为键，ChannelHandlerContext上下文为值
      */
-    public static void putUserIdCtx(Integer userId, ChannelHandlerContext ctx) {
+    public  void putUserIdCtx(Integer userId, ChannelHandlerContext ctx) {
         userIdCtxCache.put(userId,ctx);
     }
 
@@ -77,13 +82,13 @@ public class UserCache {
      * @param ctx 上下文
      * @return
      */
-    public static UserBeCache getUserByCtx(ChannelHandlerContext ctx) {
+    public  UserBeCache getUserByCtx(ChannelHandlerContext ctx) {
         return ctxUserCache.getIfPresent(ctx);
     }
     /**
      *    通过User id 获取 ChannelHandlerContext
      */
-    public static ChannelHandlerContext getCtxByUserId(Integer userId) {
+    public  ChannelHandlerContext getCtxByUserId(Integer userId) {
         return userIdCtxCache.getIfPresent(userId);
     }
     /**
@@ -91,10 +96,10 @@ public class UserCache {
      * @param userId 用户id
      * @return 用户
      */
-    public static UserBeCache getUserByUserId(Integer userId) {
+    public  UserBeCache getUserByUserId(Integer userId) {
 
         return Optional.ofNullable(getCtxByUserId(userId))
-                .map(UserCache::getUserByCtx)
+                .map(this::getUserByCtx)
                 .orElse(null);
     }
 }

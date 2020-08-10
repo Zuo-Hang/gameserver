@@ -10,7 +10,6 @@ import com.example.gameservicedemo.util.CheckParametersUtil;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 

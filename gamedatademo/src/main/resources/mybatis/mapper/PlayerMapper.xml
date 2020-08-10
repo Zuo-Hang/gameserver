@@ -15,4 +15,13 @@
     (#{playerName},#{userId}, #{nowAt});
     </insert>
 
+    <select id="selectByUserId" resultType="com.example.gamedatademo.bean.Player">
+    select * from player where user_id = #{userId};
+    </select>
+
+    <update id="updateByPlayerId" parameterType="com.example.gamedatademo.bean.Player">
+        UPDATE player SET player_name = #{playerName}, user_id = #{userId},now_at = #{nowAt}
+        WHERE player_id = #{playerId};
+    </update>
+
 </mapper>

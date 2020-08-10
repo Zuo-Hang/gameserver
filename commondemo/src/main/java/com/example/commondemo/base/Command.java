@@ -32,7 +32,6 @@ public enum Command {
     UNKNOWN("unknown", 9999,"未知的命令"),
     /** 心跳 **/
     HERATBEAT("heartbeat",0,"心跳")
-
     ;
     private String command;
 
@@ -65,7 +64,19 @@ public enum Command {
             ID_MAP.put(e.requestCode,e);
         }
     }
-
+    /**
+     *  通过字符串命令查找命令枚举，如果找不到，返回一个默认的枚举对象
+     * @param command 字符串命令
+     * @param defaultValue 默认命令枚举
+     * @return 一个相关服务的枚举
+     */
+    public static Command findByCommand(String command, Command defaultValue){
+        Command value = COMMAND_MAP.get(command);
+        if(value == null){
+            return defaultValue;
+        }
+        return value;
+    }
     public static Command find(int requestCode, Command defaultValue){
         Command value = ID_MAP.get(requestCode);
         if(value == null){

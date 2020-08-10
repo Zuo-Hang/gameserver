@@ -4,6 +4,7 @@ package com.example.gameservicedemo.base;
 import com.example.commondemo.message.Message;
 import com.example.gameservicedemo.manager.NotificationManager;
 import io.netty.channel.ChannelHandlerContext;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,6 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Description:处理、执行所有命令类和控制类的对应关系
  */
 public class ControllerManager {
+    @Autowired
+    NotificationManager notificationManager;
     /**
      * serviceCode标志和服务之间的映射
      */
@@ -43,30 +46,11 @@ public class ControllerManager {
      * @param message    信息对象
      */
     public void execute(BaseController controller, ChannelHandlerContext ctx, Message message) {
-        //Player player = playerDataService.getPlayerByCtx(ctx);
-        try {
+//        try {
             controller.handle(ctx, message);
-        } catch (Exception e) {
-            NotificationManager.notifyByCtx(ctx, "这个功能暂时无法使用，请忽略本功能");
-            e.printStackTrace();
-        }
-        // 玩家在场景内则用场景的执行器执行
-//        Optional.ofNullable(player).map(Player::getCurrentScene).ifPresent(
-//                scene -> scene.getSingleThreadSchedule().execute(
-//                        () -> {
-//                            log.debug("{} 的 {} 在执行命令 {}",
-//                                    scene.getName(),player.getName(),msg.getContent());
-//                            try {
-//                                controller.handle(ctx,msg);
-//                            } catch (Exception e) {
-//                                NotificationManager.notifyByCtx(ctx,"这个功能暂时无法使用，请忽略本功能");
-//                                e.printStackTrace();
-//                            }
-//                        })
-//        );
-//
-//        // 如果用户尚未加载角色
-//        if (Objects.isNull(player) || Objects.isNull(player.getCurrentScene())) {
-//            controller.handle(ctx,msg);
+//        } catch (Exception e) {
+//            notificationManager.notifyByCtx(ctx, "这个功能暂时无法使用，请忽略本功能");
+//            e.printStackTrace();
+//        }
     }
 }

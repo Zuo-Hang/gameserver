@@ -2,6 +2,8 @@ package com.example.gamedatademo.mapper;
 
 import com.example.gamedatademo.bean.Player;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -16,6 +18,13 @@ public interface PlayerMapper {
      * @return
      */
     Player selectByPlayerId(Integer playerId);
+
+    /**
+     * 按照用户id查询
+     * @param userId
+     * @return
+     */
+    List<Player> selectByUserId(Integer userId);
 
     /**
      * 插入新的化身

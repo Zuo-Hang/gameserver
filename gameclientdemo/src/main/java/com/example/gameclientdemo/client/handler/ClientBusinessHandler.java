@@ -24,16 +24,16 @@ public class ClientBusinessHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        Message message = new Message();
-        message.setRequestCode(Command.PLAYER_CREATE.getRequestCode());
-        message.setMessage("creatUser "+"hanghang");
-        byte[] encode = ProtobufProxy.create(Message.class).encode(message);
-        TcpProtocol protocol=new TcpProtocol();
-        protocol.setData(encode);
-        protocol.setLen(encode.length);
-        //由于设置了编码器，这里直接传入自定义的对象
-        ctx.write(protocol);
-        ctx.flush();
+//        Message message = new Message();
+//        message.setRequestCode(Command.AOI.getRequestCode());
+//        message.setMessage("creatUser "+"1");
+//        byte[] encode = ProtobufProxy.create(Message.class).encode(message);
+//        TcpProtocol protocol=new TcpProtocol();
+//        protocol.setData(encode);
+//        protocol.setLen(encode.length);
+//        //由于设置了编码器，这里直接传入自定义的对象
+//        ctx.write(protocol);
+//        ctx.flush();
     }
 
     @Override
