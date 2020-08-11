@@ -6,7 +6,7 @@ import com.example.commondemo.code.GetCoder;
 import com.example.commondemo.message.Message;
 import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.cache.PlayerCache;
-import com.example.gameservicedemo.game.service.SceneService;
+import com.example.gameservicedemo.service.SceneService;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

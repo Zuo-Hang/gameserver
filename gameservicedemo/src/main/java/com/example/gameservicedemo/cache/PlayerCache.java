@@ -1,6 +1,6 @@
 package com.example.gameservicedemo.cache;
 
-import com.example.gameservicedemo.game.service.bean.PlayerBeCache;
+import com.example.gameservicedemo.bean.PlayerBeCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -22,13 +22,13 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class PlayerCache {
-@Autowired
+    @Autowired
     NotificationManager notificationManager;
 
     /**
      * 以上下文为键，玩家信息为值的缓存
      */
-    private  Cache<ChannelHandlerContext, PlayerBeCache> ctxPlayerCache = CacheBuilder.newBuilder()
+    private Cache<ChannelHandlerContext, PlayerBeCache> ctxPlayerCache = CacheBuilder.newBuilder()
             // 设置并发级别，最多8个线程同时写
             .concurrencyLevel(10)
 
@@ -44,10 +44,10 @@ public class PlayerCache {
      * 以玩家化身id为键，上下文为值的缓存
      * 其目的是实现单点登录
      */
-    private  Cache<Integer, ChannelHandlerContext> IdCtxCache = CacheBuilder.newBuilder().build();
+    private Cache<Integer, ChannelHandlerContext> IdCtxCache = CacheBuilder.newBuilder().build();
 
     /**
-     *  键为channel id
+     * 键为channel id
      */
 
     public PlayerBeCache getPlayerByCtx(ChannelHandlerContext ctx) {
@@ -56,7 +56,7 @@ public class PlayerCache {
 
 
     /**
-     *  ctx为键  值为玩家
+     * ctx为键  值为玩家
      */
     public void putCtxPlayer(ChannelHandlerContext ctx, PlayerBeCache playerBeCache) {
         //获取老的上下文信息
@@ -64,19 +64,19 @@ public class PlayerCache {
         Optional.ofNullable(old).ifPresent(o -> {
                     ctxPlayerCache.invalidate(o);
                     if (!old.equals(ctx)) {
-                        notificationManager.notifyByCtx(old,"角色在其他敌方登陆，你已不能进行正常角色操作，除非重新登陆用户加载角色");
+                        notificationManager.notifyByCtx(old, "角色在其他敌方登陆，你已不能进行正常角色操作，除非重新登陆用户加载角色");
                     }
                 }
         );
 
-        ctxPlayerCache.put(ctx,playerBeCache);
+        ctxPlayerCache.put(ctx, playerBeCache);
     }
 
 
     /**
-     *  通过 channel Id 清除玩家信息
+     * 通过 channel Id 清除玩家信息
      */
-    public void  removePlayerByChannelId(String channelId) {
+    public void removePlayerByChannelId(String channelId) {
         ctxPlayerCache.invalidate(channelId);
     }
 
@@ -90,7 +90,8 @@ public class PlayerCache {
 
 
     /**
-     *  根据玩家id获取ChannelHandlerContext
+     * 根据玩家id获取ChannelHandlerContext
+     *
      * @param playerId 玩家id
      */
     public ChannelHandlerContext getCxtByPlayerId(Integer playerId) {
@@ -99,14 +100,16 @@ public class PlayerCache {
 
     /**
      * 移除
+     *
      * @param playerId
      */
-    public  void removePlayerCxt(Integer playerId) {
+    public void removePlayerCxt(Integer playerId) {
         IdCtxCache.invalidate(playerId);
     }
 
     /**
      * 获取所有的缓存信息
+     *
      * @return
      */
     public Map<ChannelHandlerContext, PlayerBeCache> getAllPlayerCache() {

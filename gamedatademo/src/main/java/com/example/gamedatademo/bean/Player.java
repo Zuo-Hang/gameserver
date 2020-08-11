@@ -27,4 +27,32 @@ public class Player {
      * 当前场景
      */
     private Integer nowAt;
+    /**
+     * 经验值
+     */
+    private Integer exp;
+    /**
+     * 状态
+     */
+    private Integer state;
+    /**
+     * 金币
+     */
+    private Integer money;
+    /**
+     * 参加的公会
+     */
+    private Integer guildId;
+    /**
+     * 角色的类型
+     */
+    private Integer roleClass;
+    /**
+     * 公会类型
+     */
+    private Integer guildClass;
+    /**
+     * 好友
+     */
+    private String friends;
 }
