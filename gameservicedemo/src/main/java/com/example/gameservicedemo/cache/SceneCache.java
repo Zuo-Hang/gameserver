@@ -17,8 +17,9 @@ import java.util.Map;
  * @Date: 2020/08/10/21:43
  * @Description: 场景缓存类
  */
-@Component
+
 @Slf4j
+@Component
 public class SceneCache {
     /** 缓存不过期 */
     private Cache<Integer, Scene> sceneCache = CacheBuilder.newBuilder()
@@ -32,7 +33,7 @@ public class SceneCache {
      */
     @PostConstruct
     private void init() {
-        SceneExcelUtil sceneExcelUtil = new SceneExcelUtil("C:\\java_project\\mmodemo\\gameservicedemo\\src\\main\\resources\\scene.xls");
+        SceneExcelUtil sceneExcelUtil = new SceneExcelUtil("C:\\java_project\\mmodemo\\gameservicedemo\\src\\main\\resources\\game_configuration_excel\\scene.xls");
         Map<Integer, Scene> map = sceneExcelUtil.getMap();
         for (Scene  gameScene: map.values()) {
             //存入缓存

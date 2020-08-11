@@ -1,10 +1,8 @@
 package com.example.gameservicedemo.service;
 
 import com.example.gamedatademo.bean.Player;
-import com.example.gamedatademo.bean.Scene;
 import com.example.gamedatademo.mapper.PlayerMapper;
-import com.example.gamedatademo.mapper.RoleMapper;
-import com.example.gamedatademo.mapper.SceneMapper;
+import com.example.gameservicedemo.bean.scene.Scene;
 import com.example.gameservicedemo.cache.PlayerCache;
 import com.example.gameservicedemo.cache.SceneCache;
 import com.example.gameservicedemo.cache.UserCache;
@@ -18,7 +16,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.xml.ws.soap.Addressing;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -35,10 +32,6 @@ public class PlayerService {
     @Autowired
     PlayerMapper playerMapper;
     @Autowired
-    SceneMapper sceneMapper;
-    @Autowired
-    RoleMapper roleMapper;
-    @Autowired
     UserService userService;
     @Autowired
     PlayerCache playerCache;
@@ -46,7 +39,7 @@ public class PlayerService {
     NotificationManager notificationManager;
     @Autowired
     UserCache userCache;
-    @Addressing
+    @Autowired
     SceneCache sceneCache;
 
     /**
@@ -188,13 +181,14 @@ public class PlayerService {
     public void canMove(ChannelHandlerContext context) {
         PlayerBeCache playerByCtx = playerCache.getPlayerByCtx(context);
         Integer nowAt = playerByCtx.getNowAt();
+        //缓存中获取场景信息
         String adjacentScenes = sceneCache.getScene(nowAt).getNeighbors();
         String[] adjacentScenesId = adjacentScenes.split(",");
         StringBuffer ret = new StringBuffer();
         ret.append("\n相邻场景如下：");
         for (String objectsId : adjacentScenesId) {
             com.example.gameservicedemo.bean.scene.Scene scene = sceneCache.getScene(Integer.valueOf(objectsId));
-            String sceneInformation = scene.getName() + " " + scene.getDescribe();
+            String sceneInformation = scene.getId()+" "+ scene.getName() + " " + scene.getDescribe();
             ret.append("场景：" + sceneInformation);
         }
         notificationManager.notifyByCtx(context, ret);
@@ -204,36 +198,25 @@ public class PlayerService {
      * 化身移动
      *
      * @param context   上下文
-     * @param sceneName 将移动到的场景名称
+     * @param sceneId 将移动到的场景id
      */
-    public void move(ChannelHandlerContext context, String sceneName) {
-        //先判断名称是否存在
+    public void move(ChannelHandlerContext context, Integer sceneId) {
         //获取当前化身，并设置自身位置，更新数据库当中的场景信息
         PlayerBeCache playerByCtx = playerCache.getPlayerByCtx(context);
         Integer nowAt = playerByCtx.getNowAt();
-        com.example.gameservicedemo.bean.scene.Scene scene2 = sceneCache.getScene(nowAt);
-        //Scene scene = sceneMapper.selectBySceneName(sceneName);
-        if (!Objects.isNull(scene2)) {
+        //获取当前场景
+        Scene sceneNow = sceneCache.getScene(nowAt);
+        Scene whileGo = sceneCache.getScene(sceneId);
+        if (!Objects.isNull(whileGo)) {
             //移除旧场景中的化身
-            Scene scene1 = sceneMapper.selectBySceneId(nowAt);
-            String[] split = scene1.getSceneObjects().split(",");
-            StringBuffer stringBuffer1 = new StringBuffer();
-            for (String string : split) {
-                if (!string.equals(playerByCtx.getPlayerId().toString())) {
-                    stringBuffer1.append(string + ",");
-                }
-            }
-            scene1.setSceneObjects(stringBuffer1.toString());
-            sceneMapper.updateBySceneId(scene1);
-            playerByCtx.setNowAt(scene.getSceneId());
+            sceneNow.getPlayers().remove(playerByCtx.getPlayerId());
+            //更新player缓存中的玩家信息
+            playerByCtx.setNowAt(sceneId);
             PlayerBeCache playerByCtx1 = playerCache.getPlayerByCtx(context);
             log.info(playerByCtx1.toString());
             //在新场景中加入化身
-            StringBuffer stringBuffer = new StringBuffer(scene.getSceneObjects());
-            stringBuffer.append(playerByCtx.getPlayerId());
-            scene.setSceneObjects(stringBuffer.toString() + ",");
-            sceneMapper.updateBySceneId(scene);
-            notificationManager.notifyByCtx(context, "你已在场景：" + scene.getSceneName());
+            whileGo.getPlayers().put(playerByCtx.getPlayerId(),playerByCtx);
+            notificationManager.notifyByCtx(context, "你已在场景：" + whileGo.getName());
         } else {
             notificationManager.notifyByCtx(context, "输入的场景名称错误");
         }

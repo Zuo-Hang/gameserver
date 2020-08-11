@@ -21,7 +21,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Component
-public class PlayerCache {
+public class  PlayerCache {
     @Autowired
     NotificationManager notificationManager;
 

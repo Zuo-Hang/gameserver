@@ -118,8 +118,8 @@ public class PlayerController {
      */
     public void Move(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
-        String sceneName = strings[1];
-        playerService.move(context, sceneName);
+        Integer sceneId = Integer.valueOf(strings[1]);
+        playerService.move(context, sceneId);
 
     }
 }
