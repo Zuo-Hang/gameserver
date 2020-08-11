@@ -13,7 +13,7 @@ import lombok.Data;
 @Data
 public class SceneObject {
     @EntityName(column = "id")
-    private Long id;
+    private Integer id;
 
     @EntityName(column = "名字")
     private String name;
@@ -47,4 +47,7 @@ public class SceneObject {
 
     @EntityName(column = "任务")
     private String quests;
+
+    @EntityName(column = "角色描述")
+    private String describe;
 }

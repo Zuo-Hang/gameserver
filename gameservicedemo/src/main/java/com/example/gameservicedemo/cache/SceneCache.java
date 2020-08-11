@@ -1,10 +1,12 @@
 package com.example.gameservicedemo.cache;
 
 import com.example.gameservicedemo.bean.scene.Scene;
+import com.example.gameservicedemo.service.SceneObjectService;
 import com.example.gameservicedemo.util.excel.subclassexcelutil.SceneExcelUtil;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -21,6 +23,9 @@ import java.util.Map;
 @Slf4j
 @Component
 public class SceneCache {
+    @Autowired
+    SceneObjectService sceneObjectService;
+
     /** 缓存不过期 */
     private Cache<Integer, Scene> sceneCache = CacheBuilder.newBuilder()
             .removalListener(
@@ -36,8 +41,9 @@ public class SceneCache {
         SceneExcelUtil sceneExcelUtil = new SceneExcelUtil("C:\\java_project\\mmodemo\\gameservicedemo\\src\\main\\resources\\game_configuration_excel\\scene.xls");
         Map<Integer, Scene> map = sceneExcelUtil.getMap();
         for (Scene  gameScene: map.values()) {
+            Scene scene = sceneObjectService.initSceneObject(gameScene);
             //存入缓存
-            sceneCache.put(gameScene.getId(), gameScene);
+            sceneCache.put(scene.getId(), scene);
         }
         log.info("场景资源加载进缓存完毕");
     }
