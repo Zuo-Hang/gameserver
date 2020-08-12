@@ -1,5 +1,6 @@
 package com.example.gameservicedemo.service;
 
+import com.example.commondemo.base.RequestCode;
 import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.bean.User;
 import com.example.gamedatademo.mapper.PlayerMapper;
@@ -53,7 +54,8 @@ public class UserService {
         Integer insert = userMapper.insert(user);
         log.info(user.toString());
         //通知用户
-        notificationManager.notifyByCtx(ctx, "你已成功注册！你的登录账号是：" + user.getUserId() + "，快使用\" login 账号 密码 \"去登录吧");
+        String format = MessageFormat.format("你已成功注册！你的登录账号是：{1}，快使用\" login 账号 密码 \"去登录吧", user.getUserId());
+        notificationManager.notifyByCtx(ctx, format, RequestCode.SUCCESS.getCode());
     }
 
     /**
@@ -89,13 +91,13 @@ public class UserService {
                         }
                 );
         if (Objects.isNull(userBeCache1)) {
-            notificationManager.notifyByCtx(ctx, "用户id不存在");
+            notificationManager.notifyByCtx(ctx, "用户id不存在",RequestCode.BAD_REQUEST.getCode());
             return;
         }
         //将密码加密，//对密码加密，后匹配数据库中的密码
         String md5Str = DigestUtils.md5DigestAsHex(password.getBytes());
         if (!userBeCache1.getPassword().equals(md5Str)) {
-            notificationManager.notifyByCtx(ctx, "密码或用户名错误");
+            notificationManager.notifyByCtx(ctx, "密码或用户名错误",RequestCode.BAD_REQUEST.getCode());
             return;
         }
         userCache.putCtxUser(ctx, userBeCache1);
@@ -103,7 +105,7 @@ public class UserService {
         userBeCache1.setContext(ctx);
         notificationManager.notifyByCtx(ctx, MessageFormat.format(
                 "用户登录成功，可以使用指令 load 加载当前账户下的角色吧", userBeCache1.getNickName()
-        ));
+        ),RequestCode.SUCCESS.getCode());
     }
 
     /**

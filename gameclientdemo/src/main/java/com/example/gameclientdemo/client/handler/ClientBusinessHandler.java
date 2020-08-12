@@ -1,12 +1,13 @@
 package com.example.gameclientdemo.client.handler;
 
-import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-import com.example.commondemo.base.Command;
+import com.example.commondemo.base.RequestCode;
 import com.example.commondemo.message.Message;
-import com.example.commondemo.base.TcpProtocol;
+import com.example.gameclientdemo.client.MainView;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
+
+import java.text.MessageFormat;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,23 +24,27 @@ public class ClientBusinessHandler extends ChannelInboundHandlerAdapter {
      * @throws Exception
      */
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-//        Message message = new Message();
-//        message.setRequestCode(Command.AOI.getRequestCode());
-//        message.setMessage("creatUser "+"1");
-//        byte[] encode = ProtobufProxy.create(Message.class).encode(message);
-//        TcpProtocol protocol=new TcpProtocol();
-//        protocol.setData(encode);
-//        protocol.setLen(encode.length);
-//        //由于设置了编码器，这里直接传入自定义的对象
-//        ctx.write(protocol);
-//        ctx.flush();
+    public void channelActive(ChannelHandlerContext ctx) {
     }
 
+    /**
+     * 读取服务端返回的消息
+     * @param ctx
+     * @param msg
+     * @throws Exception
+     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if(msg instanceof Message){
-            log.info("服务器返回了:{}",((Message) msg).getMessage());
+            String format = MessageFormat.format("服务器返回了:{0}", ((Message) msg).getMessage());
+            log.info(format);
+            MainView.OUTPUT.append(format + "\n");
+            if(((Message) msg).getRequestCode()== RequestCode.ABOUT_PLAYER.getCode()){
+                MainView.INFORMATION.setText(((Message) msg).getMessage());
+            }
+            if(((Message) msg).getRequestCode()== RequestCode.ABOUT_SCENE.getCode()){
+                MainView.MAP.setText(((Message) msg).getMessage());
+            }
         }
     }
 

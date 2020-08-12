@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.controller.impl;
 
 import com.example.commondemo.base.Command;
+import com.example.commondemo.base.RequestCode;
 import com.example.commondemo.message.Message;
 import com.example.gameservicedemo.controller.ControllerManager;
 import com.example.gameservicedemo.service.PlayerService;
@@ -51,7 +52,7 @@ public class PlayerController {
     public void playerCreate(ChannelHandlerContext ctx, Message message) {
         UserBeCache userByCxt = userService.getUserByCxt(ctx);
         if (Objects.isNull(userByCxt)) {
-            notificationManager.notifyByCtx(ctx, "创建角色前需要登陆账号");
+            notificationManager.notifyByCtx(ctx, "创建角色前需要登陆账号", RequestCode.NOT_LOGIN.getCode());
             return;
         }
         //指令 化身名称
@@ -74,7 +75,7 @@ public class PlayerController {
             log.info("playerLogin over");
             playerService.playerLogin(ctx, id);
         } else {
-            notificationManager.notifyByCtx(ctx, "输入的id错误");
+            notificationManager.notifyByCtx(ctx, "输入的id错误",RequestCode.BAD_REQUEST.getCode());
         }
     }
 

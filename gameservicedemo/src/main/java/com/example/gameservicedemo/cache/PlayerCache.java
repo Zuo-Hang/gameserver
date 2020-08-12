@@ -1,5 +1,6 @@
 package com.example.gameservicedemo.cache;
 
+import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.bean.PlayerBeCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.google.common.cache.Cache;
@@ -64,7 +65,8 @@ public class  PlayerCache {
         Optional.ofNullable(old).ifPresent(o -> {
                     ctxPlayerCache.invalidate(o);
                     if (!old.equals(ctx)) {
-                        notificationManager.notifyByCtx(old, "角色在其他敌方登陆，你已不能进行正常角色操作，除非重新登陆用户加载角色");
+                        String s="角色在其他敌方登陆，你已不能进行正常角色操作，除非重新登陆用户加载角色";
+                        notificationManager.notifyByCtx(old, s, RequestCode.BAD_REQUEST.getCode());
                     }
                 }
         );

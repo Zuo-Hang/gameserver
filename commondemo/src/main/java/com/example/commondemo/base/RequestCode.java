@@ -8,11 +8,15 @@ package com.example.commondemo.base;
  * @Description:自定义请求码
  */
 public enum RequestCode {
-
+    /** 操作成功 */
     SUCCESS(200, "OK"),
 
+    ABOUT_PLAYER(1212,"有关角色信息"),
+
+    ABOUT_SCENE(1213,"有关场景"),
+
     BAD_REQUEST(400, "Bad Request"),
-    //找不到
+    /**找不到 */
     NOT_FOUND(404, "Not Found"),
     //未知内部错误
     INTERNAL_SERVER_ERROR(500, "Unknown Internal Error"),

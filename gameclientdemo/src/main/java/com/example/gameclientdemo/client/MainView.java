@@ -61,6 +61,7 @@ public class MainView extends JFrame {
                 int key = e.getKeyCode();
                 if (key == '\n') {
                     String text = INPUT.getText().replaceAll("\n", "");
+                    //回显框回显
                     OUTPUT.append(text + "\n");
                     System.out.println("客户端输入： " + text);
                     String[] array = text.split("\\s+");
@@ -74,7 +75,6 @@ public class MainView extends JFrame {
                     protocol.setData(encode);
                     protocol.setLen(encode.length);
                     TcpClient.channel.writeAndFlush(protocol);
-                    //GameClient.channel.writeAndFlush(cmd);
                     INPUT.setText("");
 
                 }

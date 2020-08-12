@@ -11,6 +11,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
+import org.springframework.context.annotation.Bean;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,8 +24,9 @@ public class TcpClient {
     private static String ip;
     private static int port;
     public static Channel channel;
+    public static MainView mainView;
     static  {
-        MainView mainView = new MainView();
+        mainView = new MainView();
     }
     public static void init() throws InterruptedException {
         NioEventLoopGroup group = new NioEventLoopGroup();

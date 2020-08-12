@@ -28,6 +28,8 @@ public enum Command {
     CAM_MOVE("can_move",3002,"可以移动到的地方，参数 无"),
     /** AOI, 显示场景内各种游戏对象 **/
     AOI("aoi",4002,"AOI, 显示场景内各种游戏对象"),
+    /** 与npc谈话 **/
+    TALK_WITH_NPC("talk",13002,"与npc谈话"),
     /** 未知的命令 */
     UNKNOWN("unknown", 9999,"未知的命令"),
     /** 心跳 **/

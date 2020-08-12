@@ -5,6 +5,7 @@ import com.example.commondemo.base.TcpProtocol;
 import com.example.commondemo.code.GetCoder;
 import com.example.commondemo.message.Message;
 import com.example.gamedatademo.bean.Player;
+import com.example.gameservicedemo.bean.PlayerBeCache;
 import com.example.gameservicedemo.cache.PlayerCache;
 import com.example.gameservicedemo.service.SceneService;
 import io.netty.channel.ChannelHandlerContext;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,16 +33,17 @@ public class NotificationManager {
     @Autowired
     PlayerCache playerCache;
 
+
     /**
      *  通过通道上下文来通知单个玩家
      * @param ctx 上下文
      * @param e 信息
      * @param <E> 信息的类型
      */
-    public  <E> void notifyByCtx(ChannelHandlerContext ctx, E e){
+    public  <E> void notifyByCtx(ChannelHandlerContext ctx, E e,Integer code){
         Message message = new Message();
         message.setMessage(e.toString()+"\n");
-        message.setRequestCode(RequestCode.NOT_SUPPORTED_OPERATION.getCode());
+        message.setRequestCode(code);
         byte[] encode = new byte[0];
         try {
             encode = GetCoder.getCoder().encode(message);
@@ -59,10 +62,21 @@ public class NotificationManager {
      * @param e
      * @param <E>
      */
-    public  <E> void notifyScene(Integer sceneId,E e){
+    public  <E> void notifyScene(Integer sceneId,E e,Integer code){
         List<Player> allPlayer = sceneService.getAllPlayer(sceneId);
         for (Player player:allPlayer){
-            notifyByCtx(playerCache.getCxtByPlayerId(player.getPlayerId()),e);
+            notifyByCtx(playerCache.getCxtByPlayerId(player.getPlayerId()),e,code);
         }
+    }
+
+    /**
+     * 通知单个玩家
+     * @param playerBeCache
+     * @param e
+     * @param <E>
+     */
+    public <E> void notifyPlayer(PlayerBeCache playerBeCache, E e,Integer code){
+        ChannelHandlerContext cxtByPlayerId = playerCache.getCxtByPlayerId(playerBeCache.getPlayerId());
+        Optional.ofNullable(cxtByPlayerId).ifPresent(c->notifyByCtx(c,e,code));
     }
 }

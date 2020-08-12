@@ -1,5 +1,6 @@
 package com.example.gameservicedemo.cache;
 
+import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.bean.UserBeCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.google.common.cache.Cache;
@@ -61,7 +62,7 @@ public class UserCache {
         Optional.ofNullable(old).ifPresent( o -> {
                     ctxUserCache.invalidate(o);
                     if (!old.equals(ctx)) {
-                        notificationManager.notifyByCtx(old,"你在另一个登陆，除非你在此从新登陆");
+                        notificationManager.notifyByCtx(old,"你在另一个登陆，除非你在此从新登陆", RequestCode.NOT_FOUND.getCode());
                     }
                 }
         );
