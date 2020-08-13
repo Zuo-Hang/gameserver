@@ -5,6 +5,7 @@ import com.example.commondemo.base.TcpProtocol;
 import com.example.commondemo.code.GetCoder;
 import com.example.commondemo.message.Message;
 import com.example.gamedatademo.bean.Player;
+import com.example.gameservicedemo.bean.Creature;
 import com.example.gameservicedemo.bean.PlayerBeCache;
 import com.example.gameservicedemo.cache.PlayerCache;
 import com.example.gameservicedemo.service.SceneService;
@@ -35,14 +36,15 @@ public class NotificationManager {
 
 
     /**
-     *  通过通道上下文来通知单个玩家
+     * 通过通道上下文来通知单个玩家
+     *
      * @param ctx 上下文
-     * @param e 信息
+     * @param e   信息
      * @param <E> 信息的类型
      */
-    public  <E> void notifyByCtx(ChannelHandlerContext ctx, E e,Integer code){
+    public <E> void notifyByCtx(ChannelHandlerContext ctx, E e, Integer code) {
         Message message = new Message();
-        message.setMessage(e.toString()+"\n");
+        message.setMessage(e.toString() + "\n");
         message.setRequestCode(code);
         byte[] encode = new byte[0];
         try {
@@ -58,25 +60,40 @@ public class NotificationManager {
 
     /**
      * 通知场景内的所有玩家
+     *
      * @param sceneId
      * @param e
      * @param <E>
      */
-    public  <E> void notifyScene(Integer sceneId,E e,Integer code){
+    public <E> void notifyScene(Integer sceneId, E e, Integer code) {
         List<Player> allPlayer = sceneService.getAllPlayer(sceneId);
-        for (Player player:allPlayer){
-            notifyByCtx(playerCache.getCxtByPlayerId(player.getPlayerId()),e,code);
+        for (Player player : allPlayer) {
+            notifyByCtx(playerCache.getCxtByPlayerId(player.getPlayerId()), e, code);
         }
     }
 
     /**
      * 通知单个玩家
+     *
      * @param playerBeCache
      * @param e
      * @param <E>
      */
-    public <E> void notifyPlayer(PlayerBeCache playerBeCache, E e,Integer code){
+    public <E> void notifyPlayer(PlayerBeCache playerBeCache, E e, Integer code) {
         ChannelHandlerContext cxtByPlayerId = playerCache.getCxtByPlayerId(playerBeCache.getPlayerId());
-        Optional.ofNullable(cxtByPlayerId).ifPresent(c->notifyByCtx(c,e,code));
+        Optional.ofNullable(cxtByPlayerId).ifPresent(c -> notifyByCtx(c, e, code));
+    }
+
+    /**
+     * 通知生物
+     * @param creature
+     * @param e
+     * @param code
+     * @param <E>
+     */
+    public <E> void notifyCreature(Creature creature, E e, Integer code) {
+        if (creature instanceof PlayerBeCache) {
+            notifyPlayer((PlayerBeCache) creature, e, code);
+        }
     }
 }

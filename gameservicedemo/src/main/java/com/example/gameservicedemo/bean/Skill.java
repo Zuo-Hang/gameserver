@@ -21,20 +21,23 @@ public class Skill {
     @EntityName(column = "类型")
     private Integer skillType;
 
+    /**
+     * 前摇
+     */
     @EntityName(column = "施法时间")
     private Integer castTime;
 
     @EntityName(column = "cd")
-    private Long cd;
+    private Integer cd;
 
     @EntityName(column = "消耗mp")
-    private Long mpConsumption;
+    private Integer mpConsumption;
 
     @EntityName(column = "伤害量")
-    private Long hurt;
+    private Integer hurt;
 
     @EntityName(column = "治疗量")
-    private Long heal;
+    private Integer heal;
 
     @EntityName(column = "等级")
     private Integer level;
@@ -48,5 +51,8 @@ public class Skill {
     @EntityName(column = "描述")
     private String   describe;
 
+    /**
+     * 技能上一次使用的时间
+     */
     private Long activeTime;
 }

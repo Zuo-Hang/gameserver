@@ -21,8 +21,6 @@ import java.util.List;
 @Service
 public class SceneService {
     @Autowired
-    PlayerCache playerCache;
-    @Autowired
     SceneCache sceneCache;
 
     /**
@@ -40,5 +38,14 @@ public class SceneService {
             }
         }
         return players;
+    }
+
+    /**
+     * 获取场景
+     * @param sceneId
+     * @return
+     */
+    public Scene getScene(Integer sceneId){
+        return sceneCache.getScene(sceneId);
     }
 }

@@ -41,6 +41,7 @@ public class PlayerController {
         ControllerManager.add(Command.AOI.getRequestCode(), this::aoi);
         ControllerManager.add(Command.CAM_MOVE.getRequestCode(), this::canMove);
         ControllerManager.add(Command.MOVE.getRequestCode(), this::Move);
+        ControllerManager.add(Command.SEE_PLAYER_SKILL.getRequestCode(),this::seePlayerSkill);
     }
 
     /**
@@ -55,11 +56,12 @@ public class PlayerController {
             notificationManager.notifyByCtx(ctx, "创建角色前需要登陆账号", RequestCode.NOT_LOGIN.getCode());
             return;
         }
-        //指令 化身名称
-        String[] array = CheckParametersUtil.checkParameter(ctx, message, 2);
-        playerService.playerCreat(ctx, array[1]);
+        //指令 化身名称  角色类型
+        String[] array = CheckParametersUtil.checkParameter(ctx, message, 3);
+        playerService.playerCreat(ctx, array[1],Integer.valueOf(array[2]));
     }
 
+    //-------------------------------------------------------------------------下面所有的操作都要判断角色是否登录
     /**
      * 登录玩家
      *
@@ -122,5 +124,15 @@ public class PlayerController {
         Integer sceneId = Integer.valueOf(strings[1]);
         playerService.move(context, sceneId);
 
+    }
+
+    /**
+     * 查看当前角色的技能状况
+     * @param context
+     * @param message
+     */
+    public void seePlayerSkill(ChannelHandlerContext context,Message message){
+        CheckParametersUtil.checkParameter(context,message,1);
+        playerService.seePlayerSkill(context);
     }
 }

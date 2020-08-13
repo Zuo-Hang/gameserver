@@ -38,7 +38,7 @@ public class SceneObjectController {
      */
     public void talkWithNPC(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
-        PlayerBeCache player = playerService.getPlayer(context);
+        PlayerBeCache player = playerService.getPlayerByContext(context);
         sceneObjectService.talkWithNPC(context, Integer.valueOf(strings[1]));
     }
 }

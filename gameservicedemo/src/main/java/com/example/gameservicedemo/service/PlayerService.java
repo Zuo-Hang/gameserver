@@ -3,10 +3,9 @@ package com.example.gameservicedemo.service;
 import com.example.commondemo.base.RequestCode;
 import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.mapper.PlayerMapper;
+import com.example.gameservicedemo.bean.Skill;
 import com.example.gameservicedemo.bean.scene.Scene;
 import com.example.gameservicedemo.cache.PlayerCache;
-import com.example.gameservicedemo.cache.SceneCache;
-import com.example.gameservicedemo.cache.UserCache;
 import com.example.gameservicedemo.bean.scene.NPC;
 import com.example.gameservicedemo.bean.PlayerBeCache;
 import com.example.gameservicedemo.bean.UserBeCache;
@@ -37,11 +36,11 @@ public class PlayerService {
     @Autowired
     PlayerCache playerCache;
     @Autowired
+    SceneService sceneService;
+    @Autowired
+    RoleTypeService roleTypeService;
+    @Autowired
     NotificationManager notificationManager;
-    @Autowired
-    UserCache userCache;
-    @Autowired
-    SceneCache sceneCache;
 
     /**
      * 创建玩家
@@ -49,13 +48,17 @@ public class PlayerService {
      * @param context
      * @param playerName
      */
-    public void playerCreat(ChannelHandlerContext context, String playerName) {
-        UserBeCache userByCtx = userCache.getUserByCtx(context);
+    public void playerCreat(ChannelHandlerContext context, String playerName,Integer roleClass) {
+        UserBeCache userByCtx = userService.getUserByCxt(context);
         int userId = userByCtx.getUserId();
         Player player = new Player();
         player.setPlayerName(playerName);
         player.setUserId(userId);
         player.setNowAt(1);
+        player.setExp(0);
+        player.setMoney(0);
+        player.setState(1);
+        player.setRoleClass(roleClass);
         Integer insert = playerMapper.insert(player);
         log.info("成功创建角色{}", player.toString());
         notificationManager.notifyByCtx(context, "你已成功创建角色：" + playerName + "，快使用 load 命令去登录吧", RequestCode.SUCCESS.getCode());
@@ -85,18 +88,30 @@ public class PlayerService {
         PlayerBeCache playerBeCache = new PlayerBeCache();
         BeanUtils.copyProperties(player1, playerBeCache);
         // 以channel id 为键储存玩家数据
+        initPlayerInformation(playerBeCache);
+        /** 需要初始化玩家信息*/
         playerCache.putCtxPlayer(context, playerBeCache);
         // 保存playerId跟ChannelHandlerContext之间的关系
         playerCache.savePlayerCtx(playerId, context);
         playerBeCache.setContext(context);
         //将玩家加入场景缓存当中
-        Map<Integer, PlayerBeCache> players = sceneCache.getScene(player1.getNowAt()).getPlayers();
+        Map<Integer, PlayerBeCache> players = sceneService.getScene(player1.getNowAt()).getPlayers();
         players.put(player1.getPlayerId(), playerBeCache);
         result.append(playerBeCache.getPlayerName()).append(",角色登陆成功")
                 .append("\n 你所在位置为: ")
                 .append(playerBeCache.getNowAt()).append("\n");
         result.append("使用指令 `aoi` 可查看周围环境");
         notificationManager.notifyByCtx(context, result.toString(), RequestCode.ABOUT_PLAYER.getCode());
+    }
+
+    /**
+     * 在化身加入缓存之前对其进行初始化
+     * @param playerBeCache
+     */
+    public void initPlayerInformation(PlayerBeCache playerBeCache){
+//        //获取角色类型
+//        Integer roleClass = playerBeCache.getRoleClass();
+//        final Map<Integer, Skill> skillMap = roleTypeCache.getRoleType(roleClass).getSkillMap();
     }
 
     /**
@@ -107,7 +122,7 @@ public class PlayerService {
      * @return 用户是否拥有此角色
      */
     public boolean hasPlayer(ChannelHandlerContext ctx, Integer playerId) {
-        UserBeCache user = userCache.getUserByCtx(ctx);
+        UserBeCache user = userService.getUserByCxt(ctx);
         List<Player> players = userService.findPlayers(user.getUserId());
         for (Player player : players) {
             if (player.getPlayerId().equals(playerId)) {
@@ -144,7 +159,7 @@ public class PlayerService {
                     playerCache.removePlayerByChannelId(context.channel().id().asLongText());
                     playerCache.removePlayerCxt(playerByCtx.getPlayerId());
                     //从场景缓存中移除
-                    sceneCache.getScene(player.getNowAt()).getPlayers().remove(player.getPlayerId());
+                    sceneService.getScene(player.getNowAt()).getPlayers().remove(player.getPlayerId());
                 }
         );
 
@@ -159,7 +174,7 @@ public class PlayerService {
         //获取当前场景的所有实体信息
         PlayerBeCache playerByCtx = playerCache.getPlayerByCtx(context);
         Integer nowAt = playerByCtx.getNowAt();
-        Map<Integer, NPC> npcs = sceneCache.getScene(nowAt).getNpcs();
+        Map<Integer, NPC> npcs = sceneService.getScene(nowAt).getNpcs();
         Collection<NPC> values = npcs.values();
         if (values == null) {
             notificationManager.notifyByCtx(context, "这里空无一人！", RequestCode.SUCCESS.getCode());
@@ -184,12 +199,12 @@ public class PlayerService {
         PlayerBeCache playerByCtx = playerCache.getPlayerByCtx(context);
         Integer nowAt = playerByCtx.getNowAt();
         //缓存中获取场景信息
-        String adjacentScenes = sceneCache.getScene(nowAt).getNeighbors();
+        String adjacentScenes = sceneService.getScene(nowAt).getNeighbors();
         String[] adjacentScenesId = adjacentScenes.split(",");
         StringBuffer ret = new StringBuffer();
         ret.append("\n相邻场景如下：\n");
         for (String objectsId : adjacentScenesId) {
-            com.example.gameservicedemo.bean.scene.Scene scene = sceneCache.getScene(Integer.valueOf(objectsId));
+            com.example.gameservicedemo.bean.scene.Scene scene = sceneService.getScene(Integer.valueOf(objectsId));
             String sceneInformation = scene.getId() + " " + scene.getName() + " " + scene.getDescribe()+"\n";
             ret.append("场景：" + sceneInformation);
         }
@@ -207,8 +222,8 @@ public class PlayerService {
         PlayerBeCache playerByCtx = playerCache.getPlayerByCtx(context);
         Integer nowAt = playerByCtx.getNowAt();
         //获取当前场景
-        Scene sceneNow = sceneCache.getScene(nowAt);
-        Scene whileGo = sceneCache.getScene(sceneId);
+        Scene sceneNow = sceneService.getScene(nowAt);
+        Scene whileGo = sceneService.getScene(sceneId);
         if (!Objects.isNull(whileGo)) {
             //移除旧场景中的化身
             sceneNow.getPlayers().remove(playerByCtx.getPlayerId());
@@ -224,7 +239,18 @@ public class PlayerService {
         }
     }
 
-    public PlayerBeCache getPlayer(ChannelHandlerContext context) {
+    //------------------------------------------------------------------------------存在逻辑问题，如果掉线了，新的上下文不会有对应的用户信息
+    public PlayerBeCache getPlayerByContext(ChannelHandlerContext context) {
         return playerCache.getPlayerByCtx(context);
+    }
+
+    /**
+     * 查看当前角色的技能状况
+     * @param context
+     */
+    public void seePlayerSkill(ChannelHandlerContext context){
+        PlayerBeCache player = getPlayerByContext(context);
+        //获取对应类型的所有技能
+        Map<Integer, Skill> skillMap = roleTypeService.getRoleTypeById(player.getRoleClass()).getSkillMap();
     }
 }

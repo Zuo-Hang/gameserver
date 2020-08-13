@@ -1,7 +1,12 @@
 package com.example.gameservicedemo.bean;
 
+import com.example.gameservicedemo.cache.SkillCache;
 import com.example.gameservicedemo.util.excel.EntityName;
 import lombok.Data;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,4 +34,28 @@ public class RoleType {
 
     @EntityName(column = "技能")
     private String skills = "";
+
+    /**
+     * 用来存放该角色所具备的技能  键为技能id 值为技能对象
+     */
+    private Map<Integer, Skill> skillMap = new HashMap<>();
+
+    /**
+     * 获取当前角色类型所拥有的技能集合
+     */
+    public Map<Integer, Skill> getSkillMap() {
+        // 如果技能映射不存在，则现在加载
+        if (skillMap.size() == 0 && !this.skills.equals("")) {
+            String skillsString = this.getSkills();
+            Arrays.stream(skillsString.split(","))
+                    .map(Integer::valueOf)
+                    .map(SkillCache::get)
+                    .forEach(skill -> this.skillMap.put(skill.getId(), skill));
+        }
+        return skillMap;
+    }
+
+    public void setSkillMap(Map<Integer, Skill> skillMap) {
+        this.skillMap = skillMap;
+    }
 }

@@ -30,6 +30,14 @@ public enum Command {
     AOI("aoi",4002,"AOI, 显示场景内各种游戏对象"),
     /** 与npc谈话 **/
     TALK_WITH_NPC("talk",13002,"与npc谈话"),
+    /** 查看当前角色的技能状况 */
+    SEE_PLAYER_SKILL("see_player_skill",3003,"查看当前角色的技能状况"),
+    /** 对己方使用技能 **/
+    SKILL_TO_SELF("skill_to_self",13003,"对己方使用技能 skill_to_self 技能id 例如：skill_to_self 1"),
+    /** 使用技能攻击怪物 **/
+    SKILL_TO_MONSTER("skill_to_monster",3003),
+    /** 技能攻击玩家 **/
+    SKILL_TO_PVP("skill_to_PVP",30012,"技能攻击玩家"),
     /** 未知的命令 */
     UNKNOWN("unknown", 9999,"未知的命令"),
     /** 心跳 **/
