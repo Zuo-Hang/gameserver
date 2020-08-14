@@ -2,6 +2,7 @@ package com.example.gameservicedemo.cache;
 
 import com.example.gameservicedemo.bean.scene.Scene;
 import com.example.gameservicedemo.service.SceneObjectService;
+import com.example.gameservicedemo.service.SceneService;
 import com.example.gameservicedemo.util.excel.subclassexcelutil.SceneExcelUtil;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -25,6 +26,8 @@ import java.util.Map;
 public class SceneCache {
     @Autowired
     SceneObjectService sceneObjectService;
+    @Autowired
+    SceneService sceneService;
 
     /** 缓存不过期 */
     private Cache<Integer, Scene> sceneCache = CacheBuilder.newBuilder()
@@ -42,6 +45,7 @@ public class SceneCache {
         Map<Integer, Scene> map = sceneExcelUtil.getMap();
         for (Scene  gameScene: map.values()) {
             Scene scene = sceneObjectService.initSceneObject(gameScene);
+            sceneService.initNeighborScene(scene);
             //存入缓存
             sceneCache.put(scene.getId(), scene);
         }

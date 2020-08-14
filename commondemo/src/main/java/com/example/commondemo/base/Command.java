@@ -9,39 +9,51 @@ import java.util.Map;
  *
  * @author: hang hang
  * @Date: 2020/08/03/21:14
- * @Description:
+ * @Description: 服务请求码，服务端根据这个码分发请求
+ * 1. 1000 - 1999 为基础服务码，包含与服务器建立连接，心跳，未知等
+ * 2. 2000 - 2999 之间为与用户相关的操作
+ * 3. 3000 - 3999 之间为与角色场景相关
+ * 4. 4000 - 4999 之间为技能相关
  */
 public enum Command {
-    /** 创建用户 */
-    USER_CREATE("user_create",900,"创建用户，参数为用户昵称、密码、手机号，会返回登陆的唯一id, 例： user_create 玩家66 123 1501545"),
-    /** 创建角色*/
-    PLAYER_CREATE("role_create",9001,"创建角色,参数为角色名 例：role_create  战不息 "),
-     /** 玩家登陆, 参数为 用户账号和密码，例： login 2 123456*/
-    USER_LOGIN("login",1001,"玩家登陆, 参数为 用户账号和密码，例： login 2 123456"),
-     /** 角色登陆 ，参数为 当前用户下的角色id，例： 2001 1313*/
-    PLAYER_LOGIN("load",2001," 角色登陆 ，参数为 当前用户下的角色id，例： 2001 1313"),
-     /** 玩家退出，无参数， 例： exit*/
-    PLAYER_EXIT("exit",2002,"玩家退出，无参数， 例： exit"),
-    /** 角色移动， 参数 场景id ， 例： move 2 **/
-    MOVE("move",3001,"角色移动， 参数 场景id ， 例： move 2"),
-    /** 角色从当前位置可以进行的移动 例： move **/
-    CAM_MOVE("can_move",3002,"可以移动到的地方，参数 无"),
-    /** AOI, 显示场景内各种游戏对象 **/
-    AOI("aoi",4002,"AOI, 显示场景内各种游戏对象"),
-    /** 与npc谈话 **/
-    TALK_WITH_NPC("talk",13002,"与npc谈话"),
-    /** 查看当前角色的技能状况 */
-    SEE_PLAYER_SKILL("see_player_skill",3003,"查看当前角色的技能状况"),
-    /** 对己方使用技能 **/
-    SKILL_TO_SELF("skill_to_self",13003,"对己方使用技能 skill_to_self 技能id 例如：skill_to_self 1"),
-    /** 使用技能攻击怪物 **/
-    SKILL_TO_MONSTER("skill_to_monster",3003),
-    /** 技能攻击玩家 **/
-    SKILL_TO_PVP("skill_to_PVP",30012,"技能攻击玩家"),
-    /** 未知的命令 */
-    UNKNOWN("unknown", 9999,"未知的命令"),
     /** 心跳 **/
-    HERATBEAT("heartbeat",0,"心跳")
+    HERATBEAT("heartbeat",1000,"心跳"),
+    /** 断线重连 */
+    RECONNECTION("Reconnection",1100,"断线重连 参数为userId 例如：Reconnection 1"),
+    /** 未知的命令 */
+    UNKNOWN("unknown", 1999,"未知的命令"),
+    /** 创建用户 */
+    USER_CREATE("user_create",2000,"创建用户，参数为用户昵称、密码、手机号，会返回登陆的唯一id, 例： user_create 玩家66 123 1501545"),
+    /** 玩家登陆, 参数为 用户账号和密码，例： login 2 12345*/
+    USER_LOGIN("login",2100,"玩家登陆, 参数为 用户账号和密码，例： login 2 12345"),
+    /** 查看当前账号下的所有已创建角色 */
+    SEE_MY_PLAYER("see_my_player",2200,"查看当前账号下所有已创建的的角色信息"),
+    /** 退出登录 */
+    USER_LOGOUT("logout",2400,"玩家退出登录"),
+    /** 查看所有角色类型 */
+    SEE_ROLE_TYPE("see_role_type",2510,"查看系统支持的所有角色类型"),
+    /** 创建角色*/
+    PLAYER_CREATE("role_create",2500,"创建角色,参数为角色名 所属角色类型 例：role_create  战不息 1"),
+     /** 角色登陆 ，参数为 当前用户下的角色id，例： 2001 1313*/
+    PLAYER_LOGIN("load",2600," 角色登陆 ，参数为 当前用户下的角色id，例： 2001 1313"),
+     /** 玩家退出，无参数， 例： exit*/
+    PLAYER_EXIT("exit",2900,"玩家退出，无参数， 例： exit"),
+    /** 角色从当前位置可以进行的移动 例： move **/
+    CAM_MOVE("can_move",2710,"可以移动到的地方，参数 无"),
+    /** 角色移动， 参数 场景id ， 例： move 2 **/
+    MOVE("move",2700,"角色移动， 参数 场景id ， 例： move 2"),
+    /** AOI, 显示场景内各种游戏对象 **/
+    AOI("aoi",3000,"AOI, 显示场景内各种游戏对象"),
+    /** 与npc谈话 **/
+    TALK_WITH_NPC("talk",3100,"与npc谈话"),
+    /** 查看当前角色的技能状况 */
+    SEE_PLAYER_SKILL("see_player_skill",4000,"查看当前角色的技能状况"),
+    /** 对己方使用技能 **/
+    SKILL_TO_SELF("skill_to_self",4100,"对己方使用技能 skill_to_self 技能id 例如：skill_to_self 1"),
+    /** 使用技能攻击怪物 **/
+    SKILL_TO_MONSTER("skill_to_monster",4200),
+    /** 技能攻击玩家 **/
+    SKILL_TO_PVP("skill_to_PVP",4300,"技能攻击玩家")
     ;
     private String command;
 

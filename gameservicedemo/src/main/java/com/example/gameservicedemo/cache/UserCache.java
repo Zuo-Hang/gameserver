@@ -103,4 +103,16 @@ public class UserCache {
                 .map(this::getUserByCtx)
                 .orElse(null);
     }
+
+    /**
+     *  移除键为channel id， 值为 用户数据的缓存
+     */
+    public  void removeUserByChannelId(String channelId) {
+        ctxUserCache.invalidate(channelId);
+    }
+
+
+    public  void removeCtxByUserId(Integer userId) {
+        userIdCtxCache.invalidate(userId);
+    }
 }

@@ -4,12 +4,14 @@ import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.cache.SceneCache;
 import com.example.gameservicedemo.bean.PlayerBeCache;
 import com.example.gameservicedemo.bean.scene.Scene;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.gameservicedemo.cache.PlayerCache;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,6 +21,7 @@ import java.util.List;
  * @Description:
  */
 @Service
+@Slf4j
 public class SceneService {
     @Autowired
     SceneCache sceneCache;
@@ -47,5 +50,21 @@ public class SceneService {
      */
     public Scene getScene(Integer sceneId){
         return sceneCache.getScene(sceneId);
+    }
+
+    /**
+     * 初始化相邻场景
+     * @param scene
+     */
+    public void initNeighborScene(Scene scene){
+        String adjacentScenes = scene.getNeighbors();
+        if(Objects.isNull(adjacentScenes)){
+            log.info("{} 没有相邻场景",scene.getName());
+            return;
+        }
+        String[] adjacentScenesId = adjacentScenes.split(",");
+        for(String s:adjacentScenesId){
+            scene.getNeighborScene().add(Integer.valueOf(s));
+        }
     }
 }

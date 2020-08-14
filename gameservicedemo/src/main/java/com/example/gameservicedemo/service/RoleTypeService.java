@@ -5,6 +5,10 @@ import com.example.gameservicedemo.cache.RoleTypeCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -24,5 +28,14 @@ public class RoleTypeService {
      */
     public RoleType getRoleTypeById(Integer roleTypeId){
         return roleTypeCache.getRoleType(roleTypeId);
+    }
+
+    public List<RoleType> getAllRoleType(){
+        Map<Integer, RoleType> roleTypeMap = roleTypeCache.asMap();
+        ArrayList<RoleType> roleTypes = new ArrayList<>();
+        for(RoleType roleType:roleTypeMap.values()){
+            roleTypes.add(roleType);
+        }
+        return roleTypes;
     }
 }

@@ -51,4 +51,8 @@ public class RoleTypeCache {
         return roleTypeCache.getIfPresent(roleTypeId);
     }
 
+    public Map<Integer, RoleType> asMap(){
+        return roleTypeCache.asMap();
+    }
+
 }
