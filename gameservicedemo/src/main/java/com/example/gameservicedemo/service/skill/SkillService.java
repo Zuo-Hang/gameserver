@@ -51,7 +51,7 @@ public class SkillService {
         Skill skill = SkillCache.get(skillId);
         PlayerBeCache player = playerService.getPlayerByContext(context);
         Scene scene = sceneService.getScene(player.getNowAt());
-        if (canUseSkill(player, skill)) {
+        if (!canUseSkill(player, skill)) {
             notificationManager.notifyPlayer(player, "你现在不可以使用这个技能", RequestCode.NOT_SUPPORTED_OPERATION.getCode());
             return ;
         }
@@ -85,12 +85,12 @@ public class SkillService {
         if (creature instanceof PlayerBeCache) {
             PlayerBeCache player = (PlayerBeCache) creature;
             if (Objects.isNull(roleTypeCache.getRoleType(player.getRoleClass()).getSkillMap().get(skill.getId()))) {
-                notificationManager.notifyPlayer((PlayerBeCache) creature, "这个职业没有这个技能，使用 \" \"查看当前角色的技能与CD状态", RequestCode.BAD_REQUEST.getCode());
+                notificationManager.notifyPlayer((PlayerBeCache) creature, "这个职业没有这个技能，使用 \" see_player_skill \"查看当前角色的技能与CD状态", RequestCode.BAD_REQUEST.getCode());
             }
         }
         if (inCD(creature, skill.getId())) {
             if (creature instanceof PlayerBeCache) {
-                notificationManager.notifyPlayer((PlayerBeCache) creature, "该技能正处于CD当中，使用\" \" 查看当前角色的技能与CD状态", RequestCode.BAD_REQUEST.getCode());
+                notificationManager.notifyPlayer((PlayerBeCache) creature, "该技能正处于CD当中，使用\" see_player_skill \" 查看当前角色的技能与CD状态", RequestCode.BAD_REQUEST.getCode());
             }
             return false;
         }

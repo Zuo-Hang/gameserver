@@ -1,7 +1,6 @@
 package com.example.gameservicedemo.service;
 
 import com.example.commondemo.base.RequestCode;
-import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.bean.PlayerBeCache;
 import com.example.gameservicedemo.bean.scene.*;
 import com.example.gameservicedemo.cache.PlayerCache;
@@ -90,6 +89,7 @@ public class SceneObjectService {
      * @param sceneObject   场景对象
      */
     public void talk(PlayerBeCache playerBeCache, SceneObject sceneObject) {
-        notificationManager.notifyPlayer(playerBeCache, sceneObject.getTalk(), RequestCode.SUCCESS.getCode());
+        String string= "\n"+sceneObject.getName()+"："+sceneObject.getTalk();
+        notificationManager.notifyPlayer(playerBeCache,string , RequestCode.SUCCESS.getCode());
     }
 }

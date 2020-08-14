@@ -3,6 +3,7 @@ package com.example.gameservicedemo.service;
 import com.example.commondemo.base.RequestCode;
 import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.mapper.PlayerMapper;
+import com.example.gameservicedemo.bean.RoleType;
 import com.example.gameservicedemo.bean.Skill;
 import com.example.gameservicedemo.bean.scene.Scene;
 import com.example.gameservicedemo.cache.PlayerCache;
@@ -109,9 +110,12 @@ public class PlayerService {
      * @param playerBeCache
      */
     public void initPlayerInformation(PlayerBeCache playerBeCache){
-//        //获取角色类型
-//        Integer roleClass = playerBeCache.getRoleClass();
-//        final Map<Integer, Skill> skillMap = roleTypeCache.getRoleType(roleClass).getSkillMap();
+        //获取角色类型
+        Integer roleTypeId = playerBeCache.getRoleClass();
+        RoleType roleTypeById = roleTypeService.getRoleTypeById(roleTypeId);
+        //将要放进缓存中的player 根据角色类型将 mp hp 初始化
+        playerBeCache.setHp(roleTypeById.getBaseHp());
+        playerBeCache.setMp(roleTypeById.getBaseMp());
     }
 
     /**
@@ -264,5 +268,25 @@ public class PlayerService {
         PlayerBeCache player = getPlayerByContext(context);
         //获取对应类型的所有技能
         Map<Integer, Skill> skillMap = roleTypeService.getRoleTypeById(player.getRoleClass()).getSkillMap();
+        //显示可用的和不可用的技能
+        Map<Integer, Skill> hasUseSkillMap = player.getHasUseSkillMap();
+        StringBuilder skillCanUse=new StringBuilder("可以使用的技能有：\n");
+        StringBuilder skillInCD=new StringBuilder("正在CD的技能有：\n");
+        for(Skill skill:skillMap.values()){
+            if(Objects.isNull(hasUseSkillMap.get(skill.getId()))){
+                //处于CD的集合中没有这个技能代表可用
+                skillCanUse.append(MessageFormat.format("技能id：{0} 技能名称：{1}\n",skill.getId(),skill.getName()));
+                if(!Objects.isNull(skill.getDescribe())){
+                    skillCanUse.append("技能描述："+skill.getDescribe()+"\n");
+                }
+            }else{
+                //技能正处于CD当中
+                String format = MessageFormat.format("技能id：{0} 技能名称：{1} 等级：{2} 耗蓝:{3} cd:{4}  冷却完成时间还剩:{5}秒 \n",
+                        skill.getId(), skill.getName(), skill.getLevel(), skill.getMpConsumption(), skill.getCd(),
+                        (skill.getCd() - (System.currentTimeMillis() - skill.getActiveTime())) * 0.001);
+                skillInCD.append(format);
+            }
+        }
+        notificationManager.notifyByCtx(context,skillCanUse.toString()+skillInCD.toString(),RequestCode.SUCCESS.getCode());
     }
 }

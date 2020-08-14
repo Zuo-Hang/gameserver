@@ -33,8 +33,12 @@ public class SkillController {
      * @param message
      */
     public void useSkillToSelf(ChannelHandlerContext context, Message message) {
+        //命令名称 技能id
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
         Integer skillId = Integer.valueOf(strings[1]);
+        //---------------------------------判断玩家是否加载
         skillService.useSkillToSelf(context,skillId);
     }
+
+
 }

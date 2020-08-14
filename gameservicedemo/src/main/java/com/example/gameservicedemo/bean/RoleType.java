@@ -35,6 +35,12 @@ public class RoleType {
     @EntityName(column = "技能")
     private String skills = "";
 
+    @EntityName(column = "基础hp")
+    private Integer baseHp;
+
+    @EntityName(column = "基础mp")
+    private Integer baseMp;
+
     /**
      * 用来存放该角色所具备的技能  键为技能id 值为技能对象
      */
