@@ -5,7 +5,6 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.nio.Buffer;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,9 +24,14 @@ public class PlayerBeCache extends Player implements Creature{
     private Creature target;
 
     /**  受职业配置表和装备影响 */
-    private Integer hp;
+    /** 最大生命值 */
+    private Integer maxHp;
+    /** 最大魔法值 */
+    private Integer maxMp;
 
+    /** 当前的生命值和魔法值 */
     private Integer mp;
+    private Integer hp;
     /** 角色当前处于CD的技能集合 */
     private Map<Integer, Skill> hasUseSkillMap = new ConcurrentHashMap<>();
 

@@ -3,14 +3,12 @@ package com.example.gameservicedemo.service;
 import com.example.commondemo.base.RequestCode;
 import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.mapper.PlayerMapper;
-import com.example.gameservicedemo.bean.RoleType;
-import com.example.gameservicedemo.bean.Skill;
+import com.example.gameservicedemo.bean.*;
 import com.example.gameservicedemo.bean.scene.Scene;
 import com.example.gameservicedemo.cache.PlayerCache;
 import com.example.gameservicedemo.bean.scene.NPC;
-import com.example.gameservicedemo.bean.PlayerBeCache;
-import com.example.gameservicedemo.bean.UserBeCache;
 import com.example.gameservicedemo.manager.NotificationManager;
+import com.example.gameservicedemo.manager.TimedTaskManager;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -49,7 +47,7 @@ public class PlayerService {
      * @param context
      * @param playerName
      */
-    public void playerCreat(ChannelHandlerContext context, String playerName,Integer roleClass) {
+    public void playerCreat(ChannelHandlerContext context, String playerName, Integer roleClass) {
         UserBeCache userByCtx = userService.getUserByCxt(context);
         int userId = userByCtx.getUserId();
         Player player = new Player();
@@ -107,15 +105,18 @@ public class PlayerService {
 
     /**
      * 在化身加入缓存之前对其进行初始化
+     *
      * @param playerBeCache
      */
-    public void initPlayerInformation(PlayerBeCache playerBeCache){
+    public void initPlayerInformation(PlayerBeCache playerBeCache) {
         //获取角色类型
         Integer roleTypeId = playerBeCache.getRoleClass();
         RoleType roleTypeById = roleTypeService.getRoleTypeById(roleTypeId);
         //将要放进缓存中的player 根据角色类型将 mp hp 初始化
         playerBeCache.setHp(roleTypeById.getBaseHp());
+        playerBeCache.setMaxHp(roleTypeById.getBaseHp());
         playerBeCache.setMp(roleTypeById.getBaseMp());
+        playerBeCache.setMaxMp(roleTypeById.getBaseMp());
     }
 
     /**
@@ -127,7 +128,7 @@ public class PlayerService {
      */
     public boolean hasPlayer(ChannelHandlerContext ctx, Integer playerId) {
         UserBeCache user = userService.getUserByCxt(ctx);
-        List<Player> players = userService.findPlayers(ctx,user.getUserId());
+        List<Player> players = userService.findPlayers(ctx, user.getUserId());
         for (Player player : players) {
             if (player.getPlayerId().equals(playerId)) {
                 return true;
@@ -188,7 +189,7 @@ public class PlayerService {
         ret.append("\nnpc如下：\n");
         if (values != null) {
             for (NPC objectsId : values) {
-                ret.append(objectsId.displayData()+"\n");
+                ret.append(objectsId.displayData() + "\n");
             }
         }
         notificationManager.notifyByCtx(context, ret.toString(), RequestCode.SUCCESS.getCode());
@@ -204,7 +205,7 @@ public class PlayerService {
         Integer nowAt = playerByCtx.getNowAt();
         //缓存中获取场景信息
         List<Integer> neighborScene = sceneService.getScene(nowAt).getNeighborScene();
-        if(neighborScene.isEmpty()){
+        if (neighborScene.isEmpty()) {
             notificationManager.notifyByCtx(context, "这里已经是世界的尽头了", RequestCode.SUCCESS.getCode());
             return;
         }
@@ -212,7 +213,7 @@ public class PlayerService {
         ret.append("\n相邻场景如下：\n");
         for (Integer sceneId : neighborScene) {
             Scene scene = sceneService.getScene(sceneId);
-            String sceneInformation = scene.getId() + " " + scene.getName() + " " + scene.getDescribe()+"\n";
+            String sceneInformation = scene.getId() + " " + scene.getName() + " " + scene.getDescribe() + "\n";
             ret.append("场景：" + sceneInformation);
         }
         notificationManager.notifyByCtx(context, ret, RequestCode.SUCCESS.getCode());
@@ -231,8 +232,8 @@ public class PlayerService {
         //获取当前场景
         Scene sceneNow = sceneService.getScene(nowAt);
         //进行判断从当前场景是否可以到达目标场景
-        if(!sceneNow.getNeighborScene().contains(sceneId)){
-            notificationManager.notifyByCtx(context,"这里并不能到达地点"+sceneId,RequestCode.BAD_REQUEST.getCode());
+        if (!sceneNow.getNeighborScene().contains(sceneId)) {
+            notificationManager.notifyByCtx(context, "这里并不能到达地点" + sceneId, RequestCode.BAD_REQUEST.getCode());
             return;
         }
         Scene whileGo = sceneService.getScene(sceneId);
@@ -253,6 +254,7 @@ public class PlayerService {
 
     /**
      * 通过context获取角色
+     *
      * @param context
      * @return
      */
@@ -262,31 +264,60 @@ public class PlayerService {
 
     /**
      * 查看当前角色的技能状况
+     *
      * @param context
      */
-    public void seePlayerSkill(ChannelHandlerContext context){
+    public void seePlayerSkill(ChannelHandlerContext context) {
         PlayerBeCache player = getPlayerByContext(context);
         //获取对应类型的所有技能
         Map<Integer, Skill> skillMap = roleTypeService.getRoleTypeById(player.getRoleClass()).getSkillMap();
         //显示可用的和不可用的技能
         Map<Integer, Skill> hasUseSkillMap = player.getHasUseSkillMap();
-        StringBuilder skillCanUse=new StringBuilder("可以使用的技能有：\n");
-        StringBuilder skillInCD=new StringBuilder("正在CD的技能有：\n");
-        for(Skill skill:skillMap.values()){
-            if(Objects.isNull(hasUseSkillMap.get(skill.getId()))){
+        StringBuilder skillCanUse = new StringBuilder("可以使用的技能有：\n");
+        StringBuilder skillInCD = new StringBuilder("正在CD的技能有：\n");
+        for (Skill skill : skillMap.values()) {
+            if (Objects.isNull(hasUseSkillMap.get(skill.getId()))) {
                 //处于CD的集合中没有这个技能代表可用
-                skillCanUse.append(MessageFormat.format("技能id：{0} 技能名称：{1}\n",skill.getId(),skill.getName()));
-                if(!Objects.isNull(skill.getDescribe())){
-                    skillCanUse.append("技能描述："+skill.getDescribe()+"\n");
+                skillCanUse.append(MessageFormat.format("技能id：{0} 技能名称：{1}\n", skill.getId(), skill.getName()));
+                if (!Objects.isNull(skill.getDescribe())) {
+                    skillCanUse.append("技能描述：" + skill.getDescribe() + "\n");
                 }
-            }else{
+            } else {
+                //这才是缓存中的技能
+                Skill skill1 = hasUseSkillMap.get(skill.getId());
                 //技能正处于CD当中
                 String format = MessageFormat.format("技能id：{0} 技能名称：{1} 等级：{2} 耗蓝:{3} cd:{4}  冷却完成时间还剩:{5}秒 \n",
-                        skill.getId(), skill.getName(), skill.getLevel(), skill.getMpConsumption(), skill.getCd(),
-                        (skill.getCd() - (System.currentTimeMillis() - skill.getActiveTime())) * 0.001);
+                        skill1.getId(), skill1.getName(), skill1.getLevel(), skill1.getMpConsumption(), skill1.getCd(),
+                        (skill1.getCd() - (System.currentTimeMillis() - skill1.getActiveTime())) * 0.001);
                 skillInCD.append(format);
             }
         }
-        notificationManager.notifyByCtx(context,skillCanUse.toString()+skillInCD.toString(),RequestCode.SUCCESS.getCode());
+        notificationManager.notifyByCtx(context, skillCanUse.toString() + skillInCD.toString(), RequestCode.SUCCESS.getCode());
+    }
+
+    /**
+     * 检测玩家是否死亡，若死亡进行复活操作
+     *
+     * @param playerBeCache
+     * @param murderer
+     * @return
+     */
+    public boolean isPlayerDead(PlayerBeCache playerBeCache, Creature murderer) {
+        if (playerBeCache.getHp() < 0) {
+            playerBeCache.setHp(0);
+            playerBeCache.setState(-1);
+            //广播通知玩家死亡
+            //从场景中移除
+            //开启复活操作
+            TimedTaskManager.schedule(10000, () -> {
+                playerBeCache.setState(1);
+                //初始化玩家
+                //initPlayer(casualty);
+                notificationManager.notifyPlayer(playerBeCache, playerBeCache.getName() + "  你已经复活 \n", RequestCode.SUCCESS.getCode());
+            });
+            return true;
+        } else {
+            return false;
+        }
     }
 }

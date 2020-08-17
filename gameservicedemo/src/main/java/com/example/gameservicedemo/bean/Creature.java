@@ -1,6 +1,6 @@
 package com.example.gameservicedemo.bean;
 
-import java.nio.Buffer;
+
 import java.util.List;
 import java.util.Map;
 
@@ -29,24 +29,28 @@ public interface Creature {
      * @return
      */
     Integer getHp();
+    Integer getMaxHp();
 
     /**
      * 设置血量
      * @param hp
      */
     void setHp(Integer hp);
+    void setMaxHp(Integer maxHp);
 
     /**
      * 获取魔法值（能量值）
      * @return
      */
     Integer getMp();
+    Integer getMaxMp();
 
     /**
      * 设置魔法值
      * @param mp
      */
     void setMp(Integer mp);
+    void setMaxMp(Integer maxMp);
 
     /**
      * 获取状态

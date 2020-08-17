@@ -51,6 +51,9 @@ public class Skill {
     @EntityName(column = "描述")
     private String   describe;
 
+    @EntityName(column = "技能语音")
+    private String sound;
+
     /**
      * 技能上一次使用的时间
      */

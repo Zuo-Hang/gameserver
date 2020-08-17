@@ -25,7 +25,7 @@ public enum ToolsType {
         this.type = type;
     }
 
-    public Integer getKind() {
+    public Integer getType() {
         return type;
     }
 }

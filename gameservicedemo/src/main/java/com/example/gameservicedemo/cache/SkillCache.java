@@ -20,7 +20,9 @@ import java.util.Map;
 @Component
 @Slf4j
 public class SkillCache {
-    /** 缓存 */
+    /**
+     * 缓存
+     */
     private static Cache<Integer, Skill> skillsCache = CacheBuilder.newBuilder()
             .recordStats()
             .removalListener(
@@ -28,21 +30,19 @@ public class SkillCache {
             ).build();
 
     /**
-     *     初始化技能
+     * 初始化技能
      */
     @PostConstruct
     private void init() {
         SkillExcelUtil skillExcelUtil = new SkillExcelUtil("C:\\java_project\\mmodemo\\gameservicedemo\\src\\main\\resources\\game_configuration_excel\\skill.xlsx");
         Map<Integer, Skill> skillMap = skillExcelUtil.getMap();
-
-        for (Skill skill : skillMap.values()) {
-            skillsCache.put(skill.getId(), skill);
-        }
+        skillMap.values().forEach((v) -> skillsCache.put(v.getId(), v));
         log.info("技能配置表加载");
     }
 
     /**
      * 获取技能
+     *
      * @param skillId
      * @return
      */
@@ -52,6 +52,7 @@ public class SkillCache {
 
     /**
      * 添加技能
+     *
      * @param skillId
      * @param value
      */

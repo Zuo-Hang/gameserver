@@ -53,7 +53,9 @@ public enum Command {
     /** 使用技能攻击怪物 **/
     SKILL_TO_MONSTER("skill_to_monster",4200),
     /** 技能攻击玩家 **/
-    SKILL_TO_PVP("skill_to_PVP",4300,"技能攻击玩家")
+    SKILL_TO_PVP("skill_to_PVP",4300,"技能攻击玩家"),
+    /** buffer开始 **/
+    START_BUFFER("start_buffer",3004,"buffer开始")
     ;
     private String command;
 

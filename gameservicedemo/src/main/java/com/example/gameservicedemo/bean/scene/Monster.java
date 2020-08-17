@@ -1,5 +1,6 @@
 package com.example.gameservicedemo.bean.scene;
 
+import com.example.gameservicedemo.bean.Creature;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

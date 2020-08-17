@@ -167,10 +167,12 @@ public class SkillService {
         skillWillCD.setName(skill.getName());
         //用于给用户显示还需cd多久
         skillWillCD.setCd(skill.getCd());
+        skillWillCD.setLevel(skill.getLevel());
+        skillWillCD.setMpConsumption(skill.getMpConsumption());
         skillWillCD.setCastTime(skill.getCastTime());
-        creature.getHasUseSkillMap().put(skill.getId(), skillWillCD);
         //设置上次使用技能的时间
         skillWillCD.setActiveTime(System.currentTimeMillis());
+        creature.getHasUseSkillMap().put(skill.getId(), skillWillCD);
         //定时器——>移除CD完成的技能
         TimedTaskManager.schedule(skill.getCd(), () -> creature.getHasUseSkillMap().remove(skill.getId()));
     }

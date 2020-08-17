@@ -1,5 +1,6 @@
 package com.example.gameservicedemo.manager;
 
+import com.example.gameservicedemo.event.Event;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,15 +35,15 @@ public class TimedTaskManager {
 
 
 
-//    /**
-//     *  设置定时任务
-//     * @param delay 延迟执行时间，单位毫秒
-//     * @param callback 任务
-//     * @return 一个带结果的future
-//     */
-//    public static Future<Event> scheduleWithData(long delay, Callable<Event> callback) {
-//        return ScheduledThreadPool.schedule(callback,delay, TimeUnit.MILLISECONDS);
-//    }
+    /**
+     *  设置定时任务
+     * @param delay 延迟执行时间，单位毫秒
+     * @param callback 任务
+     * @return 一个带结果的future
+     */
+    public static Future<Event> scheduleWithData(long delay, Callable<Event> callback) {
+        return ScheduledThreadPool.schedule(callback,delay, TimeUnit.MILLISECONDS);
+    }
 
 
     /**
@@ -76,7 +77,7 @@ public class TimedTaskManager {
      * @return    一个不带结果的future
      */
     public static ScheduledFuture<?> scheduleAtFixedRate(long initDelay , long delay , Runnable runnable) {
-        return ScheduledThreadPool.scheduleAtFixedRate(runnable,initDelay,delay, TimeUnit.MILLISECONDS);
+            return ScheduledThreadPool.scheduleAtFixedRate(runnable,initDelay,delay, TimeUnit.MILLISECONDS);
     }
 
 

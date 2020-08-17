@@ -3,6 +3,10 @@ package com.example.gameservicedemo.bean.shop;
 import com.example.gameservicedemo.util.excel.EntityName;
 import lombok.Data;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -28,8 +32,11 @@ public class Tools {
     @EntityName(column = "种类")
     private Integer kind;
 
+    /**
+     * 加成的json格式
+     */
     @EntityName(column = "属性")
-    private String roleProperties = "";
+    private String toolsProperties = "";
 
     @EntityName(column = "部位")
     private String part;
@@ -39,4 +46,10 @@ public class Tools {
 
     @EntityName(column = "描述")
     private String describe;
+
+    /** 物品状态，1为已装备，2为未装备 */
+    private Integer state;
+
+    /** 物品属性,此装备可以带来的加成、效果 */
+    private List<ToolsProperty> toolsPropertie=null;
 }

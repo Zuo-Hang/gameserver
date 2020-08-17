@@ -105,10 +105,13 @@ public class SkillEffect {
      *  对友方使用的技能
      */
     private void friendly(Creature initiator, Creature target, Scene gameScene, Skill skill) {
-// 消耗mp和治疗目标hp
+        // 消耗mp和治疗目标hp
         initiator.setMp(initiator.getMp() - skill.getMpConsumption());
-        target.setHp(target.getHp() + skill.getHeal());
-
+        Integer nowHp = target.getHp() + skill.getHeal() > target.getMaxHp() ? target.getMaxHp() : target.getHp() + skill.getHeal();
+        target.setHp(nowHp);
+        //释放技能音效
+        notificationManager.notifyScene(gameScene.getId(),skill.getSound(),RequestCode.SUCCESS.getCode());
+        //场景内通知
         if(skill.getHeal() > 0) {
             notificationManager.notifyScene(gameScene.getId(), MessageFormat.format("{0} 受到 {1} 的治疗,hp增加了 {2}，当前hp是 {3}",
                     target.getName(),initiator.getName(),skill.getHeal(),target.getHp()),RequestCode.SUCCESS.getCode());
