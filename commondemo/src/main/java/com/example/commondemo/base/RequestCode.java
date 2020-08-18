@@ -15,6 +15,8 @@ public enum RequestCode {
 
     ABOUT_SCENE(1213,"有关场景"),
 
+    ABOUT_BAG(1214,"有关背包"),
+
     BAD_REQUEST(400, "Bad Request"),
     /**找不到 */
     NOT_FOUND(404, "Not Found"),

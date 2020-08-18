@@ -1,16 +1,21 @@
 package com.example.gameservicedemo.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gamedatademo.bean.Bag;
 import com.example.gamedatademo.bean.Player;
+import com.example.gamedatademo.mapper.BagMapper;
 import com.example.gamedatademo.mapper.PlayerMapper;
 import com.example.gameservicedemo.bean.*;
 import com.example.gameservicedemo.bean.scene.Scene;
+import com.example.gameservicedemo.bean.shop.Tools;
 import com.example.gameservicedemo.bean.shop.ToolsProperty;
 import com.example.gameservicedemo.cache.PlayerCache;
 import com.example.gameservicedemo.bean.scene.NPC;
 import com.example.gameservicedemo.cache.ToolsPropertyCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.example.gameservicedemo.manager.TimedTaskManager;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -37,6 +42,8 @@ public class PlayerService {
     @Autowired
     PlayerCache playerCache;
     @Autowired
+    BagMapper bagMapper;
+    @Autowired
     SceneService sceneService;
     @Autowired
     ToolsPropertyCache toolsPropertyCache;
@@ -47,6 +54,7 @@ public class PlayerService {
 
     /**
      * 创建玩家
+     * -------------------------------------------------同时创建相关联的背包
      *
      * @param context
      * @param playerName
@@ -109,6 +117,7 @@ public class PlayerService {
 
     /**
      * 在化身加入缓存之前对其进行初始化
+     * 对于背包初始化
      * 初始化影响列表：
      *
      * @param playerBeCache
@@ -142,7 +151,23 @@ public class PlayerService {
         toolsInfluence.get(9).setValue(roleTypeById.getMagicDefense());
         toolsInfluence.get(10).setValue(roleTypeById.getEndurance());
         toolsInfluence.get(11).setValue(roleTypeById.getAp());
-
+        //初始化背包
+        Bag bag = bagMapper.selectByBagId(playerBeCache.getBagId());
+        BagBeCache bagBeCache = new BagBeCache();
+        bagBeCache.setPlayerId(playerBeCache.getPlayerId());
+        BeanUtils.copyProperties(bag,bagBeCache);
+        //获取背包中的物品信息并转化为对象
+        String json = bagBeCache.getItems();
+        Gson gson = new Gson();
+        ArrayList<Tools> toolslist = (ArrayList<Tools>) gson.fromJson(json, new TypeToken<ArrayList<Tools>>() {}.getType());
+        if(!Objects.isNull(toolslist)){
+            toolslist.forEach(v->{
+                //放入被缓存的背包中
+                bagBeCache.getToolsMap().put(v.getId(),v);
+            });
+        }
+        playerBeCache.setBagBeCache(bagBeCache);
+        log.info("角色：{} 的背包初始化完毕！",playerBeCache.getName());
     }
 
     /**
@@ -288,5 +313,23 @@ public class PlayerService {
         } else {
             return false;
         }
+    }
+
+    /**
+     * 查看背包
+     * @param context
+     */
+    public void seePlayerBag(ChannelHandlerContext context) {
+        BagBeCache bagBeCache = getPlayerByContext(context).getBagBeCache();
+        StringBuilder stringBuilder = new StringBuilder(MessageFormat.format("这个背包的大小为：{0}，背包中有：\n",bagBeCache.getSize()));
+        Map<Integer, Tools> toolsMap = bagBeCache.getToolsMap();
+        if(!Objects.isNull(toolsMap)){
+            toolsMap.values().forEach(v->{
+                stringBuilder.append(MessageFormat.format("名称：{0} 数量：{1}\n",v.getName(),v.getCount()));
+            });
+        }else{
+            stringBuilder.append("哦，空空如也！");
+        }
+        notificationManager.notifyByCtx(context,stringBuilder.toString(),RequestCode.ABOUT_BAG.getCode());
     }
 }

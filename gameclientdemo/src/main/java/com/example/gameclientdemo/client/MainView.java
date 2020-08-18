@@ -25,26 +25,26 @@ public class MainView extends JFrame {
     public MainView() {
         this.setLayout(null);
 
-        OUTPUT.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 16));
+        OUTPUT.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 15));
         OUTPUT.setLineWrap(true);
 
-        INPUT.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 20));
+        INPUT.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 15));
         INPUT.setLineWrap(true);
         INPUT.setText("请在此处输入命令");
 
-        INFORMATION.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 16));
+        INFORMATION.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 15));
         INFORMATION.setLineWrap(true);
         INFORMATION.setText("角色信息：\n 角色尚未登陆");
 
-        MAP.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 20));
+        MAP.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 15));
         MAP.setLineWrap(true);
         MAP.setText("位置 ：未知地点\n");
 
-        EQUIPMENT.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 20));
+        EQUIPMENT.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 15));
         EQUIPMENT.setLineWrap(true);
         EQUIPMENT.setText("装备栏：\n 角色尚未登陆");
 
-        BAG.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 20));
+        BAG.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 15));
         BAG.setLineWrap(true);
         BAG.setText("背包栏：\n 角色尚未登陆");
 

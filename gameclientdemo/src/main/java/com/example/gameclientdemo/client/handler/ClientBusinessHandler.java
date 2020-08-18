@@ -45,6 +45,9 @@ public class ClientBusinessHandler extends ChannelInboundHandlerAdapter {
             if(((Message) msg).getRequestCode()== RequestCode.ABOUT_SCENE.getCode()){
                 MainView.MAP.setText(((Message) msg).getMessage());
             }
+            if(((Message) msg).getRequestCode()== RequestCode.ABOUT_BAG.getCode()){
+                MainView.BAG.setText(((Message) msg).getMessage());
+            }
         }
     }
 

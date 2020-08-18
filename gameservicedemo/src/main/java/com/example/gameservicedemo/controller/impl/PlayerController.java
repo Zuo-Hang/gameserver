@@ -45,6 +45,7 @@ public class PlayerController {
         ControllerManager.add(Command.CAM_MOVE.getRequestCode(), this::canMove);
         ControllerManager.add(Command.MOVE.getRequestCode(), this::Move);
         ControllerManager.add(Command.SEE_PLAYER_SKILL.getRequestCode(),this::seePlayerSkill);
+        ControllerManager.add(Command.SEE_PLAYER_BAG.getRequestCode(),this::seePlayerBag);
     }
 
     /**
@@ -137,5 +138,15 @@ public class PlayerController {
     public void seePlayerSkill(ChannelHandlerContext context,Message message){
         CheckParametersUtil.checkParameter(context,message,1);
         playerService.seePlayerSkill(context);
+    }
+
+    /**
+     * 查看背包当前状况
+     * @param context
+     * @param message
+     */
+    public void seePlayerBag(ChannelHandlerContext context,Message message){
+        CheckParametersUtil.checkParameter(context,message,1);
+        playerService.seePlayerBag(context);
     }
 }

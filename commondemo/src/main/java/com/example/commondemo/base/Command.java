@@ -54,6 +54,15 @@ public enum Command {
     SKILL_TO_MONSTER("skill_to_monster",4200),
     /** 技能攻击玩家 **/
     SKILL_TO_PVP("skill_to_PVP",4300,"技能攻击玩家"),
+    /** 查看背包当前情况 */
+    SEE_PLAYER_BAG("see_player_bag",4001,"查看背包当前情况"),
+    /**
+     * 买东西
+     * 穿装备
+     * 卸装备
+     * 修理装备
+     * 出售装备
+     */
     /** buffer开始 **/
     START_BUFFER("start_buffer",3004,"buffer开始")
     ;

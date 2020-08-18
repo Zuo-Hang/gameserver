@@ -55,4 +55,8 @@ public class Player {
      * 好友
      */
     private String friends;
+    /**
+     * 该角色对应的背包
+     */
+    private Integer bagId;
 }

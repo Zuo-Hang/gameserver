@@ -10,9 +10,9 @@
 
     <insert id="insert" parameterType="com.example.gamedatademo.bean.Player" useGeneratedKeys="true" keyProperty="playerId">
     INSERT INTO player
-    (player_name, user_id,now_at)
+    (player_name, user_id,now_at,bag_id)
     VALUES
-    (#{playerName},#{userId}, #{nowAt});
+    (#{playerName},#{userId}, #{nowAt},{bagId});
     </insert>
 
     <select id="selectByUserId" resultType="com.example.gamedatademo.bean.Player">
@@ -20,7 +20,7 @@
     </select>
 
     <update id="updateByPlayerId" parameterType="com.example.gamedatademo.bean.Player">
-        UPDATE player SET player_name = #{playerName}, user_id = #{userId},now_at = #{nowAt}
+        UPDATE player SET player_name = #{playerName}, user_id = #{userId},now_at = #{nowAt},bag_id=#{bagId}
         WHERE player_id = #{playerId};
     </update>
 
