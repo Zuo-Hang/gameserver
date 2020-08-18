@@ -29,8 +29,23 @@ public class RoleType {
     @EntityName(column = "法术攻击")
     private Integer ap;
 
-    @EntityName(column = "防御力")
-    private Integer def;
+    @EntityName(column = "物理防御")
+    private Integer physicalDefense;
+
+    @EntityName(column = "法术防御")
+    private Integer magicDefense;
+
+    @EntityName(column = "耐力")
+    private Integer endurance;
+
+    @EntityName(column = "力量")
+    private Integer power;
+
+    @EntityName(column = "精神")
+    private Integer spirit;
+
+    @EntityName(column = "命中")
+    private Integer Hit;
 
     @EntityName(column = "技能")
     private String skills = "";
@@ -40,6 +55,10 @@ public class RoleType {
 
     @EntityName(column = "基础mp")
     private Integer baseMp;
+
+    @EntityName(column = "智力")
+    private Integer intelligence;
+
 
     /**
      * 用来存放该角色所具备的技能  键为技能id 值为技能对象

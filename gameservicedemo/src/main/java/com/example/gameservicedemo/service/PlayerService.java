@@ -5,8 +5,10 @@ import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.mapper.PlayerMapper;
 import com.example.gameservicedemo.bean.*;
 import com.example.gameservicedemo.bean.scene.Scene;
+import com.example.gameservicedemo.bean.shop.ToolsProperty;
 import com.example.gameservicedemo.cache.PlayerCache;
 import com.example.gameservicedemo.bean.scene.NPC;
+import com.example.gameservicedemo.cache.ToolsPropertyCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.example.gameservicedemo.manager.TimedTaskManager;
 import io.netty.channel.ChannelHandlerContext;
@@ -36,6 +38,8 @@ public class PlayerService {
     PlayerCache playerCache;
     @Autowired
     SceneService sceneService;
+    @Autowired
+    ToolsPropertyCache toolsPropertyCache;
     @Autowired
     RoleTypeService roleTypeService;
     @Autowired
@@ -105,6 +109,7 @@ public class PlayerService {
 
     /**
      * 在化身加入缓存之前对其进行初始化
+     * 初始化影响列表：
      *
      * @param playerBeCache
      */
@@ -117,6 +122,27 @@ public class PlayerService {
         playerBeCache.setMaxHp(roleTypeById.getBaseHp());
         playerBeCache.setMp(roleTypeById.getBaseMp());
         playerBeCache.setMaxMp(roleTypeById.getBaseMp());
+        //加载背包
+        //加载增益属性
+        Map<Integer, ToolsProperty> toolsInfluence = playerBeCache.getToolsInfluence();
+        for(int i=1;i<12;i++){
+            ToolsProperty toolsPropertyById = toolsPropertyCache.getToolsPropertyById(i);
+            ToolsProperty toolsProperty = new ToolsProperty();
+            BeanUtils.copyProperties(toolsPropertyById,toolsProperty);
+            toolsInfluence.put(toolsProperty.getId(),toolsProperty);
+        }
+        toolsInfluence.get(1).setValue(roleTypeById.getBaseHp());
+        toolsInfluence.get(2).setValue(roleTypeById.getBaseMp());
+        toolsInfluence.get(3).setValue(roleTypeById.getPhysicalDefense());
+        toolsInfluence.get(4).setValue(roleTypeById.getAd());
+        toolsInfluence.get(5).setValue(roleTypeById.getPower());
+        toolsInfluence.get(6).setValue(roleTypeById.getIntelligence());
+        toolsInfluence.get(7).setValue(roleTypeById.getSpirit());
+        toolsInfluence.get(8).setValue(roleTypeById.getHit());
+        toolsInfluence.get(9).setValue(roleTypeById.getMagicDefense());
+        toolsInfluence.get(10).setValue(roleTypeById.getEndurance());
+        toolsInfluence.get(11).setValue(roleTypeById.getAp());
+
     }
 
     /**

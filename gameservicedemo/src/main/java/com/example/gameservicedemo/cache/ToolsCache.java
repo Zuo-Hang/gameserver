@@ -44,6 +44,10 @@ public class ToolsCache {
         log.info("物品缓存完毕");
     }
 
+    /**
+     * 根据配置初始化工具的增益列表
+     * @param tools
+     */
     public void initTools(Tools tools) {
         //加入这件工具的作用
         //获取到配置的json字符串

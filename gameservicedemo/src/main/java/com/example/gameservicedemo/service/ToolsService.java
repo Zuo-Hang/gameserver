@@ -1,20 +1,23 @@
 package com.example.gameservicedemo.service;
 
+import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.bean.BagBeCache;
+import com.example.gameservicedemo.bean.Buffer;
 import com.example.gameservicedemo.bean.PlayerBeCache;
 import com.example.gameservicedemo.bean.shop.Tools;
 import com.example.gameservicedemo.bean.shop.ToolsProperty;
+import com.example.gameservicedemo.bean.shop.ToolsType;
 import com.example.gameservicedemo.cache.ToolsCache;
-import com.example.gameservicedemo.cache.ToolsPropertyCache;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
+import com.example.gameservicedemo.manager.NotificationManager;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.text.MessageFormat;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,13 +31,10 @@ import java.util.ArrayList;
 public class ToolsService {
     @Autowired
     ToolsCache toolsCache;
-//    final
-//    ToolsPropertyCache toolsPropertyCache;
-
-//    public ToolsService(ToolsCache toolsCache, ToolsPropertyCache toolsPropertyCache) {
-//        this.toolsCache = toolsCache;
-//        this.toolsPropertyCache = toolsPropertyCache;
-//    }
+    @Autowired
+    NotificationManager notificationManager;
+    @Autowired
+    BufferService bufferService;
 
     /**
      * 屏蔽数据与业务层
@@ -46,38 +46,62 @@ public class ToolsService {
         return toolsCache.getToolsById(toolsId);
     }
 
-//    /**
-//     * 根据配置信息初始化装备
-//     *
-//     * @param tools
-//     */
-//    public void initTools(Tools tools) {
-//        //加入这件工具的作用
-//        //获取到配置的json字符串
-//        String toolsProperties = tools.getToolsProperties();
-//        Gson gson = new Gson();
-//        //获取到的所有增益
-//        ArrayList<ToolsProperty> toolsPropertiesList = (ArrayList<ToolsProperty>) gson.fromJson(toolsProperties, new TypeToken<ArrayList<ToolsProperty>>() {
-//        }.getType());
-//        toolsPropertiesList.forEach(pro->{
-//            ToolsProperty toolsPropertyById = toolsPropertyCache.getToolsPropertyById(pro.getId());
-//            pro.setName(toolsPropertyById.getName());
-//            pro.setType(toolsPropertyById.getType());
-//            pro.setDescribe(toolsPropertyById.getDescribe());
-//        });
-//        tools.setToolsPropertie(toolsPropertiesList);
-//        log.info(MessageFormat.format("装备：{0} 的自带增益初始化完成",tools.getName()));
-//    }
-
     /**
      * 装配某件装备
      * 1.获取玩家的背包
      * 2.判断背包中是否有此装备，判断此物品是否是可穿戴的装备
      * 3.判断穿戴位置是否有空，无空则替换装备
      * 4.穿戴完毕后改变玩家增益属性
+     *
+     * @param player
      * @param tools
+     * @return
      */
-    public boolean assemblingTools(PlayerBeCache player ,Tools tools) {
+    public boolean assemblingTools(PlayerBeCache player, Tools tools) {
+        //--------------------------------------------------------------在装备买入的时候一定要深拷贝一个新的对象------------
+        BagBeCache bagBeCache = player.getBagBeCache();
+        Tools tools1 = bagBeCache.getToolsMap().get(tools.getId());
+        Integer kind = tools.getKind();
+        if (!ToolsType.EQUIPMENT.equals(kind)) {
+            notificationManager.notifyPlayer(player, "此物品并非可装配的整备", RequestCode.BAD_REQUEST.getCode());
+            return false;
+        }
+        if (Objects.isNull(tools1)) {
+            notificationManager.notifyPlayer(player, "你的背包中还没有这件装备哦", RequestCode.BAD_REQUEST.getCode());
+            return false;
+        }
+        if (player.getEquipmentBar().size() >= 6) {
+            notificationManager.notifyPlayer(player, "你的装备栏已满，使用指令\"\"替换装备", RequestCode.BAD_REQUEST.getCode());
+            return false;
+        }
+        //将背包中的装备添加到装备栏
+        player.getEquipmentBar().put(tools1.getId(), tools1);
+        //将背包中的装备移除
+        bagBeCache.getToolsMap().remove(tools1.getId());
+        //计算装备对玩家属性的影响
+        Map<Integer, ToolsProperty> toolsInfluence = player.getToolsInfluence();
+        //buf影响（装备的唯一被动，如名刀、金身、复活甲等）
+        //----------------------------------------------------------------------------------------------------需细化
+        Integer bufferId = tools.getBuffer();
+        if (bufferId != null) {
+            Buffer buffer1 = new Buffer();
+            Buffer buffer = bufferService.getBuffer(bufferId);
+            BeanUtils.copyProperties(buffer, buffer1);
+            boolean add = player.getBufferList().add(buffer1);
+            if (add) {
+                log.info("{}添加了Buf{}", player.getName(), buffer1.getName());
+            }
+        }
+
+        //性能影响
+        List<ToolsProperty> toolsPropertie = tools.getToolsPropertie();
+        if (!Objects.isNull(toolsPropertie)) {
+            toolsPropertie.forEach(v -> {
+                //将装备的影响叠加到用户的影响集合数值上
+                int value = toolsInfluence.get(v.getId()).getValue() + v.getValue();
+                toolsInfluence.get(v.getId()).setValue(value);
+            });
+        }
         return true;
     }
 
@@ -85,9 +109,44 @@ public class ToolsService {
      * 卸载某个装备
      * 1.判断此装备是否被装配
      * 2.移除装备放入背包
+     * 3.用户加成减去装备的影响值，去除装备带来的buf
+     *
+     * @param player
      * @param tools
      */
-    public void uninstallTools(PlayerBeCache player,Tools tools) {
+    public boolean uninstallTools(PlayerBeCache player, Tools tools) {
+        Tools tools1 = player.getEquipmentBar().get(tools.getId());
+        if (Objects.isNull(tools1)) {
+            notificationManager.notifyPlayer(player, "你的装备栏并没有这件装备哦", RequestCode.BAD_REQUEST.getCode());
+            return false;
+        }
+        Tools remove = player.getEquipmentBar().remove(tools.getId());
+        List<ToolsProperty> toolsPropertie = remove.getToolsPropertie();
+        //去除buf加成--------------------------------------------------------------------------------------
+        //更新影响
+        if (!Objects.isNull(toolsPropertie)) {
+            toolsPropertie.forEach(v -> {
+                int value = player.getToolsInfluence().get(v.getId()).getValue() - v.getValue();
+                player.getToolsInfluence().get(v.getId()).setValue(value);
+            });
+        }
+        //将卸下的装备放回背包
+        player.getBagBeCache().getToolsMap().put(remove.getId(), remove);
+        return true;
+    }
 
+    /**
+     * 更换装备
+     * 先卸载，再装配
+     *
+     * @param player   玩家
+     * @param toolsOut 需要卸下的装备
+     * @param toolsIn  需要装配的装备
+     * @return
+     */
+    public boolean changeTools(PlayerBeCache player, Tools toolsOut, Tools toolsIn) {
+        boolean b1 = uninstallTools(player, toolsOut);
+        boolean b = assemblingTools(player, toolsIn);
+        return true;
     }
 }
