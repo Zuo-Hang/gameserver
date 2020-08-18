@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.bean;
 
 import com.example.gamedatademo.bean.Player;
+import com.example.gameservicedemo.bean.shop.Tools;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,6 +38,11 @@ public class PlayerBeCache extends Player implements Creature{
 
     /** 角色当前的buffer,因为可能拥有多个重复的技能，所以这里使用List保存 */
     private List<Buffer> bufferList = new CopyOnWriteArrayList<>();
+
+    /** 装备栏 装备id 装备 最大值为6 小于6则可以进行装配，否则只能换装*/
+    private Map<Integer, Tools> equipmentBar = new ConcurrentHashMap<>();
+    // 背包栏
+    //private Bag bag = new Bag(this.getId(),"16格背包",16,1) ;
 
     @Override
     public Integer getId() {

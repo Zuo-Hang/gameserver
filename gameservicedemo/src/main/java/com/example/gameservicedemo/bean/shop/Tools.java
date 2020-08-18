@@ -49,7 +49,8 @@ public class Tools {
 
     /** 物品状态，1为已装备，2为未装备 */
     private Integer state;
-
+    /** 物品在背包中被叠加的数量 */
+    private Integer count;
     /** 物品属性,此装备可以带来的加成、效果 */
     private List<ToolsProperty> toolsPropertie=null;
 }

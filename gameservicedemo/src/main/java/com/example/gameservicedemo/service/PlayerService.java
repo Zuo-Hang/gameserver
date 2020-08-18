@@ -196,63 +196,6 @@ public class PlayerService {
     }
 
     /**
-     * 获取可以移动到的位置
-     *
-     * @param context
-     */
-    public void canMove(ChannelHandlerContext context) {
-        PlayerBeCache playerByCtx = playerCache.getPlayerByCtx(context);
-        Integer nowAt = playerByCtx.getNowAt();
-        //缓存中获取场景信息
-        List<Integer> neighborScene = sceneService.getScene(nowAt).getNeighborScene();
-        if (neighborScene.isEmpty()) {
-            notificationManager.notifyByCtx(context, "这里已经是世界的尽头了", RequestCode.SUCCESS.getCode());
-            return;
-        }
-        StringBuffer ret = new StringBuffer();
-        ret.append("\n相邻场景如下：\n");
-        for (Integer sceneId : neighborScene) {
-            Scene scene = sceneService.getScene(sceneId);
-            String sceneInformation = scene.getId() + " " + scene.getName() + " " + scene.getDescribe() + "\n";
-            ret.append("场景：" + sceneInformation);
-        }
-        notificationManager.notifyByCtx(context, ret, RequestCode.SUCCESS.getCode());
-    }
-
-    /**
-     * 化身移动
-     *
-     * @param context 上下文
-     * @param sceneId 将移动到的场景id
-     */
-    public void move(ChannelHandlerContext context, Integer sceneId) {
-        //获取当前化身，并设置自身位置，更新数据库当中的场景信息
-        PlayerBeCache playerByCtx = playerCache.getPlayerByCtx(context);
-        Integer nowAt = playerByCtx.getNowAt();
-        //获取当前场景
-        Scene sceneNow = sceneService.getScene(nowAt);
-        //进行判断从当前场景是否可以到达目标场景
-        if (!sceneNow.getNeighborScene().contains(sceneId)) {
-            notificationManager.notifyByCtx(context, "这里并不能到达地点" + sceneId, RequestCode.BAD_REQUEST.getCode());
-            return;
-        }
-        Scene whileGo = sceneService.getScene(sceneId);
-        if (!Objects.isNull(whileGo)) {
-            //移除旧场景中的化身
-            sceneNow.getPlayers().remove(playerByCtx.getPlayerId());
-            //更新player缓存中的玩家信息
-            playerByCtx.setNowAt(sceneId);
-            PlayerBeCache playerByCtx1 = playerCache.getPlayerByCtx(context);
-            log.info(playerByCtx1.toString());
-            //在新场景中加入化身
-            whileGo.getPlayers().put(playerByCtx.getPlayerId(), playerByCtx);
-            notificationManager.notifyByCtx(context, "你已在场景：" + whileGo.getName(), RequestCode.ABOUT_SCENE.getCode());
-        } else {
-            notificationManager.notifyByCtx(context, "输入的场景名称错误", RequestCode.BAD_REQUEST.getCode());
-        }
-    }
-
-    /**
      * 通过context获取角色
      *
      * @param context

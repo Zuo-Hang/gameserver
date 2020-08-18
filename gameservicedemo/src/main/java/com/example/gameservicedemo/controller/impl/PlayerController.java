@@ -5,6 +5,7 @@ import com.example.commondemo.base.RequestCode;
 import com.example.commondemo.message.Message;
 import com.example.gameservicedemo.controller.ControllerManager;
 import com.example.gameservicedemo.service.PlayerService;
+import com.example.gameservicedemo.service.SceneService;
 import com.example.gameservicedemo.service.UserService;
 import com.example.gameservicedemo.bean.UserBeCache;
 import com.example.gameservicedemo.manager.NotificationManager;
@@ -31,6 +32,8 @@ public class PlayerController {
     PlayerService playerService;
     @Resource
     UserService userService;
+    @Autowired
+    SceneService sceneService;
     @Autowired
     NotificationManager notificationManager;
 
@@ -110,7 +113,7 @@ public class PlayerController {
      * @param message
      */
     public void canMove(ChannelHandlerContext ctx, Message message) {
-        playerService.canMove(ctx);
+        sceneService.canMove(ctx);
     }
 
     /**
@@ -122,7 +125,7 @@ public class PlayerController {
     public void Move(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
         Integer sceneId = Integer.valueOf(strings[1]);
-        playerService.move(context, sceneId);
+        sceneService.move(context, sceneId);
 
     }
 

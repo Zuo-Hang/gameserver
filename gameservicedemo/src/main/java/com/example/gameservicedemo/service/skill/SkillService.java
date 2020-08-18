@@ -15,6 +15,7 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.Objects;
@@ -26,7 +27,7 @@ import java.util.Objects;
  * @Date: 2020/08/13/15:39
  * @Description: 主要进行对技能的处理
  */
-@Component
+@Service
 @Slf4j
 public class SkillService {
     @Autowired

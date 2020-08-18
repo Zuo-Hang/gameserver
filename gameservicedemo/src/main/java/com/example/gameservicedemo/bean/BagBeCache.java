@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.bean;
 
 import com.example.gamedatademo.bean.Bag;
+import com.example.gameservicedemo.bean.shop.Tools;
 import lombok.Data;
 
 import java.util.Map;
@@ -16,6 +17,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 @Data
 public class BagBeCache extends Bag {
     private Integer playerId;
-    Map<Integer,Item> itemMap = new ConcurrentSkipListMap<>();
-
+    /** 背包中的物品 */
+    Map<Integer, Tools> toolsMap=new ConcurrentSkipListMap<>();
 }

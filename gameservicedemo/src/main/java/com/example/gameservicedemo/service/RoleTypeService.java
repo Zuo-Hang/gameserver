@@ -4,6 +4,7 @@ import com.example.gameservicedemo.bean.RoleType;
 import com.example.gameservicedemo.cache.RoleTypeCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.Map;
  * @Date: 2020/08/13/20:23
  * @Description: 角色类型服务
  */
-@Component
+@Service
 public class RoleTypeService {
     @Autowired
     RoleTypeCache roleTypeCache;

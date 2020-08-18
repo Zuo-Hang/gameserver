@@ -15,7 +15,7 @@ public class Bag {
     private Integer size;
     private String name;
     /**
-     * 存放的物品
+     * 存放的物品,最终以json的格式落库
      */
     private String items;
 }

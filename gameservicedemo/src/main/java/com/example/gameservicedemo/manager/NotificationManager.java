@@ -12,6 +12,7 @@ import com.example.gameservicedemo.service.SceneService;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ import java.util.Optional;
  * @Description:通知管理器
  */
 @Slf4j
-@Service
+@Component
 public class NotificationManager {
 
     @Autowired
