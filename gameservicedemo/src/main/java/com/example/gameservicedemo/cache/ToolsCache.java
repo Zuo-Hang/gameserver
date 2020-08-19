@@ -14,7 +14,7 @@ import javax.annotation.PostConstruct;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,16 +27,15 @@ import java.util.Objects;
 @Slf4j
 public class ToolsCache {
 
-    @Autowired
-    public ToolsService toolsService;
-    @Autowired
-    public ToolsPropertyCache toolsPropertyCache;
+//    @Autowired
+//    public ToolsService toolsService;
 
     private HashMap<Integer, Tools> toolsCache= new HashMap<Integer, Tools>();
     @PostConstruct
     public void init(){
         ToolsExcelUtil toolsExcelUtil = new ToolsExcelUtil("C:\\java_project\\mmodemo\\gameservicedemo\\src\\main\\resources\\game_configuration_excel\\tools.xlsx");
-        toolsExcelUtil.getMap().values().forEach((v)->{
+        Map<Integer, Tools> map = toolsExcelUtil.getMap();
+        map.values().forEach((v)->{
             //将这个装备的效果加载
             initTools(v);
             toolsCache.put(v.getId(),v);
@@ -56,15 +55,6 @@ public class ToolsCache {
         //获取到的所有增益
         ArrayList<ToolsProperty> toolsPropertiesList = (ArrayList<ToolsProperty>) gson.fromJson(toolsProperties, new TypeToken<ArrayList<ToolsProperty>>() {
         }.getType());
-        //对获取到的增益list进行判断，可能为空
-        if(!Objects.isNull(toolsPropertiesList)){
-            toolsPropertiesList.forEach(pro->{
-                ToolsProperty toolsPropertyById = toolsPropertyCache.getToolsPropertyById(pro.getId());
-                pro.setName(toolsPropertyById.getName());
-                pro.setType(toolsPropertyById.getType());
-                pro.setDescribe(toolsPropertyById.getDescribe());
-            });
-        }
         tools.setToolsPropertie(toolsPropertiesList);
         log.info(MessageFormat.format("装备：{0} 的自带增益初始化完成",tools.getName()));
     }

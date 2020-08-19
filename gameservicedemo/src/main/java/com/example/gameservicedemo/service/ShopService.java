@@ -1,10 +1,18 @@
 package com.example.gameservicedemo.service;
 
+import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.bean.shop.Shop;
 import com.example.gameservicedemo.bean.shop.Tools;
+import com.example.gameservicedemo.bean.shop.ToolsType;
+import com.example.gameservicedemo.cache.ShopCache;
+import com.example.gameservicedemo.manager.NotificationManager;
+import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.text.MessageFormat;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,23 +25,45 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ShopService {
     @Autowired
-    ToolsService toolsService;
+    ShopCache shopCache;
+    @Autowired
+    NotificationManager notificationManager;
 
     /**
-     * 初始化商店的货架
-     * @param shop
+     * 展示
+     * 应按照装备的属性展示这些可购买的装备 （id 名字）
      */
-    public void initShopGoodsMap(Shop shop){
-        String goods = shop.getGoods();
-        String[] split = goods.split(",");
-        for (String s : split) {
-            //获取到商品
-            Tools toolsById = toolsService.getToolsById(Integer.valueOf(s));
-            //放入货架
-            shop.getGoodsMap().put(toolsById.getId(),toolsById);
-        }
-        log.info("商店：{} 的货架初始化完毕",shop.getShopName());
+    public void showShop(ChannelHandlerContext context){
+        Shop shopById = shopCache.getShopById(1);
+        StringBuilder stringBuilder = new StringBuilder(MessageFormat.format("欢迎来到{0},这里的待售物品如下：\n", shopById.getShopName()));
+        Map<Integer, Tools> goodsMap = shopById.getGoodsMap();
+        StringBuilder stringBuilder1 = new StringBuilder(ToolsType.PHYSICS.getDescribe()+":\n");
+        StringBuilder stringBuilder2 = new StringBuilder(ToolsType.MAGIC.getDescribe()+":\n");
+        StringBuilder stringBuilder3 = new StringBuilder(ToolsType.DEFENSE.getDescribe()+":\n");
+        StringBuilder stringBuilder4 = new StringBuilder(ToolsType.MEDICINE.getDescribe()+":\n");
+        StringBuilder stringBuilder5 = new StringBuilder(ToolsType.PEST.getDescribe()+":\n");
+        goodsMap.values().forEach(v->{
+            String s = MessageFormat.format("商品id：{0}  商品名称：{1}\n", v.getId(), v.getName());
+            switch (v.getType()){
+                case 1:
+                    stringBuilder1.append(s);
+                    break;
+                case 2:
+                    stringBuilder2.append(s);
+                    break;
+                case 3:
+                    stringBuilder3.append(s);
+                    break;
+                case 4:
+                    stringBuilder4.append(s);
+                    break;
+                case 5:
+                    stringBuilder5.append(s);
+                    break;
+            }
+        });
+        stringBuilder.append(stringBuilder1).append(stringBuilder2).append(stringBuilder3).append(stringBuilder4).append(stringBuilder5);
+        stringBuilder.append("你可以使用\"see_tools_info\"来查看某一商品的详细信息！");
+        notificationManager.notifyByCtx(context,stringBuilder.toString(), RequestCode.SUCCESS.getCode());
     }
-
-
 }

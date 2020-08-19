@@ -35,14 +35,17 @@ public class Buffer {
     private Integer effect;
 
     @EntityName(column = "持续时间")
-    private Long duration;
+    private Integer duration;
 
     @EntityName(column = "间隔时间")
     private Integer intervalTime;
 
     @EntityName(column = "次数")
     private Integer times;
-
+    @EntityName(column = "描述")
+    private String describe;
+    @EntityName(column = "cd")
+    private Integer cd;
 
 
     private long startTime;

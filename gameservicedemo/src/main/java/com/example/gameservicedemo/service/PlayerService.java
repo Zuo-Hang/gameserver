@@ -11,7 +11,6 @@ import com.example.gameservicedemo.bean.shop.Tools;
 import com.example.gameservicedemo.bean.shop.ToolsProperty;
 import com.example.gameservicedemo.cache.PlayerCache;
 import com.example.gameservicedemo.bean.scene.NPC;
-import com.example.gameservicedemo.cache.ToolsPropertyCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.example.gameservicedemo.manager.TimedTaskManager;
 import com.google.common.reflect.TypeToken;
@@ -45,8 +44,8 @@ public class PlayerService {
     BagMapper bagMapper;
     @Autowired
     SceneService sceneService;
-    @Autowired
-    ToolsPropertyCache toolsPropertyCache;
+//    @Autowired
+//    ToolsPropertyCache toolsPropertyCache;
     @Autowired
     RoleTypeService roleTypeService;
     @Autowired
@@ -131,26 +130,17 @@ public class PlayerService {
         playerBeCache.setMaxHp(roleTypeById.getBaseHp());
         playerBeCache.setMp(roleTypeById.getBaseMp());
         playerBeCache.setMaxMp(roleTypeById.getBaseMp());
-        //加载背包
-        //加载增益属性
-        Map<Integer, ToolsProperty> toolsInfluence = playerBeCache.getToolsInfluence();
-        for(int i=1;i<12;i++){
-            ToolsProperty toolsPropertyById = toolsPropertyCache.getToolsPropertyById(i);
-            ToolsProperty toolsProperty = new ToolsProperty();
-            BeanUtils.copyProperties(toolsPropertyById,toolsProperty);
-            toolsInfluence.put(toolsProperty.getId(),toolsProperty);
+        //加载增益属性---------------------------------------------------------------------------------------------
+        Map<Integer, ToolsProperty> toolsInfluence1 = playerBeCache.getToolsInfluence();
+        String attribute = roleTypeById.getGainAttribute();
+        Gson gson1 = new Gson();
+        ArrayList<ToolsProperty> ToolsPropertylist = (ArrayList<ToolsProperty>) gson1.fromJson(attribute, new TypeToken<ArrayList<ToolsProperty>>() {}.getType());
+        if(!Objects.isNull(ToolsPropertylist)){
+            ToolsPropertylist.forEach(v->{
+                toolsInfluence1.put(v.getId(),v);
+            });
         }
-        toolsInfluence.get(1).setValue(roleTypeById.getBaseHp());
-        toolsInfluence.get(2).setValue(roleTypeById.getBaseMp());
-        toolsInfluence.get(3).setValue(roleTypeById.getPhysicalDefense());
-        toolsInfluence.get(4).setValue(roleTypeById.getAd());
-        toolsInfluence.get(5).setValue(roleTypeById.getPower());
-        toolsInfluence.get(6).setValue(roleTypeById.getIntelligence());
-        toolsInfluence.get(7).setValue(roleTypeById.getSpirit());
-        toolsInfluence.get(8).setValue(roleTypeById.getHit());
-        toolsInfluence.get(9).setValue(roleTypeById.getMagicDefense());
-        toolsInfluence.get(10).setValue(roleTypeById.getEndurance());
-        toolsInfluence.get(11).setValue(roleTypeById.getAp());
+        //-------------------------------------------------------------------------------------------------------
         //初始化背包
         Bag bag = bagMapper.selectByBagId(playerBeCache.getBagId());
         BagBeCache bagBeCache = new BagBeCache();
@@ -331,5 +321,16 @@ public class PlayerService {
             stringBuilder.append("哦，空空如也！");
         }
         notificationManager.notifyByCtx(context,stringBuilder.toString(),RequestCode.ABOUT_BAG.getCode());
+    }
+
+    /**
+     * 购买装备
+     * 1.钱（判断、更改）
+     * 2.放入背包，背包是否还有位置
+     * @param context
+     * @param toolsId
+     */
+    public void buyTools(ChannelHandlerContext context,Integer toolsId){
+
     }
 }

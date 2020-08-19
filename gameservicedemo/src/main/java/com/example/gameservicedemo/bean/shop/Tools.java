@@ -26,11 +26,11 @@ public class Tools {
     @EntityName(column="触发效果")
     private Integer  buffer;
 
-    @EntityName(column="装备等级")
-    private Integer level;
+    @EntityName(column="耐久度")
+    private Integer durability;
 
-    @EntityName(column = "种类")
-    private Integer kind;
+    @EntityName(column = "可叠加数量")
+    private Integer repeat;
 
     /**
      * 加成的json格式
@@ -38,14 +38,18 @@ public class Tools {
     @EntityName(column = "属性")
     private String toolsProperties = "";
 
-    @EntityName(column = "部位")
-    private String part;
+    @EntityName(column = "购入价格")
+    private Integer priceIn ;
 
-    @EntityName(column = "价格")
-    private Integer price ;
+    @EntityName(column = "卖出价格")
+    private Integer priceOut ;
 
     @EntityName(column = "描述")
     private String describe;
+
+    /** 属于哪种物品（装备由此属性和repeatKind共同决定） 装备、药品、宠物*/
+    @EntityName(column = "类型")
+    private Integer type;
 
     /** 物品状态，1为已装备，2为未装备 */
     private Integer state;

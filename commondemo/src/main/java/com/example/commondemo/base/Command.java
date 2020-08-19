@@ -14,6 +14,7 @@ import java.util.Map;
  * 2. 2000 - 2999 之间为与用户相关的操作
  * 3. 3000 - 3999 之间为与角色场景相关
  * 4. 4000 - 4999 之间为技能相关
+ * 5. 5000 - 5999 之间为和装备有关
  */
 public enum Command {
     /** 心跳 **/
@@ -22,6 +23,8 @@ public enum Command {
     RECONNECTION("Reconnection",1100,"断线重连 参数为userId 例如：Reconnection 1"),
     /** 未知的命令 */
     UNKNOWN("unknown", 1999,"未知的命令"),
+
+
     /** 创建用户 */
     USER_CREATE("user_create",2000,"创建用户，参数为用户昵称、密码、手机号，会返回登陆的唯一id, 例： user_create 玩家66 123 1501545"),
     /** 玩家登陆, 参数为 用户账号和密码，例： login 2 12345*/
@@ -38,6 +41,8 @@ public enum Command {
     PLAYER_LOGIN("load",2600," 角色登陆 ，参数为 当前用户下的角色id，例： 2001 1313"),
      /** 玩家退出，无参数， 例： exit*/
     PLAYER_EXIT("exit",2900,"玩家退出，无参数， 例： exit"),
+
+
     /** 角色从当前位置可以进行的移动 例： move **/
     CAM_MOVE("can_move",2710,"可以移动到的地方，参数 无"),
     /** 角色移动， 参数 场景id ， 例： move 2 **/
@@ -46,6 +51,8 @@ public enum Command {
     AOI("aoi",3000,"AOI, 显示场景内各种游戏对象"),
     /** 与npc谈话 **/
     TALK_WITH_NPC("talk",3100,"与npc谈话"),
+
+
     /** 查看当前角色的技能状况 */
     SEE_PLAYER_SKILL("see_player_skill",4000,"查看当前角色的技能状况"),
     /** 对己方使用技能 **/
@@ -56,13 +63,26 @@ public enum Command {
     SKILL_TO_PVP("skill_to_PVP",4300,"技能攻击玩家"),
     /** 查看背包当前情况 */
     SEE_PLAYER_BAG("see_player_bag",4001,"查看背包当前情况"),
-    /**
-     * 买东西
-     * 穿装备
-     * 卸装备
-     * 修理装备
-     * 出售装备
-     */
+
+
+    /** 展示商店 show_shop 5000 */
+    SHOW_SHOP("show_shop",5000,"展示商店中可以购买的物品"),
+    /** 查看装备详情信息 see_tools_info 5100 */
+    SEE_TOOLS_INFO("see_tools_info",5100,"查看某件装备的详细信息"),
+    /** 买东西 buy_tools 5200 */
+    BUY_TOOLS("buy_tools",5200,"购买某件物品 buy_tools 物品id 例子：buy_tools 1"),
+    /** 穿装备 wear_tools 5300 */
+    WEAR_TOOLS("wear_tools",5300,"穿戴背包中的某件装备 wear_tools 装备id"),
+    /** 卸装备 take_off_tools 5400 */
+    TAKE_OFF_TOOLS("take_off_tools",5400,"卸装备 take_off_tools 装备id"),
+    /** 更换装备 replace_tools 5500 */
+    REPLACE_TOOLS("replace_tools",5500,"更换装备 replace_tools 原装备id 新装备id"),
+    /** 修理装备 fix_tools 5600 */
+    FIX_TOOLS("fix_tools",5600,"修理某件装备 fix_tools 装备id"),
+    /** 出售装备 sell_tools 5700 */
+    SELL_TOOLS("sell_tools",5700,"出售不再需要的装备 sell_tools 装备id"),
+
+
     /** buffer开始 **/
     START_BUFFER("start_buffer",3004,"buffer开始")
     ;

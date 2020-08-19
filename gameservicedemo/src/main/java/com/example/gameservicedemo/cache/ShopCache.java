@@ -2,6 +2,7 @@ package com.example.gameservicedemo.cache;
 
 import com.example.gameservicedemo.bean.shop.Shop;
 import com.example.gameservicedemo.service.ShopService;
+import com.example.gameservicedemo.service.ToolsService;
 import com.example.gameservicedemo.util.excel.subclassexcelutil.ShopExcelUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +22,14 @@ import java.util.HashMap;
 @Slf4j
 public class ShopCache {
     @Autowired
-    ShopService shopService;
+    ToolsService toolsService;
 
     private HashMap<Integer, Shop> shopCache=new HashMap<Integer, Shop>();
     @PostConstruct
     public void init(){
         ShopExcelUtil shopExcelUtil = new ShopExcelUtil("C:\\java_project\\mmodemo\\gameservicedemo\\src\\main\\resources\\game_configuration_excel\\shop.xlsx");
         shopExcelUtil.getMap().values().forEach(v->{
-            shopService.initShopGoodsMap(v);
+            toolsService.initShopGoodsMap(v);
             shopCache.put(v.getShopId(),v);
         });
         log.info("商城信息缓存加载完毕！");

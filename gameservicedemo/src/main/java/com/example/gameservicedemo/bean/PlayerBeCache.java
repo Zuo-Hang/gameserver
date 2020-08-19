@@ -59,18 +59,24 @@ public class PlayerBeCache extends Player implements Creature {
     /**
      * 这个集合的元素应该在用户加入缓存之前就初始化
      * 受装备影响的属性值，集合中的元素代表当前装备对某一方面加成的总和数值
-     * <K,V>
-     * 1：HP
-     * 2：MP
-     * 3：物理防御
-     * 4：物理攻击
-     * 5：力量
-     * 6：智力
-     * 7：精神
-     * 8：命中
-     * 9：法术防御
-     * 10：耐力
-     * 11:法术攻击
+     * ID
+     * 1	HP增益
+     * 2	MP增益
+     * 3	物理攻击
+     * 4	法术攻击
+     * 5	物理穿透
+     * 6	法术穿透
+     * 7	物理防御
+     * 8	法术防御
+     * 9	物理吸血
+     * 10	法术吸血
+     * 11	暴击率
+     * 12	冷却  为百分比
+     * 13	暴击效果
+     * 14	恢复HP速度
+     * 15	恢复MP速度
+     *
+     * v 只有两个属性 id 和value  可以用id在缓存的map中查找到对这种id类型的描述
      */
     private Map<Integer, ToolsProperty> toolsInfluence = new ConcurrentHashMap<>();
 

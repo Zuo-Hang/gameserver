@@ -1,31 +1,39 @@
 package com.example.gameservicedemo.bean.shop;
 
+import lombok.Data;
+
 /**
  * Created with IntelliJ IDEA.
  *
  * @author: hang hang
- * @Date: 2020/08/11/17:38
- * @Description: 道具类型
+ * @Date: 2020/08/19/11:41
+ * @Description: 物品类型
  */
 public enum ToolsType {
 
-    /** 普通物品，占一个格子*/
-    COMMON_THING(1),
+    PHYSICS(1,"物理加成类装备"),
 
-    /** 装备 **/
-    EQUIPMENT(2),
+    MAGIC(2,"法术加成类装备"),
 
-    /** 可堆叠 **/
-    STACKABLE(3)
+    DEFENSE(3,"防御类装备"),
+
+    MEDICINE(4,"药品"),
+
+    PEST(5,"宠物")
     ;
+    Integer code;
+    String describe;
 
-    private Integer type;
-
-    ToolsType(Integer type) {
-        this.type = type;
+    ToolsType(Integer code, String describe) {
+        this.code = code;
+        this.describe = describe;
     }
 
-    public Integer getType() {
-        return type;
+    public Integer getCode() {
+        return code;
+    }
+
+    public String getDescribe() {
+        return describe;
     }
 }

@@ -117,4 +117,19 @@ public class BufferService {
     public Buffer getBuffer(Integer bufferId){
         return bufferCache.getBufById(bufferId);
     }
+
+    /**
+     * 获取buffer的详细信息字符串
+     * @param buffer
+     * @return
+     */
+    public String bufferInfo(Buffer buffer){
+        return new StringBuilder(MessageFormat.format("名称：{0} 是否可覆盖：{1} 效果：{2} 持续时间：{3} cd时间：{4} ",
+                buffer.getName(),
+                buffer.getCover()==1?"是":"否",
+                buffer.getEffect(),
+                buffer.getDuration(),
+                buffer.getIntervalTime()
+                )).toString();
+    }
 }
