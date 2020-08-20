@@ -9,6 +9,7 @@ import com.example.gameservicedemo.bean.shop.Tools;
 import com.example.gameservicedemo.bean.shop.ToolsProperty;
 import com.example.gameservicedemo.bean.shop.ToolsRepeatKind;
 import com.example.gameservicedemo.cache.ToolsCache;
+import com.example.gameservicedemo.cache.ToolsPropertyInfoCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -197,7 +198,7 @@ public class ToolsService {
         List<ToolsProperty> toolsPropertie = toolsById.getToolsPropertie();
         if(!Objects.isNull(toolsPropertie)){
             toolsPropertie.forEach(v->{
-                add.append(MessageFormat.format("{0}增加{1}点;",v.getId(),v.getValue()));
+                add.append(MessageFormat.format("{0}增加{1}点;", ToolsPropertyInfoCache.toolsPropertyInfoCache.get(v.getId()),v.getValue()));
             });
         }
         StringBuilder stringBuilder = new StringBuilder("物品的详细信息如下：\n");

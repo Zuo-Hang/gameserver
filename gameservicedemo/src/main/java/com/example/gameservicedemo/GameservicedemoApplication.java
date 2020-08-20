@@ -21,6 +21,5 @@ public class GameservicedemoApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         nettyServer.start();
-
     }
 }

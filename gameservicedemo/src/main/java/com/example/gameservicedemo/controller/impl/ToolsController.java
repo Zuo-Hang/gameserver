@@ -47,7 +47,7 @@ public class ToolsController {
     }
 
     /**
-     * 查看商店
+     * 查看商店  ok
      *
      * @param context
      * @param message
@@ -58,7 +58,7 @@ public class ToolsController {
     }
 
     /**
-     * 查看装备详情
+     * 查看装备详情  ok
      *
      * @param context
      * @param message 指令 ToolsId
@@ -69,7 +69,7 @@ public class ToolsController {
     }
 
     /**
-     * 购买装备
+     * 购买装备 ok
      *
      * @param context
      * @param message

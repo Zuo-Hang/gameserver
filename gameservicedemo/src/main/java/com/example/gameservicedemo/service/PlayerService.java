@@ -44,8 +44,8 @@ public class PlayerService {
     BagMapper bagMapper;
     @Autowired
     SceneService sceneService;
-//    @Autowired
-//    ToolsPropertyCache toolsPropertyCache;
+    @Autowired
+    ToolsService toolsService;
     @Autowired
     RoleTypeService roleTypeService;
     @Autowired
@@ -325,12 +325,53 @@ public class PlayerService {
 
     /**
      * 购买装备
-     * 1.钱（判断、更改）
-     * 2.放入背包，背包是否还有位置
+     * 钱（判断、更改）
+     * 从背包中获取当前物品（有无）
+     * 判断物品是否可以叠加
+     * 有且不可叠加->不可购买
+     *     ->可叠加并且已叠加数量可叠加最大数量则叠加
+     * 无->判断背包是否还有位置
+     * 放入背包
      * @param context
      * @param toolsId
      */
     public void buyTools(ChannelHandlerContext context,Integer toolsId){
+        PlayerBeCache playerByContext = getPlayerByContext(context);
+        //判断是否登录
+        if(Objects.isNull(playerByContext)){
+            notificationManager.notifyByCtx(context,"你还未登录，请使用\"load\"登录角色",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        //判断金币是否足够
+        if(playerByContext.getMoney()<toolsService.getToolsById(toolsId).getPriceIn()){
+            notificationManager.notifyByCtx(context,"你的金币还不足以购买此商品",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        //判断背包中是否存在此类型道具
+        BagBeCache bagBeCache = playerByContext.getBagBeCache();
+        Tools tools = bagBeCache.getToolsMap().get(toolsId);
+        if(!Objects.isNull(tools)){
+            if(tools.getCount().equals(tools.getRepeat())){
+                notificationManager.notifyByCtx(context,"此装备你已叠加到最大值，不可在购买",RequestCode.BAD_REQUEST.getCode());
+                return;
+            }
+            //以叠加的方式放入背包
+            tools.setCount(tools.getCount()+1);
 
+        }else{
+            //判断背包中是否有足够的足够的位置存放
+            if(bagBeCache.getToolsMap().size()>=bagBeCache.getSize()){
+                notificationManager.notifyByCtx(context,"你的背包已满，要购买背包中不存在类型的装备必须卖掉某些装备",RequestCode.BAD_REQUEST.getCode());
+                return;
+            }
+            //创建一个新的道具放入背包，因为后期可能改变这个道具的某些属性，所以不能使用缓存中的道具对象
+            Tools newTools = new Tools();
+            BeanUtils.copyProperties(toolsService.getToolsById(toolsId),newTools);
+            newTools.setCount(1);
+            bagBeCache.getToolsMap().put(newTools.getId(),newTools);
+        }
+        //扣除金币
+        playerByContext.setMoney(playerByContext.getMoney()-toolsService.getToolsById(toolsId).getPriceIn());
+        notificationManager.notifyByCtx(context,MessageFormat.format("你已成功购买了道具{0}，新道具已经放入你的背包了，你可以使用\"\"查看",toolsService.getToolsById(toolsId).getName()),RequestCode.BAD_REQUEST.getCode());
     }
 }
