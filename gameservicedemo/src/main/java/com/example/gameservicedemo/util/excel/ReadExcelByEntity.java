@@ -98,8 +98,9 @@ public class ReadExcelByEntity<T>{
     }
 
     public Map<Integer,T> getMap() {
+        setEntityMap();
         try {
-            setEntityMap();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -109,8 +110,9 @@ public class ReadExcelByEntity<T>{
     /**
      *
      * 将excel数据内容填充到map
+     * throws Exception
      */
-    private void setEntityMap() throws Exception{
+    private void setEntityMap() {
         this.map = new HashMap<>();
         T t;
         List<String> invokeList = setInvokeList();
@@ -122,7 +124,7 @@ public class ReadExcelByEntity<T>{
         int colNum = row.getLastCellNum();  //每行单元格总数
 
 
-        for (int i = 1; i <= rowNum; i++) {   //从第二行开始，遍历每一行
+        for (int i = 1; i <= rowNum; i++) {   //从第二行开始，遍历每一行----------------------------------------------------------------------------
             row = sheet.getRow(i);
             t = exchangeEntity(invokeList, colNum);
             map.put(i-1, t);  //将封装好的实体放入map
@@ -136,9 +138,9 @@ public class ReadExcelByEntity<T>{
             DecimalFormat df = new DecimalFormat("#");          // 对长数字段进行string的转化
             String methodName;
             int j = 0;
-            t = tClass.newInstance();  //每次新建一个T
-            while (j < colNum) {
-                Object obj = getCellFormatValue(row.getCell(j));  //
+            t = tClass.newInstance();  //每次新建一个T目标对象，下面对每个属性进行赋值
+            while (j < colNum) {//设置值（以属性个数循环，获取每个单元格的值，再赋给属性）
+                Object obj = getCellFormatValue(row.getCell(j));  //---------------------------------------------------------------------------
                 Class clazz = typeList.get(j);
                 methodName = invokeList.get(j);
                 Method method = t.getClass().getMethod(methodName, typeList.get(j));
@@ -198,11 +200,11 @@ public class ReadExcelByEntity<T>{
 
     /**
      * 将标题头和实体的属性set方法对应上,形成一个执行函数集list,之后调用这个函数时，每次遍历list，然后invoke即可
-     *
+     *throws Exception
      */
-    private List<String> setInvokeList() throws Exception{
+    private List<String> setInvokeList() {
         if(wb==null){
-            throw new Exception("Workbook对象为空！");
+//            throw new Exception("Workbook对象为空！");
         }
         List<String> invokeList = new ArrayList<>();
 
@@ -240,12 +242,12 @@ public class ReadExcelByEntity<T>{
 
     /**
      * 得到标题头,标题头一定要是string类型，否则报错
-     *
+     *throws Exception
      */
     @SuppressWarnings("deprecation")
-    private List<String> readExcelTitle() throws Exception{
+    private List<String> readExcelTitle() {
         if(wb == null){
-            throw new Exception(" workbook对象为空");
+//            throw new Exception(" workbook对象为空");
         }
         sheet = wb.getSheetAt(0);
         row = sheet.getRow(0);

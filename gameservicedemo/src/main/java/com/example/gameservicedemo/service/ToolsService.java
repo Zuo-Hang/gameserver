@@ -55,7 +55,11 @@ public class ToolsService {
      */
     public void initShopGoodsMap(Shop shop){
         String goods = shop.getGoods();
+        if(Objects.isNull(goods)){
+            return;
+        }
         String[] split = goods.split(",");
+//        if()
         for (String s : split) {
             //获取到商品
             Tools toolsById = getToolsById(Integer.valueOf(s));
