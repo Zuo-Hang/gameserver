@@ -7,6 +7,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import java.awt.*;
 import java.text.MessageFormat;
 
 /**
@@ -38,7 +43,8 @@ public class ClientBusinessHandler extends ChannelInboundHandlerAdapter {
         if(msg instanceof Message){
             String format = MessageFormat.format("服务器返回了:{0}", ((Message) msg).getMessage());
             log.info(format);
-            MainView.OUTPUT.append(format + "\n");
+            //追加输出显示
+            MainView.outputAppend(((Message) msg).getRequestCode(),format);
             if(((Message) msg).getRequestCode()== RequestCode.ABOUT_PLAYER.getCode()){
                 MainView.INFORMATION.setText(((Message) msg).getMessage());
             }
@@ -47,6 +53,9 @@ public class ClientBusinessHandler extends ChannelInboundHandlerAdapter {
             }
             if(((Message) msg).getRequestCode()== RequestCode.ABOUT_BAG.getCode()){
                 MainView.BAG.setText(((Message) msg).getMessage());
+            }
+            if(((Message) msg).getRequestCode()== RequestCode.ABOUT_EQU.getCode()){
+                MainView.EQUIPMENT.setText(((Message) msg).getMessage());
             }
         }
     }

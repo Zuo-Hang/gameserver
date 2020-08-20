@@ -1,16 +1,17 @@
 package com.example.gameservicedemo.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.commondemo.message.Message;
 import com.example.gameservicedemo.bean.BagBeCache;
 import com.example.gameservicedemo.bean.Buffer;
 import com.example.gameservicedemo.bean.PlayerBeCache;
 import com.example.gameservicedemo.bean.shop.Shop;
 import com.example.gameservicedemo.bean.shop.Tools;
 import com.example.gameservicedemo.bean.shop.ToolsProperty;
-import com.example.gameservicedemo.bean.shop.ToolsRepeatKind;
 import com.example.gameservicedemo.cache.ToolsCache;
 import com.example.gameservicedemo.cache.ToolsPropertyInfoCache;
 import com.example.gameservicedemo.manager.NotificationManager;
+import com.example.gameservicedemo.manager.TimedTaskManager;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -82,8 +83,8 @@ public class ToolsService {
      * @return
      */
     public boolean wearTools(PlayerBeCache player, Tools tools) {
-        //--------------------------------------------------------------在装备买入的时候一定要深拷贝一个新的对象------------
         BagBeCache bagBeCache = player.getBagBeCache();
+        //需要对这件装备进行判断
         Tools tools1 = bagBeCache.getToolsMap().get(tools.getId());
         Integer type = tools.getType();
         if (type>3) {//1~3是不同种类的装备
@@ -126,6 +127,7 @@ public class ToolsService {
                 toolsInfluence.get(v.getId()).setValue(value);
             });
         }
+        notificationManager.notifyPlayer(player,MessageFormat.format("穿戴装备：{0} 成功",tools1.getName()),RequestCode.SUCCESS.getCode());
         return true;
     }
 
@@ -155,7 +157,9 @@ public class ToolsService {
             });
         }
         //将卸下的装备放回背包
+        //判断背包容量
         player.getBagBeCache().getToolsMap().put(remove.getId(), remove);
+        notificationManager.notifyPlayer(player,MessageFormat.format("脱下装备：{0} 成功",tools1.getName()),RequestCode.SUCCESS.getCode());
         return true;
     }
 
@@ -217,11 +221,68 @@ public class ToolsService {
         notificationManager.notifyByCtx(context,stringBuilder.toString(),RequestCode.SUCCESS.getCode());
     }
 
+    /**
+     * 修理装备，在这个期间不可以使用技能
+     * @param playerBeCache
+     * @param toolsId
+     */
     public void fixTools(PlayerBeCache playerBeCache,Integer toolsId){
-
+        Tools toolsInBag;
+        if(!Objects.isNull(playerBeCache.getBagBeCache().getToolsMap().get(toolsId))){
+            toolsInBag=playerBeCache.getBagBeCache().getToolsMap().get(toolsId);
+        }else if(!Objects.isNull(playerBeCache.getEquipmentBar().get(toolsId))){
+            toolsInBag=playerBeCache.getEquipmentBar().get(toolsId);
+        }else{
+            notificationManager.notifyPlayer(playerBeCache,"你还未拥有该装备",RequestCode.WARNING.getCode());
+            return;
+        }
+        //是否在待修理列表中
+//        if(!playerBeCache.getNeedFix().contains(toolsId)){
+//            notificationManager.notifyPlayer(playerBeCache,"该装备目前不需要修理",RequestCode.WARNING.getCode());
+//            return;
+//        }
+        //开启线程去修理
+        notificationManager.notifyPlayer(playerBeCache, MessageFormat.format("将要修理装备：{0},需要{1}秒，在此期间你将不能使用任何技能！",toolsInBag.getName(),15),RequestCode.WARNING.getCode());
+        playerBeCache.setCanUseSkill(false);
+        TimedTaskManager.singleThreadSchedule( 15*1000,
+                ()->{
+                    toolsInBag.setDurability(getToolsById(toolsId).getDurability());
+                    playerBeCache.setCanUseSkill(false);
+                    notificationManager.notifyPlayer(playerBeCache,MessageFormat.format("装备{0}修理完毕！",toolsInBag.getName()),RequestCode.SUCCESS.getCode());
+                }
+        );
     }
 
-    public void sellTools(PlayerBeCache playerBeCache,Integer toolsId){
-
+    /**
+     * 将不需要装备出售
+     * @param player
+     * @param toolsId
+     */
+    public void sellTools(PlayerBeCache player,Integer toolsId){
+        //判断是否是正在装配的装备
+        Tools tools = player.getEquipmentBar().get(toolsId);
+        //是正在装配的装备->卸载装备,并提醒
+        if (!Objects.isNull(tools)) {
+            takeOffTools(player,tools);
+            notificationManager.notifyPlayer(player,"由于该装备之前处于装备栏，请注意自己属性的变化值",RequestCode.WARNING.getCode());
+        }
+        //是否是背包中的物品
+        Tools toolsInBag = player.getBagBeCache().getToolsMap().get(toolsId);
+        if (Objects.isNull(toolsInBag)) {
+            notificationManager.notifyPlayer(player, "你暂时还没有拥有这件物品哦", RequestCode.BAD_REQUEST.getCode());
+            return ;
+        }
+        //判断是否是重叠的物品
+        Integer count = toolsInBag.getCount();
+        if(count>1){
+            //有叠加的情况下，减少叠加数量
+            toolsInBag.setCount(toolsInBag.getCount()-1);
+        }else{
+            //只有一件的情况下移除该物品
+            player.getBagBeCache().getToolsMap().remove(toolsId);
+        }
+        player.setMoney(player.getMoney()+toolsInBag.getPriceOut());
+        notificationManager.notifyPlayer(player,MessageFormat.format("{0}出售成功，获得金{1}币",
+                toolsInBag.getName(),toolsInBag.getPriceOut()),RequestCode.SUCCESS.getCode());
     }
 }

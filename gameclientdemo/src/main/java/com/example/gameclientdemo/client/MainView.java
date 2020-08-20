@@ -2,11 +2,16 @@ package com.example.gameclientdemo.client;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.example.commondemo.base.Command;
+import com.example.commondemo.base.RequestCode;
 import com.example.commondemo.base.TcpProtocol;
 import com.example.commondemo.message.Message;
 import lombok.SneakyThrows;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -14,7 +19,8 @@ import java.awt.event.KeyListener;
 
 public class MainView extends JFrame {
 
-    public static final JTextArea OUTPUT = new JTextArea();
+    //public static final JTextArea OUTPUT = new JTextArea();
+    public static final JTextPane  OUTPUT = new JTextPane();
     private static final JTextArea INPUT = new JTextArea();
     public static final JTextArea INFORMATION = new JTextArea();
     /** 地图界面 */
@@ -22,11 +28,32 @@ public class MainView extends JFrame {
     public static final JTextArea EQUIPMENT = new JTextArea();
     public static final JTextArea BAG = new JTextArea();
 
+    public static void outputAppend(Integer type,String string){
+        Integer size=15;
+        Color color=Color.BLUE;
+        if(type.equals(RequestCode.BAD_REQUEST.getCode())){
+            size=21;
+            color=Color.RED;
+        }else if(type.equals(RequestCode.WARNING.getCode())){
+            size=18;
+            color=Color.ORANGE;
+        }
+        SimpleAttributeSet attrSet = new SimpleAttributeSet();
+        StyleConstants.setForeground(attrSet, color);
+        StyleConstants.setFontSize(attrSet, size);
+        Document doc = MainView.OUTPUT.getDocument();
+        try {
+            doc.insertString(doc.getLength(), string+"\n", attrSet);
+        } catch (BadLocationException e) {
+            System.out.println("BadLocationException:   " + e);
+        }
+    }
+
     public MainView() {
         this.setLayout(null);
 
-        OUTPUT.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 15));
-        OUTPUT.setLineWrap(true);
+    //    OUTPUT.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 15));
+//        OUTPUT.setLineWrap(true);
 
         INPUT.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 15));
         INPUT.setLineWrap(true);
@@ -62,7 +89,16 @@ public class MainView extends JFrame {
                 if (key == '\n') {
                     String text = INPUT.getText().replaceAll("\n", "");
                     //回显框回显
-                    OUTPUT.append(text + "\n");
+                    SimpleAttributeSet attrSet = new SimpleAttributeSet();
+                    StyleConstants.setForeground(attrSet, Color.BLACK);
+                    StyleConstants.setFontSize(attrSet, 15);
+                    Document doc = MainView.OUTPUT.getDocument();
+                    String s = text+ "\n";
+                    try {
+                        doc.insertString(doc.getLength(), s, attrSet);
+                    } catch (BadLocationException exception) {
+                        System.out.println("BadLocationException:   " + exception);
+                    }
                     System.out.println("客户端输入： " + text);
                     String[] array = text.split("\\s+");
                     Command byCommand = Command.findByCommand(array[0], Command.UNKNOWN);

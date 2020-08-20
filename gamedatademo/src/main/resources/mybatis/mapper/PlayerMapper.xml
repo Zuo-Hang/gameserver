@@ -20,7 +20,7 @@
     </select>
 
     <update id="updateByPlayerId" parameterType="com.example.gamedatademo.bean.Player">
-        UPDATE player SET player_name = #{playerName}, user_id = #{userId},now_at = #{nowAt},bag_id=#{bagId}
+        UPDATE player SET player_name = #{playerName}, user_id = #{userId},now_at = #{nowAt},bag_id=#{bagId},money=#{money}
         WHERE player_id = #{playerId};
     </update>
 

@@ -11,6 +11,7 @@ import com.example.gameservicedemo.bean.shop.Tools;
 import com.example.gameservicedemo.bean.shop.ToolsProperty;
 import com.example.gameservicedemo.cache.PlayerCache;
 import com.example.gameservicedemo.bean.scene.NPC;
+import com.example.gameservicedemo.cache.ToolsPropertyInfoCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.example.gameservicedemo.manager.TimedTaskManager;
 import com.google.common.reflect.TypeToken;
@@ -311,11 +312,16 @@ public class PlayerService {
      */
     public void seePlayerBag(ChannelHandlerContext context) {
         BagBeCache bagBeCache = getPlayerByContext(context).getBagBeCache();
-        StringBuilder stringBuilder = new StringBuilder(MessageFormat.format("这个背包的大小为：{0}，背包中有：\n",bagBeCache.getSize()));
+        StringBuilder stringBuilder = new StringBuilder(MessageFormat.format("这个背包容量为：{0}，当前可用位置：{1},背包中有：\n",
+                bagBeCache.getSize(),bagBeCache.getSize()-bagBeCache.getToolsMap().size()));
         Map<Integer, Tools> toolsMap = bagBeCache.getToolsMap();
         if(!Objects.isNull(toolsMap)){
             toolsMap.values().forEach(v->{
-                stringBuilder.append(MessageFormat.format("名称：{0} 数量：{1}\n",v.getName(),v.getCount()));
+                stringBuilder.append(MessageFormat.format("物品id:{0} 名称：{1} 数量：{2}",v.getId(),v.getName(),v.getCount()));
+                if(v.getType()<4){
+                    stringBuilder.append("当前耐久度："+v.getDurability());
+                }
+                stringBuilder.append("\n");
             });
         }else{
             stringBuilder.append("哦，空空如也！");
@@ -336,15 +342,12 @@ public class PlayerService {
      * @param toolsId
      */
     public void buyTools(ChannelHandlerContext context,Integer toolsId){
-        PlayerBeCache playerByContext = getPlayerByContext(context);
         //判断是否登录
-        if(Objects.isNull(playerByContext)){
-            notificationManager.notifyByCtx(context,"你还未登录，请使用\"load\"登录角色",RequestCode.BAD_REQUEST.getCode());
-            return;
-        }
+        if(!isLoad(context)){return;}
+        PlayerBeCache playerByContext = getPlayerByContext(context);
         //判断金币是否足够
         if(playerByContext.getMoney()<toolsService.getToolsById(toolsId).getPriceIn()){
-            notificationManager.notifyByCtx(context,"你的金币还不足以购买此商品",RequestCode.BAD_REQUEST.getCode());
+            notificationManager.notifyByCtx(context,"你的金币还不足以购买此商品",RequestCode.WARNING.getCode());
             return;
         }
         //判断背包中是否存在此类型道具
@@ -352,7 +355,7 @@ public class PlayerService {
         Tools tools = bagBeCache.getToolsMap().get(toolsId);
         if(!Objects.isNull(tools)){
             if(tools.getCount().equals(tools.getRepeat())){
-                notificationManager.notifyByCtx(context,"此装备你已叠加到最大值，不可在购买",RequestCode.BAD_REQUEST.getCode());
+                notificationManager.notifyByCtx(context,"此装备你已叠加到最大值，不可在购买",RequestCode.WARNING.getCode());
                 return;
             }
             //以叠加的方式放入背包
@@ -361,7 +364,7 @@ public class PlayerService {
         }else{
             //判断背包中是否有足够的足够的位置存放
             if(bagBeCache.getToolsMap().size()>=bagBeCache.getSize()){
-                notificationManager.notifyByCtx(context,"你的背包已满，要购买背包中不存在类型的装备必须卖掉某些装备",RequestCode.BAD_REQUEST.getCode());
+                notificationManager.notifyByCtx(context,"你的背包已满，要购买背包中不存在类型的装备必须卖掉某些装备",RequestCode.WARNING.getCode());
                 return;
             }
             //创建一个新的道具放入背包，因为后期可能改变这个道具的某些属性，所以不能使用缓存中的道具对象
@@ -372,6 +375,69 @@ public class PlayerService {
         }
         //扣除金币
         playerByContext.setMoney(playerByContext.getMoney()-toolsService.getToolsById(toolsId).getPriceIn());
-        notificationManager.notifyByCtx(context,MessageFormat.format("你已成功购买了道具{0}，新道具已经放入你的背包了，你可以使用\"\"查看",toolsService.getToolsById(toolsId).getName()),RequestCode.BAD_REQUEST.getCode());
+        notificationManager.notifyByCtx(context,MessageFormat.format("你已成功购买了道具{0}，新道具已经放入你的背包了，你可以使用\"see_player_bag\"查看",toolsService.getToolsById(toolsId).getName()),RequestCode.SUCCESS.getCode());
+    }
+
+    /**
+     * 判断当前会话是否有角色加载
+     * @param context
+     * @return
+     */
+    public boolean isLoad(ChannelHandlerContext context){
+        PlayerBeCache playerByContext = getPlayerByContext(context);
+        if(Objects.isNull(playerByContext)){
+            notificationManager.notifyByCtx(context,"你还未登录，请使用\"load\"登录角色",RequestCode.BAD_REQUEST.getCode());
+            return false;
+        }
+        return true;
+    }
+    /**
+     * 查看角色装备栏（主要查看当前装备的耐久度，是否需要更换或者修理该装备）
+     * @param context
+     */
+    public void seePlayerEquipmentBar(ChannelHandlerContext context){
+        //判断是否登录
+        if(!isLoad(context)){return;}
+        PlayerBeCache playerByContext = getPlayerByContext(context);
+        Map<Integer, Tools> equipmentBar = playerByContext.getEquipmentBar();
+        if(equipmentBar.values().size()==0){
+            notificationManager.notifyByCtx(context,"你还没有装配任何装备！",RequestCode.SUCCESS.getCode());
+            return;
+        }
+        StringBuilder stringBuilder = new StringBuilder("装备详情如下:\n");
+        equipmentBar.values().forEach(v->{
+            stringBuilder.append(MessageFormat.format("名称：{0} 当前耐久度：{1}\n",v.getName(),v.getDurability()));
+            if(v.getDurability()==0){
+                stringBuilder.append("当前耐久度过低，该装备处于无效状态，需要更换或修理！");
+            }
+        });
+        notificationManager.notifyByCtx(context,stringBuilder.toString(),RequestCode.ABOUT_EQU.getCode());
+    }
+
+    /**
+     * 查看玩家性能属性
+     * 生命值&魔法值：最大  当前  恢复能力
+     * 金币：
+     * 其他基本值：
+     * @param context
+     */
+    public void seePlayerAbility(ChannelHandlerContext context){
+        if(!isLoad(context)){return;}
+        PlayerBeCache playerByContext = getPlayerByContext(context);
+        StringBuilder stringBuilder = new StringBuilder("角色基本属性如下：\n");
+
+        stringBuilder.append(MessageFormat.format("最大生命值：{0}\n当前生命值：{1}\n最大魔法值：{2}\n当前魔法值：{3}\n金币：{4}\n",
+                playerByContext.getMaxHp(),
+                playerByContext.getHp(),
+                playerByContext.getMaxMp(),
+                playerByContext.getMp(),
+                playerByContext.getMoney()));
+        playerByContext.getToolsInfluence().values().forEach(v->{
+            stringBuilder.append(MessageFormat.format("{0}:{1}\n",
+                    ToolsPropertyInfoCache.toolsPropertyInfoCache.get(v.getId()),
+                    v.getValue())
+            );
+        });
+        notificationManager.notifyByCtx(context,stringBuilder.toString(),RequestCode.SUCCESS.getCode());
     }
 }

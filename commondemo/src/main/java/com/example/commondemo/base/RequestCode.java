@@ -17,6 +17,10 @@ public enum RequestCode {
 
     ABOUT_BAG(1214,"有关背包"),
 
+    ABOUT_EQU(1215,"有关装备"),
+
+    WARNING(1216,"警告"),
+
     BAD_REQUEST(400, "Bad Request"),
     /**找不到 */
     NOT_FOUND(404, "Not Found"),

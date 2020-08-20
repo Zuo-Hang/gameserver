@@ -46,6 +46,8 @@ public class PlayerController {
         ControllerManager.add(Command.MOVE.getRequestCode(), this::Move);
         ControllerManager.add(Command.SEE_PLAYER_SKILL.getRequestCode(),this::seePlayerSkill);
         ControllerManager.add(Command.SEE_PLAYER_BAG.getRequestCode(),this::seePlayerBag);
+        ControllerManager.add(Command.SEE_PLAYER_EQU.getRequestCode(),this::seePlayerEqu);
+        ControllerManager.add(Command.SEE_PLAYER_ABILITY.getRequestCode(),this::seePlayerAbility);
     }
 
     /**
@@ -148,5 +150,28 @@ public class PlayerController {
     public void seePlayerBag(ChannelHandlerContext context,Message message){
         CheckParametersUtil.checkParameter(context,message,1);
         playerService.seePlayerBag(context);
+    }
+
+    /**
+     * 查看当前装备栏信息
+     * @param context
+     * @param message
+     */
+    public void seePlayerEqu(ChannelHandlerContext context,Message message){
+        CheckParametersUtil.checkParameter(context,message,1);
+        playerService.seePlayerEquipmentBar(context);
+    }
+
+    /**
+     * 查看角色属性
+     * @param context
+     * @param message
+     */
+    public void seePlayerAbility(ChannelHandlerContext context,Message message){
+        CheckParametersUtil.checkParameter(context,message,1);
+        playerService.seePlayerAbility(context);
+
+
+
     }
 }

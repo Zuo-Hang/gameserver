@@ -7,6 +7,7 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +41,11 @@ public class PlayerBeCache extends Player implements Creature {
      */
     private Integer mp;
     private Integer hp;
+
+    /**
+     * 是否可以使用技能  （某些情况下不能使用技能，如修理装备的时候，使用金身的时候）
+     */
+    private volatile boolean canUseSkill=true;
     /**
      * 角色当前处于CD的技能集合
      */
@@ -54,6 +60,10 @@ public class PlayerBeCache extends Player implements Creature {
      * 装备栏 装备id 装备 最大值为6 小于6则可以进行装配，否则只能换装
      */
     private Map<Integer, Tools> equipmentBar = new ConcurrentHashMap<>();
+    /**
+     * 需要被修理的装备的id列表
+     */
+    private List<Integer> needFix=new ArrayList<Integer>();
     // 背包栏
     private BagBeCache bagBeCache = null;
     /**
