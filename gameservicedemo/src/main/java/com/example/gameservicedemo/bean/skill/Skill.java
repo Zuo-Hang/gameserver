@@ -1,4 +1,4 @@
-package com.example.gameservicedemo.bean;
+package com.example.gameservicedemo.bean.skill;
 
 import com.example.gameservicedemo.util.excel.EntityName;
 import lombok.Data;
@@ -18,8 +18,16 @@ public class Skill {
     @EntityName(column = "名字")
     private String name;
 
-    @EntityName(column = "类型")
+    /**
+     * 技能类型：天赋/装备/常驻
+     */
+    @EntityName(column = "技能类型")
     private Integer skillType;
+    /**
+     * 技能影响类型
+     */
+    @EntityName(column = "影响类型")
+    private Integer skillInfluenceType;
 
     /**
      * 前摇

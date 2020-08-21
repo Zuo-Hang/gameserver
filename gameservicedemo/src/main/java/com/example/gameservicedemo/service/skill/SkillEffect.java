@@ -2,8 +2,8 @@ package com.example.gameservicedemo.service.skill;
 
 import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.bean.Creature;
-import com.example.gameservicedemo.bean.Skill;
-import com.example.gameservicedemo.bean.SkillType;
+import com.example.gameservicedemo.bean.skill.Skill;
+import com.example.gameservicedemo.bean.skill.SkillInfluenceType;
 import com.example.gameservicedemo.bean.scene.Scene;
 import com.example.gameservicedemo.manager.NotificationManager;
 import lombok.extern.slf4j.Slf4j;
@@ -30,12 +30,12 @@ public class SkillEffect {
     private Map<Integer, ISkillEffect> skillEffectMap = new HashMap<>();
 
     {
-        skillEffectMap.put(SkillType.ATTACK_SINGLE.getTypeId(),this::attackSingle);
-        skillEffectMap.put(SkillType.CALL_PET.getTypeId(),this::callPet);
-        skillEffectMap.put(SkillType.TAUNT.getTypeId(),this::taunt);
-        skillEffectMap.put(SkillType.FRIENDLY.getTypeId(),this::friendly);
+        skillEffectMap.put(SkillInfluenceType.ATTACK_SINGLE.getTypeId(),this::attackSingle);
+        skillEffectMap.put(SkillInfluenceType.CALL_PET.getTypeId(),this::callPet);
+        skillEffectMap.put(SkillInfluenceType.TAUNT.getTypeId(),this::taunt);
+        skillEffectMap.put(SkillInfluenceType.FRIENDLY.getTypeId(),this::friendly);
         // 群体攻击技能
-        skillEffectMap.put(SkillType.ATTACK_MULTI.getTypeId(),this::attackSMulti);
+        skillEffectMap.put(SkillInfluenceType.ATTACK_MULTI.getTypeId(),this::attackSMulti);
 
     }
 

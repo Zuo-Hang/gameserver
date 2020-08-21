@@ -1,13 +1,13 @@
-package com.example.gameservicedemo.bean;
+package com.example.gameservicedemo.bean.skill;
 
 /**
  * Created with IntelliJ IDEA.
  *
  * @author: hang hang
  * @Date: 2020/08/11/17:59
- * @Description: 技能类型
+ * @Description: 技能影响类型
  */
-public enum SkillType {
+public enum SkillInfluenceType {
 
     /** 对自身或友方使用 */
     FRIENDLY(1),
@@ -26,13 +26,8 @@ public enum SkillType {
 
     /** 嘲讽技能 **/
     TAUNT(7)
-
-
-
     ;
-
-
-    SkillType(Integer typeId) {
+    SkillInfluenceType(Integer typeId) {
         this.typeId = typeId;
     }
 

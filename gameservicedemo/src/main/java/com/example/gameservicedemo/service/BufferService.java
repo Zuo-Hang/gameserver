@@ -124,9 +124,8 @@ public class BufferService {
      * @return
      */
     public String bufferInfo(Buffer buffer){
-        return new StringBuilder(MessageFormat.format("名称：{0} 是否可覆盖：{1} 效果：{2} 持续时间：{3} cd时间：{4} 描述：{5}",
+        return new StringBuilder(MessageFormat.format("名称：{0}  效果：{1} 持续时间：{2} cd时间：{3} 描述：{4}",
                 buffer.getName(),
-                buffer.getCover()==1?"是":"否",
                 buffer.getEffect(),
                 buffer.getDuration(),
                 buffer.getIntervalTime(),

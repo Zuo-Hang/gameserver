@@ -1,7 +1,7 @@
 package com.example.gameservicedemo.service.skill;
 
 import com.example.gameservicedemo.bean.Creature;
-import com.example.gameservicedemo.bean.Skill;
+import com.example.gameservicedemo.bean.skill.Skill;
 import com.example.gameservicedemo.bean.scene.Scene;
 
 /**

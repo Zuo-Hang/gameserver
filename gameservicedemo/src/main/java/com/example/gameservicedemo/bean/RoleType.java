@@ -1,5 +1,6 @@
 package com.example.gameservicedemo.bean;
 
+import com.example.gameservicedemo.bean.skill.Skill;
 import com.example.gameservicedemo.cache.SkillCache;
 import com.example.gameservicedemo.util.excel.EntityName;
 import lombok.Data;

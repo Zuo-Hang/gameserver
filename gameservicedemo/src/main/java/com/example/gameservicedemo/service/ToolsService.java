@@ -1,7 +1,6 @@
 package com.example.gameservicedemo.service;
 
 import com.example.commondemo.base.RequestCode;
-import com.example.commondemo.message.Message;
 import com.example.gameservicedemo.bean.BagBeCache;
 import com.example.gameservicedemo.bean.Buffer;
 import com.example.gameservicedemo.bean.PlayerBeCache;
@@ -122,6 +121,7 @@ public class ToolsService {
         List<ToolsProperty> toolsPropertie = tools.getToolsPropertie();
         if (!Objects.isNull(toolsPropertie)) {
             toolsPropertie.forEach(v -> {
+                //安全问题-----------------------------------------------------------------------
                 //将装备的影响叠加到用户的影响集合数值上
                 int value = toolsInfluence.get(v.getId()).getValue() + v.getValue();
                 toolsInfluence.get(v.getId()).setValue(value);
@@ -148,7 +148,8 @@ public class ToolsService {
         }
         Tools remove = player.getEquipmentBar().remove(tools.getId());
         List<ToolsProperty> toolsPropertie = remove.getToolsPropertie();
-        //去除buf加成--------------------------------------------------------------------------------------
+        //线程安全问题-----------------------------------------------------------------------------------------
+        //去除buf加成
         //更新影响
         if (!Objects.isNull(toolsPropertie)) {
             toolsPropertie.forEach(v -> {
@@ -237,17 +238,17 @@ public class ToolsService {
             return;
         }
         //是否在待修理列表中
-//        if(!playerBeCache.getNeedFix().contains(toolsId)){
-//            notificationManager.notifyPlayer(playerBeCache,"该装备目前不需要修理",RequestCode.WARNING.getCode());
-//            return;
-//        }
-        //开启线程去修理
+        if(!playerBeCache.getNeedFix().contains(toolsId)){
+            notificationManager.notifyPlayer(playerBeCache,"该装备目前不需要修理",RequestCode.WARNING.getCode());
+            return;
+        }
+        //开启线程去修理---------------------------------------------------考虑线程安全问题
         notificationManager.notifyPlayer(playerBeCache, MessageFormat.format("将要修理装备：{0},需要{1}秒，在此期间你将不能使用任何技能！",toolsInBag.getName(),15),RequestCode.WARNING.getCode());
         playerBeCache.setCanUseSkill(false);
         TimedTaskManager.singleThreadSchedule( 15*1000,
                 ()->{
                     toolsInBag.setDurability(getToolsById(toolsId).getDurability());
-                    playerBeCache.setCanUseSkill(false);
+                    playerBeCache.setCanUseSkill(true);
                     notificationManager.notifyPlayer(playerBeCache,MessageFormat.format("装备{0}修理完毕！",toolsInBag.getName()),RequestCode.SUCCESS.getCode());
                 }
         );

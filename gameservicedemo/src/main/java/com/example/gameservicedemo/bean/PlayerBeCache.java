@@ -3,6 +3,7 @@ package com.example.gameservicedemo.bean;
 import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.bean.shop.Tools;
 import com.example.gameservicedemo.bean.shop.ToolsProperty;
+import com.example.gameservicedemo.bean.skill.Skill;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -51,6 +52,12 @@ public class PlayerBeCache extends Player implements Creature {
      */
     private Map<Integer, Skill> hasUseSkillMap = new ConcurrentHashMap<>();
 
+    /**
+     * 可以使用的技能集合
+     * 主要为天赋技能、装备技能
+     * 注意：不包含角色类型所附带的常驻技能
+     */
+    private Map<Integer,Skill> canUseSkillMap = new ConcurrentHashMap<>();
     /**
      * 角色当前的buffer,因为可能拥有多个重复的技能，所以这里使用List保存
      */

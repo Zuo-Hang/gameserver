@@ -3,7 +3,7 @@ package com.example.gameservicedemo.service.skill;
 import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.bean.Creature;
 import com.example.gameservicedemo.bean.PlayerBeCache;
-import com.example.gameservicedemo.bean.Skill;
+import com.example.gameservicedemo.bean.skill.Skill;
 import com.example.gameservicedemo.bean.scene.Scene;
 import com.example.gameservicedemo.cache.RoleTypeCache;
 import com.example.gameservicedemo.cache.SkillCache;
@@ -13,8 +13,8 @@ import com.example.gameservicedemo.service.PlayerService;
 import com.example.gameservicedemo.service.SceneService;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -139,7 +139,7 @@ public class SkillService {
                                         MessageFormat.format(" {0}  对 {1} 使用了技能  {2} ",
                                                 initiator.getName(),target.getName(),skill.getName()), RequestCode.SUCCESS.getCode());
                                 // 注意，这里的技能进行还是要用场景执行器执行，不然会导致多线程问题
-                                skillEffect.castSkill(skill.getSkillType(), initiator, target, scene, skill);
+                                skillEffect.castSkill(skill.getSkillInfluenceType(), initiator, target, scene, skill);
                             }
                     )
             );
@@ -147,7 +147,7 @@ public class SkillService {
             notificationManager.notifyScene(scene.getId(),
                     MessageFormat.format(" {0}  对 {1} 使用了技能  {2} ",
                             initiator.getName(),target.getName(),skill.getName()),RequestCode.SUCCESS.getCode());
-            skillEffect.castSkill(skill.getSkillType(),initiator,target,scene,skill);
+            skillEffect.castSkill(skill.getSkillInfluenceType(),initiator,target,scene,skill);
             // 开启技能冷却
             startSkillCd(initiator,skill);
         }
@@ -163,14 +163,15 @@ public class SkillService {
     public void startSkillCd(Creature creature, Skill skill) {
         //创建一个新的对象来存入map
         Skill skillWillCD = new Skill();
-        //设置id用于判断是否在map中
-        skillWillCD.setId(skill.getId());
-        skillWillCD.setName(skill.getName());
-        //用于给用户显示还需cd多久
-        skillWillCD.setCd(skill.getCd());
-        skillWillCD.setLevel(skill.getLevel());
-        skillWillCD.setMpConsumption(skill.getMpConsumption());
-        skillWillCD.setCastTime(skill.getCastTime());
+        BeanUtils.copyProperties(skill,skillWillCD);
+//        //设置id用于判断是否在map中
+//        skillWillCD.setId(skill.getId());
+//        skillWillCD.setName(skill.getName());
+//        //用于给用户显示还需cd多久
+//        skillWillCD.setCd(skill.getCd());
+//        skillWillCD.setLevel(skill.getLevel());
+//        skillWillCD.setMpConsumption(skill.getMpConsumption());
+//        skillWillCD.setCastTime(skill.getCastTime());
         //设置上次使用技能的时间
         skillWillCD.setActiveTime(System.currentTimeMillis());
         creature.getHasUseSkillMap().put(skill.getId(), skillWillCD);

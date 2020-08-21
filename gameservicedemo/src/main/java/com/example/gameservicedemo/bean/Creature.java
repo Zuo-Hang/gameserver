@@ -1,6 +1,8 @@
 package com.example.gameservicedemo.bean;
 
 
+import com.example.gameservicedemo.bean.skill.Skill;
+
 import java.util.List;
 import java.util.Map;
 
