@@ -2,12 +2,10 @@ package com.example.gameservicedemo.cache;
 
 import com.example.gameservicedemo.bean.shop.Tools;
 import com.example.gameservicedemo.bean.shop.ToolsProperty;
-import com.example.gameservicedemo.service.ToolsService;
 import com.example.gameservicedemo.util.excel.subclassexcelutil.ToolsExcelUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;

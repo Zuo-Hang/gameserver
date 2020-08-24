@@ -20,15 +20,10 @@ import java.util.Map;
 public class RoleType {
     @EntityName(column = "id")
     private Integer id;
-
     @EntityName(column = "职业名称")
     private String name;
-
-
-
     @EntityName(column = "基础hp")
     private Integer baseHp;
-
     @EntityName(column = "基础mp")
     private Integer baseMp;
     @EntityName(column = "技能")

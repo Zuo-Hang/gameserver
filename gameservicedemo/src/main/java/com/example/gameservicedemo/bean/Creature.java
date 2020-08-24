@@ -1,10 +1,12 @@
 package com.example.gameservicedemo.bean;
 
 
+import com.example.gameservicedemo.bean.shop.ToolsProperty;
 import com.example.gameservicedemo.bean.skill.Skill;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,13 +34,18 @@ public interface Creature {
      */
     Integer getHp();
     Integer getMaxHp();
-
     /**
      * 设置血量
      * @param hp
      */
     void setHp(Integer hp);
     void setMaxHp(Integer maxHp);
+
+    Integer getMagicShield();
+    Integer getShield();
+    void setMagicShield(Integer magicShield);
+    void setShield(Integer shield);
+
 
     /**
      * 获取魔法值（能量值）
@@ -70,11 +77,15 @@ public interface Creature {
     void setHasUseSkillMap(Map<Integer, Skill> skillMap);
 
     /** 活物的当前buffer */
-    List<Buffer> getBufferList();
-    void setBufferList(List<Buffer> bufferList);
+    ConcurrentHashMap<Integer,Buffer>  getBufferMap();
+    void setBufferMap(ConcurrentHashMap<Integer,Buffer> bufferMap);
 
-
+    Map<Integer, ToolsProperty> getToolsInfluence();
+    void setToolsInfluence(Map<Integer, ToolsProperty> map);
     /** 活物的当前目标 */
     Creature getTarget();
     void setTarget(Creature target);
+
+    Map<Integer,Skill> getCanUseSkillMap();
+
 }

@@ -12,37 +12,30 @@ import lombok.Data;
  */
 @Data
 public class Buffer {
-
     @EntityName(column = "id")
     private Integer id;
-
     @EntityName(column = "名字")
     private String name;
-
     @EntityName(column = "类型")
     private Integer type;
+    @EntityName(column = "能否覆盖")
+    private Integer cover;
     @EntityName(column = "hp效果")
     private Integer hp;
-
     @EntityName(column = "mp效果")
     private Integer mp;
-
     /**
      * 根据效果调用具体该执行的方法
      */
     @EntityName(column = "效果")
     private Integer effect;
-
     @EntityName(column = "持续时间")
     private Integer duration;
-
     @EntityName(column = "间隔时间")
     private Integer intervalTime;
-
+    @EntityName(column = "次数")
+    private Integer frequency;
     @EntityName(column = "描述")
     private String describe;
-
     private long startTime;
-
-
 }

@@ -1,19 +1,26 @@
 package com.example.gameservicedemo.service.skill;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.bean.Buffer;
 import com.example.gameservicedemo.bean.Creature;
+import com.example.gameservicedemo.bean.shop.ToolsPropertyInfo;
 import com.example.gameservicedemo.bean.skill.Skill;
+import com.example.gameservicedemo.bean.skill.SkillHurtType;
 import com.example.gameservicedemo.bean.skill.SkillInfluenceType;
 import com.example.gameservicedemo.bean.scene.Scene;
 import com.example.gameservicedemo.manager.NotificationManager;
+import com.example.gameservicedemo.service.BufferService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,6 +32,10 @@ import java.util.Optional;
 @Component
 @Slf4j
 public class SkillEffect {
+    @Autowired
+    BufferService bufferService;
+    @Autowired
+    SkillService skillService;
 @Autowired
     NotificationManager notificationManager;
     private Map<Integer, ISkillEffect> skillEffectMap = new HashMap<>();
@@ -68,7 +79,7 @@ public class SkillEffect {
                         target.getName(),initiator.getName(),skill.getName(),skill.getHurt(), target.getHp()), RequestCode.SUCCESS.getCode());
     }
     /**
-     *  施放单体攻击技能造成影响
+     *  施放单体攻击技能造成影响(伤害型）
      * @param initiator 施放者
      * @param target 施放目标
      * @param gameScene 场景
@@ -77,21 +88,41 @@ public class SkillEffect {
     private  void attackSingle(Creature initiator, Creature target, Scene gameScene, Skill skill) {
         // 消耗mp和损伤目标hp
         initiator.setMp(initiator.getMp() - skill.getMpConsumption());
-        target.setHp(target.getHp() - skill.getHurt());
-        target.setHp(target.getHp() + skill.getHeal());
 
-//        // 如果技能触发的buffer不是0，则对敌方单体目标释放buffer
-//        if (!skill.getBuffer().equals(0)) {
-//            Buffer buffer = bufferService.getTBuffer(skill.getBuffer());
-//            // 如果buffer存在则启动buffer
-//            Optional.ofNullable(buffer).map(
-//                    (b) -> bufferService.startBuffer(target,b)
-//            );
-//        }
-//
-//        notificationManager.notifyScene(gameScene,
-//                MessageFormat.format(" {0} 受到 {1} 技能 {2}攻击，  hp减少{3},当前hp为 {4}\n",
-//                        target.getName(),initiator.getName(),skill.getName(),skill.getHurt(), target.getHp()));
+        Integer hurt=0;
+        if(skill.getSkillHurtType().equals(SkillHurtType.PHYSICS.getType())||skill.getSkillHurtType().equals(SkillHurtType.PH_REAL.getType())){
+            hurt=initiator.getToolsInfluence().get(ToolsPropertyInfo.Physical_attack.getId()).getValue();
+        }else  if(skill.getSkillHurtType().equals(SkillHurtType.MAGIC.getType())||skill.getSkillHurtType().equals(SkillHurtType.MA_REAL.getType())){
+            hurt=initiator.getToolsInfluence().get(ToolsPropertyInfo.Magic_Attack.getId()).getValue();
+        }
+        int addHpHurt = skill.getHPPercentage() * target.getMaxHp() / 100;
+        //计算伤害 技能基础伤害=技能伤害值+法术/物理攻击提成+技能对敌人造成的生命比伤害加成
+        int initialHurt = skill.getHurt() + hurt * skill.getAddHurtPercentage() / 100+addHpHurt;
+        GetHurtNum skillHurtNum = new GetHurtNum();
+        skillHurtNum.getHurtNum(initiator, target, initialHurt, skill.getSkillHurtType());
+        //更改属性-----------------------------------------------------------------------安全问题
+        target.setHp(target.getHp()-skillHurtNum.hurt);
+        target.setMagicShield(target.getMagicShield()-skillHurtNum.hurtToMaShield);
+        target.setShield(target.getShield()-skillHurtNum.hurtToShield);
+        // 如果技能触发的buffer不是0，则对敌方单体目标释放buffer
+        if (!skill.getBuffer().equals(0)) {
+            Buffer buffer = bufferService.getBuffer(skill.getBuffer());
+            // 如果buffer存在则启动buffer
+            Optional.ofNullable(buffer).map(
+                    (b) -> bufferService.startBuffer(target,b)
+            );
+        }
+        //如果是受到物理伤害进行反伤
+        if(skill.getSkillType().equals(SkillHurtType.PHYSICS)&&target.getCanUseSkillMap().containsKey(24)){
+            Skill skill1 = new Skill();
+            BeanUtils.copyProperties(skillService.getSkillById(24),skill1);
+            skill1.setHurt((skillHurtNum.hurt+skillHurtNum.hurtToShield)*skill1.getAddHurtPercentage()/100);
+            skill1.setAddHurtPercentage(0);
+            attackSingle(target,initiator,gameScene,skill1);
+        }
+        notificationManager.notifyScene(gameScene.getId(),
+                MessageFormat.format(" {0} 受到 {1} 技能 {2}攻击，  hp减少{3},当前hp为 {4}\n",
+                        target.getName(),initiator.getName(),skill.getName(),skill.getHurt(), target.getHp()),RequestCode.SUCCESS.getCode());
     }
     /**
      *  召唤兽类型的技能

@@ -50,4 +50,6 @@ public class SceneObject {
 
     @EntityName(column = "角色描述")
     private String describe;
+
+
 }

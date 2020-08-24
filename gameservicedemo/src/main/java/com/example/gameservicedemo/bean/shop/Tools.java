@@ -23,8 +23,8 @@ public class Tools {
     @EntityName(column="物品名称")
     private String  name;
 
-    @EntityName(column="触发效果")
-    private Integer  buffer;
+    @EntityName(column="唯一被动技能")
+    private Integer  passiveSkills;
 
     @EntityName(column="耐久度")
     private Integer durability;

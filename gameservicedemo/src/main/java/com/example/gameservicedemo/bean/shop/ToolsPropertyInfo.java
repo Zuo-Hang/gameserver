@@ -31,4 +31,12 @@ public enum ToolsPropertyInfo {
         this.id = id;
         this.describe = describe;
     }
+
+    public String getDescribe() {
+        return describe;
+    }
+
+    public Integer getId() {
+        return id;
+    }
 }

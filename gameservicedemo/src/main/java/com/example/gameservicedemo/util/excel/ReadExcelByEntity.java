@@ -98,7 +98,7 @@ public class ReadExcelByEntity<T>{
     }
 
     public Map<Integer,T> getMap() {
-        setEntityMap();
+        setEntityMap();//----------------------------------------------------------------------------------------------
         try {
 
         } catch (Exception e) {
@@ -126,7 +126,7 @@ public class ReadExcelByEntity<T>{
 
         for (int i = 1; i <= rowNum; i++) {   //从第二行开始，遍历每一行----------------------------------------------------------------------------
             row = sheet.getRow(i);
-            t = exchangeEntity(invokeList, colNum);
+            t = exchangeEntity(invokeList, colNum);//------------------------------------------------------------------------------
             map.put(i-1, t);  //将封装好的实体放入map
         }
     }
@@ -142,7 +142,7 @@ public class ReadExcelByEntity<T>{
             while (j < colNum) {//设置值（以属性个数循环，获取每个单元格的值，再赋给属性）
                 Object obj = getCellFormatValue(row.getCell(j));  //---------------------------------------------------------------------------
                 Class clazz = typeList.get(j);
-                methodName = invokeList.get(j);
+                methodName = invokeList.get(j);//----------------------------------------------------------------------------
                 Method method = t.getClass().getMethod(methodName, typeList.get(j));
                 // logger.debug("cell的数据 {}" , obj);
                 if(obj == null || obj.equals("")){

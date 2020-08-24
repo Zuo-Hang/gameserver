@@ -42,6 +42,10 @@ public class PlayerBeCache extends Player implements Creature {
      */
     private Integer mp;
     private Integer hp;
+    /** 护盾*/
+    private Integer magicShield=0;
+    /** 魔法，物理护盾*/
+    private Integer Shield=0;
 
     /**
      * 是否可以使用技能  （某些情况下不能使用技能，如修理装备的时候，使用金身的时候）
@@ -54,14 +58,14 @@ public class PlayerBeCache extends Player implements Creature {
 
     /**
      * 可以使用的技能集合
-     * 主要为天赋技能、装备技能
+     * 主要为天赋技能、装备技能//在装配装备的时候加入技能
      * 注意：不包含角色类型所附带的常驻技能
      */
     private Map<Integer,Skill> canUseSkillMap = new ConcurrentHashMap<>();
     /**
      * 角色当前的buffer,因为可能拥有多个重复的技能，所以这里使用List保存
      */
-    private List<Buffer> bufferList = new CopyOnWriteArrayList<>();
+    private ConcurrentHashMap<Integer,Buffer> bufferMap =  new ConcurrentHashMap<>();
 
     /**
      * 装备栏 装备id 装备 最大值为6 小于6则可以进行装配，否则只能换装
@@ -106,4 +110,6 @@ public class PlayerBeCache extends Player implements Creature {
     public String getName() {
         return this.getPlayerName();
     }
+
+
 }

@@ -54,7 +54,7 @@ public class BufferService {
         playerBuffer.setIntervalTime(buffer.getIntervalTime());
         //设置开始时间
         playerBuffer.setStartTime(System.currentTimeMillis());
-        creature.getBufferList().add(playerBuffer);
+        creature.getBufferMap().put(playerBuffer.getId(),playerBuffer);
         // 如果是buffer有不良效果
         if (buffer.getEffect() != 0) {
             creature.setState(buffer.getEffect());
@@ -89,7 +89,7 @@ public class BufferService {
             TimedTaskManager.scheduleWithData(buffer.getDuration(),
                     () -> {
                         // 过期移除buffer
-                        creature.getBufferList().remove(playerBuffer);
+                        creature.getBufferMap().remove(playerBuffer.getId());
                         // 恢复正常状态
                         creature.setState(1);
                         // 如果是玩家，进行通知

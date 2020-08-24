@@ -7,10 +7,12 @@ import com.example.gameservicedemo.bean.PlayerBeCache;
 import com.example.gameservicedemo.bean.shop.Shop;
 import com.example.gameservicedemo.bean.shop.Tools;
 import com.example.gameservicedemo.bean.shop.ToolsProperty;
+import com.example.gameservicedemo.bean.skill.Skill;
 import com.example.gameservicedemo.cache.ToolsCache;
 import com.example.gameservicedemo.cache.ToolsPropertyInfoCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.example.gameservicedemo.manager.TimedTaskManager;
+import com.example.gameservicedemo.service.skill.SkillService;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -39,6 +41,8 @@ public class ToolsService {
     NotificationManager notificationManager;
     @Autowired
     BufferService bufferService;
+    @Autowired
+    SkillService skillService;
 
     /**
      * 屏蔽数据与业务层
@@ -104,19 +108,16 @@ public class ToolsService {
         bagBeCache.getToolsMap().remove(tools1.getId());
         //计算装备对玩家属性的影响
         Map<Integer, ToolsProperty> toolsInfluence = player.getToolsInfluence();
-        //buf影响（装备的唯一被动，如名刀、金身、复活甲等）
-        //----------------------------------------------------------------------------------------------------需细化
-        Integer bufferId = tools.getBuffer();
-        if (bufferId != null) {
-            Buffer buffer1 = new Buffer();
-            Buffer buffer = bufferService.getBuffer(bufferId);
-            BeanUtils.copyProperties(buffer, buffer1);
-            boolean add = player.getBufferList().add(buffer1);
-            if (add) {
-                log.info("{}添加了Buf{}", player.getName(), buffer1.getName());
+        //添加装备的唯一被动，如名刀、金身、复活甲等技能
+        Integer passiveSkills = tools.getPassiveSkills();
+        if(passiveSkills!=null){
+            Skill skill = new Skill();
+            BeanUtils.copyProperties(skillService.getSkillById(passiveSkills),skill);
+            Skill put = player.getCanUseSkillMap().put(skill.getId(), skill);
+            if(put!=null){
+                log.info("{}添加了被动技能{}", player.getName(), skill.getName());
             }
         }
-
         //性能影响
         List<ToolsProperty> toolsPropertie = tools.getToolsPropertie();
         if (!Objects.isNull(toolsPropertie)) {
@@ -149,7 +150,7 @@ public class ToolsService {
         Tools remove = player.getEquipmentBar().remove(tools.getId());
         List<ToolsProperty> toolsPropertie = remove.getToolsPropertie();
         //线程安全问题-----------------------------------------------------------------------------------------
-        //去除buf加成
+        //移去被动技能
         //更新影响
         if (!Objects.isNull(toolsPropertie)) {
             toolsPropertie.forEach(v -> {
@@ -191,12 +192,13 @@ public class ToolsService {
             notificationManager.notifyByCtx(context,"不存在这个物品，请检查输入！",RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        String s;
-        Integer bufferId = toolsById.getBuffer();
-        if(Objects.isNull(bufferId)){
+        String s=" ";
+        Integer passiveSkills = toolsById.getPassiveSkills();
+        if(Objects.isNull(passiveSkills)){
             s="无被动";
-        }else {//需调用buf效果的查看
-            s = bufferService.bufferInfo(bufferService.getBuffer(bufferId));
+        }else{
+            Skill skillById = skillService.getSkillById(passiveSkills);
+            s=skillById.getName()+"——"+skillById.getDescribe();
         }
         //增益
         StringBuilder add=new StringBuilder();
@@ -207,7 +209,7 @@ public class ToolsService {
             });
         }
         StringBuilder stringBuilder = new StringBuilder("物品的详细信息如下：\n");
-        stringBuilder.append(MessageFormat.format("id:{0}\n名称:{1}\n唯一被动（触发的buf）:{2}\n耐久度:{3}\n" +
+        stringBuilder.append(MessageFormat.format("id:{0}\n名称:{1}\n唯一被动技能:{2}\n耐久度:{3}\n" +
                         "是否可叠加:{4}\n增益:{5}\n购入价格:{6}\n卖出价格:{7}\n描述信息:{8}\n",
                 toolsById.getId(),
                 toolsById.getName(),

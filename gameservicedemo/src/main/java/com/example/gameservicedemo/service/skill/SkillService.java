@@ -178,4 +178,8 @@ public class SkillService {
         //定时器——>移除CD完成的技能
         TimedTaskManager.schedule(skill.getCd(), () -> creature.getHasUseSkillMap().remove(skill.getId()));
     }
+
+    public Skill getSkillById(Integer skillId){
+        return  SkillCache.get(skillId);
+    }
 }
