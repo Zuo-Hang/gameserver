@@ -1,19 +1,17 @@
 package com.example.gameservicedemo.manager;
 
-import com.example.commondemo.base.RequestCode;
 import com.example.commondemo.base.TcpProtocol;
 import com.example.commondemo.code.GetCoder;
 import com.example.commondemo.message.Message;
 import com.example.gamedatademo.bean.Player;
-import com.example.gameservicedemo.bean.Creature;
-import com.example.gameservicedemo.bean.PlayerBeCache;
-import com.example.gameservicedemo.cache.PlayerCache;
-import com.example.gameservicedemo.service.SceneService;
+import com.example.gameservicedemo.game.scene.bean.Creature;
+import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
+import com.example.gameservicedemo.game.player.cache.PlayerCache;
+import com.example.gameservicedemo.game.scene.service.SceneService;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;

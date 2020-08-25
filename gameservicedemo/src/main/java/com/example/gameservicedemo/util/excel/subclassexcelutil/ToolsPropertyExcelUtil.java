@@ -1,6 +1,6 @@
 package com.example.gameservicedemo.util.excel.subclassexcelutil;
 
-import com.example.gameservicedemo.bean.shop.ToolsProperty;
+import com.example.gameservicedemo.game.tools.bean.ToolsProperty;
 import com.example.gameservicedemo.util.excel.ReadExcelByEntity;
 
 /**

@@ -1,16 +1,13 @@
 package com.example.gameservicedemo.background;
 
-import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.mapper.BagMapper;
 import com.example.gamedatademo.mapper.PlayerMapper;
-import com.example.gameservicedemo.bean.BagBeCache;
-import com.example.gameservicedemo.bean.PlayerBeCache;
-import com.example.gameservicedemo.bean.shop.Tools;
-import com.example.gameservicedemo.bean.shop.ToolsProperty;
-import com.example.gameservicedemo.cache.PlayerCache;
+import com.example.gameservicedemo.game.bag.bean.BagBeCache;
+import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
+import com.example.gameservicedemo.game.tools.bean.Tools;
+import com.example.gameservicedemo.game.player.cache.PlayerCache;
 import com.google.gson.Gson;
 import io.netty.channel.ChannelHandlerContext;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
