@@ -1,4 +1,4 @@
-package com.example.gameservicedemo.game.skill.cache;
+package com.example.gameservicedemo.game.buffer.cache;
 
 import com.example.gameservicedemo.game.buffer.bean.Buffer;
 import com.example.gameservicedemo.util.excel.subclassexcelutil.BufferExcelUtill;

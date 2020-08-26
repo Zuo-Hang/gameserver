@@ -1,6 +1,6 @@
 package com.example.gameservicedemo.game.skill.service;
 
-import com.example.gameservicedemo.game.scene.bean.Creature;
+import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.tools.bean.ToolsProperty;
 import com.example.gameservicedemo.game.tools.bean.ToolsPropertyInfo;
@@ -28,89 +28,62 @@ public class GetHurtNum {
     public int hurtToShield=0;
 
     /**
-     * 获取某一技能对目标造成的伤害值：
-     * @param initiator 技能发起方
-     * @param target    技能承受方
+     * 获取某一伤害对目标造成的各方面损伤
+     * @param murderer 技能发起方
+     * @param victim    技能承受方
+     * @param initialHurt 基础伤害值
+     * @param hurtType  伤害类型
      * @return
      */
-    public  void getHurtNum(Creature initiator, Creature target, Integer initialHurt,Integer hurtType) {
+    public  void getHurtNum(Creature murderer, Creature victim, Integer initialHurt,Integer hurtType) {
         //不同的伤害类型进行不同的运算流程。
         if (SkillHurtType.PHYSICS.getType().equals(hurtType)) {
-            //调用物理伤害
-            physicsHurt((PlayerBeCache) initiator,(PlayerBeCache) target,initialHurt,hurtType);
+            physicsHurt(murderer,victim,initialHurt,hurtType);
         } else if (SkillHurtType.MAGIC.getType().equals(hurtType)) {
-            //调用法术伤害
-            magicHurt((PlayerBeCache) initiator,(PlayerBeCache) target,initialHurt, hurtType);
+            magicHurt(murderer,victim,initialHurt,hurtType);
         } else if (SkillHurtType.PH_REAL.getType().equals(hurtType)) {
-            //物理加成的真实伤害，没有反伤。无视防御、护盾。直接对生命值扣减。（可暴击）
-            PlayerBeCache player = (PlayerBeCache) initiator;
-            int baseHurt = player.getToolsInfluence().get(ToolsPropertyInfo.Physical_attack.getId()).getValue();
-            //物理真实伤害可暴击
-            Integer hurt = markUpHurt(player.getToolsInfluence(), baseHurt);
-            this.hurt=hurt;
+            //物理加成的真实伤害无视防御、护盾。直接对生命值扣减。（可暴击）
+            if(murderer instanceof PlayerBeCache){
+                initialHurt = markUpHurt(((PlayerBeCache)murderer).getToolsInfluence(), initialHurt);
+            }
+            this.hurt=initialHurt;
         }else if(SkillHurtType.MA_REAL.getType().equals(hurtType)) {
-            //法术加成的真实伤害，没有反伤。无视防御、护盾。直接对生命值扣减。
-            PlayerBeCache player = (PlayerBeCache) initiator;
-            int hurt =  player.getToolsInfluence().get(ToolsPropertyInfo.Magic_Attack.getId()).getValue();
-            this.hurt=hurt;
+            //法术加成的真实伤害无视防御、护盾。直接对生命值扣减。
+            this.hurt=initialHurt;
         }
     }
 
     /**
-     * 法术伤害
      * 2.法术伤害：不可暴击、可防御穿透、不可反伤
-     * @param player
-     * @param target1
-     * @param hurtType
      * @return
      */
-    public  Integer magicHurt(PlayerBeCache player,PlayerBeCache target1, Integer initHurt,Integer hurtType){
-        //获取属性
-        Map<Integer, ToolsProperty> initiatorInfo = player.getToolsInfluence();
-        Map<Integer, ToolsProperty> targetInfo = target1.getToolsInfluence();
+    public  void magicHurt(Creature murderer,Creature victim, Integer initHurt,Integer hurtType){
         //计算承受者被穿透后的防御
-        Integer defense = targetInfo.get(ToolsPropertyInfo.Magic_defense.getId()).getValue();
-        Integer pierceThrough = initiatorInfo.get(ToolsPropertyInfo.Spell_penetration.getId()).getValue();
-        Integer finalDefense = cutDownDefense(defense, pierceThrough);
+        Integer finalDefense = cutDownDefense(victim.getMDefense(), murderer.getMPenetration());
         //得到最终伤害值
         int hurt = initHurt - finalDefense;
         //扣除护盾打出的真实伤害
-        this.hurt = shield(hurt, target1, hurtType);
-        return 0;
+        this.hurt = shield(hurt, victim, hurtType);
     }
 
     /**
-     * 物理伤害
      * 1.物理伤害：可暴击、可防御穿透机制
-     * @param player
-     * @param target1
-     * @param hurtType
-     * @return
      */
-    public  void   physicsHurt(PlayerBeCache player,PlayerBeCache target1,Integer initHurt, Integer hurtType){
-        //获取属性
-        Map<Integer, ToolsProperty> initiatorInfo = player.getToolsInfluence();
-        Map<Integer, ToolsProperty> targetInfo = target1.getToolsInfluence();
-        //计算承受者被穿透后的防御
-        Integer defense = targetInfo.get(ToolsPropertyInfo.Physical_defense.getId()).getValue();
-        Integer pierceThrough = initiatorInfo.get(ToolsPropertyInfo.Physical_penetration.getId()).getValue();
-        Integer finalDefense = cutDownDefense(defense, pierceThrough);
-        //进行暴击加成
-        Integer shouldBeBear = markUpHurt(initiatorInfo, initHurt - defense);
-        //得到最终伤害值
-        int hurt = shouldBeBear - finalDefense;
+    public  void   physicsHurt(Creature murderer, Creature victim,Integer initHurt, Integer hurtType){
+        //计算穿透后的防御值
+        Integer finalDefense = cutDownDefense(victim.getPDefense(), murderer.getPPenetration());
+        //只有玩家可以打出暴击
+        if(murderer instanceof PlayerBeCache){
+            Map<Integer, ToolsProperty> initiatorInfo = ((PlayerBeCache)murderer).getToolsInfluence();
+            //将玩家打出的伤害进行暴击
+            initHurt= markUpHurt(initiatorInfo, initHurt - finalDefense);
+        }
         //扣除护盾打出的真实伤害
-        this.hurt= shield(hurt, target1, hurtType);
+        this.hurt= shield(initHurt, victim, hurtType);
     }
 
     /**
      * 进行暴击加成
-     * （(末世、破军、回响等)为什么要在这个位置进行，其实这些伤害应该分开来一次一次的实现不好吗？）即打出技能伤害后，再遍历装备列表，装备中如果有这些buf则这些buf的执行器
-     * 中再次调用技能系统，打出第二次伤害。
-     *
-     * @param map      属性集合
-     * @param baseHurt 基础伤害
-     * @return
      */
     public  Integer markUpHurt(Map<Integer, ToolsProperty> map, Integer baseHurt) {
         //暴击率
@@ -125,29 +98,20 @@ public class GetHurtNum {
 
     /**
      * 对防御值进行穿透削减
-     *
-     * @param defense
-     * @param pierceThrough
-     * @return
      */
     public  Integer cutDownDefense(Integer defense, Integer pierceThrough) {
         return defense * (100-pierceThrough) / 100;
     }
 
     /**
-     * 护盾抵消部分伤害
-     *
-     * @param hurt
-     * @param target
-     * @param hurtType
-     * @return
+     * 计算对目标具有的护盾造成的伤害
      */
-    public  Integer shield(Integer hurt, PlayerBeCache target, Integer hurtType) {
+    public  Integer shield(Integer hurt, Creature victim, Integer hurtType) {
         if (SkillHurtType.MAGIC.getType().equals(hurtType)) {
-            if (target.getMagicShield() != 0) {
-                if (hurt - target.getMagicShield() > 0) {
+            if (victim.getMagicShield() != 0) {
+                if (hurt - victim.getMagicShield() > 0) {
                     //护盾不足以抵抗伤害
-                    hurtToMaShield= target.getMagicShield();
+                    hurtToMaShield= victim.getMagicShield();
                     hurt=hurt-hurtToMaShield;
                 } else {
                     //护盾可以抵抗所有伤害
@@ -157,10 +121,10 @@ public class GetHurtNum {
             }
         }
         //存在基础护盾
-        if (target.getShield() > 0) {
-            if (hurt - target.getShield() > 0) {
+        if (victim.getShield() > 0) {
+            if (hurt - victim.getShield() > 0) {
                 //护盾不足以抵抗伤害
-                hurtToShield=target.getShield();
+                hurtToShield=victim.getShield();
                 hurt=hurt-hurtToShield;
             } else {
                 //护盾可以抵抗所有伤害

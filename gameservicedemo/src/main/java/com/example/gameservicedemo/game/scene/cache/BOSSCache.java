@@ -1,7 +1,6 @@
 package com.example.gameservicedemo.game.scene.cache;
 
-import com.example.gameservicedemo.game.scene.bean.BOSS;
-import com.example.gameservicedemo.game.scene.bean.Monster;
+import com.example.gameservicedemo.game.copy.bean.BOSS;
 import com.example.gameservicedemo.game.scene.bean.SceneObject;
 import com.example.gameservicedemo.game.scene.service.SceneObjectService;
 import org.springframework.beans.BeanUtils;

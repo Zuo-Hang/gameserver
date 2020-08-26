@@ -24,10 +24,6 @@ import java.util.Map;
 @Component
 @Slf4j
 public class ToolsCache {
-
-//    @Autowired
-//    public ToolsService toolsService;
-
     private HashMap<Integer, Tools> toolsCache= new HashMap<Integer, Tools>();
     @PostConstruct
     public void init(){

@@ -1,5 +1,6 @@
 package com.example.gameservicedemo.game.scene.bean;
 
+import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.buffer.bean.Buffer;
 import com.example.gameservicedemo.game.skill.bean.Skill;
 import com.example.gameservicedemo.util.excel.EntityName;
@@ -16,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Description: 场景内的实体，所具有的共性。可以从Excel中配置
  */
 @Data
-public class SceneObject {
+public class SceneObject implements Creature {
     @EntityName(column = "id")
     private Integer id;
     @EntityName(column = "名字")
@@ -69,8 +70,39 @@ public class SceneObject {
     // 死亡时间
     private long deadTime;
     //需初始化
-    private volatile boolean canUseSkill=true;
+    private volatile boolean canUseSkill=true; //不能使用技能即被沉默
     private Map<Integer, Skill> hasUseSkillMap = new ConcurrentHashMap<>();
     private Map<Integer,Skill> canUseSkillMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, Buffer> bufferMap =  new ConcurrentHashMap<>();
+
+    @Override
+    public Integer getPHurt() {
+        return physicalAttack;
+    }
+
+    @Override
+    public Integer getMHurt() {
+        return magicAttack;
+    }
+
+    @Override
+    public Integer getPDefense() {
+        return physicalDefense;
+    }
+
+    @Override
+    public Integer getMDefense() {
+        return magicDefense;
+    }
+
+    //场景对象打出的伤害没有穿透值
+    @Override
+    public Integer getPPenetration() {
+        return 0;
+    }
+
+    @Override
+    public Integer getMPenetration() {
+        return 0;
+    }
 }

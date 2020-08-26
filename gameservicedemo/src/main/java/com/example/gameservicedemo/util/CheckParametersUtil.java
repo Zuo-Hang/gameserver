@@ -18,13 +18,15 @@ import org.springframework.stereotype.Component;
 public class CheckParametersUtil {
     @Autowired
     static NotificationManager notificationManager;
+
     public static String[] checkParameter(ChannelHandlerContext ctx, Message message, int parameterNumber) {
-        String[] args = null;
         //按照正则的方式拆分参数字符串
-        args = message.getMessage().split("\\s+");
+        String[] args = message.getMessage().split("\\s+");
         if (args.length != parameterNumber) {
             notificationManager.notifyByCtx(ctx,"您输入的参数数目不正确，请重新输入", RequestCode.BAD_REQUEST.getCode());
+            args = null;
         }
+        //参数数量正确的时候返回参数列表，不正确的时候返回null
         return args;
     }
 }

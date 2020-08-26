@@ -3,10 +3,11 @@ package com.example.gameservicedemo.game.player.bean;
 import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.buffer.bean.Buffer;
-import com.example.gameservicedemo.game.scene.bean.Creature;
+import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.tools.bean.ToolsProperty;
 import com.example.gameservicedemo.game.skill.bean.Skill;
+import com.example.gameservicedemo.game.tools.bean.ToolsPropertyInfo;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -44,15 +45,19 @@ public class PlayerBeCache extends Player implements Creature {
      */
     private Integer mp;
     private Integer hp;
-    /** 护盾*/
-    private Integer magicShield=0;
-    /** 魔法，物理护盾*/
-    private Integer Shield=0;
+    /**
+     * 护盾
+     */
+    private Integer magicShield = 0;
+    /**
+     * 魔法，物理护盾
+     */
+    private Integer Shield = 0;
 
     /**
      * 是否可以使用技能  （某些情况下不能使用技能，如修理装备的时候，使用金身的时候）
      */
-    private volatile boolean canUseSkill=true;
+    private volatile boolean canUseSkill = true;
     /**
      * 角色当前处于CD的技能集合
      */
@@ -63,11 +68,11 @@ public class PlayerBeCache extends Player implements Creature {
      * 主要为天赋技能、装备技能//在装配装备的时候加入技能
      * 注意：不包含角色类型所附带的常驻技能
      */
-    private Map<Integer,Skill> canUseSkillMap = new ConcurrentHashMap<>();
+    private Map<Integer, Skill> canUseSkillMap = new ConcurrentHashMap<>();
     /**
      * 角色当前的buffer,因为可能拥有多个重复的技能，所以这里使用List保存
      */
-    private ConcurrentHashMap<Integer, Buffer> bufferMap =  new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, Buffer> bufferMap = new ConcurrentHashMap<>();
 
     /**
      * 装备栏 装备id 装备 最大值为6 小于6则可以进行装配，否则只能换装
@@ -76,7 +81,7 @@ public class PlayerBeCache extends Player implements Creature {
     /**
      * 需要被修理的装备的id列表
      */
-    private List<Integer> needFix=new ArrayList<Integer>();
+    private List<Integer> needFix = new ArrayList<Integer>();
     // 背包栏
     private BagBeCache bagBeCache = null;
     /**
@@ -84,6 +89,8 @@ public class PlayerBeCache extends Player implements Creature {
      * 受装备影响的属性值，集合中的元素代表当前装备对某一方面加成的总和数值
      */
     private Map<Integer, ToolsProperty> toolsInfluence = new ConcurrentHashMap<>();
+
+    Long teamId=null;
 
     @Override
     public Integer getId() {
@@ -93,6 +100,36 @@ public class PlayerBeCache extends Player implements Creature {
     @Override
     public String getName() {
         return this.getPlayerName();
+    }
+
+    @Override
+    public Integer getPHurt() {
+        return toolsInfluence.get(ToolsPropertyInfo.Physical_attack.getId()).getValue();
+    }
+
+    @Override
+    public Integer getMHurt() {
+        return toolsInfluence.get(ToolsPropertyInfo.Magic_Attack.getId()).getValue();
+    }
+
+    @Override
+    public Integer getPDefense() {
+        return toolsInfluence.get(ToolsPropertyInfo.Physical_defense.getId()).getValue();
+    }
+
+    @Override
+    public Integer getMDefense() {
+        return toolsInfluence.get(ToolsPropertyInfo.Magic_defense.getId()).getValue();
+    }
+
+    @Override
+    public Integer getPPenetration() {
+        return toolsInfluence.get(ToolsPropertyInfo.Physical_penetration.getId()).getValue();
+    }
+
+    @Override
+    public Integer getMPenetration() {
+        return toolsInfluence.get(ToolsPropertyInfo.Spell_penetration.getId()).getValue();
     }
 
 

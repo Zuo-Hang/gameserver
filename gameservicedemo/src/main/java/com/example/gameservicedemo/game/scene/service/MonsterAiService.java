@@ -3,7 +3,7 @@ package com.example.gameservicedemo.game.scene.service;
 import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerDataService;
-import com.example.gameservicedemo.game.scene.bean.Creature;
+import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.scene.bean.Monster;
 import com.example.gameservicedemo.game.scene.bean.Pet;
 import com.example.gameservicedemo.game.scene.bean.Scene;

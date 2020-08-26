@@ -1,5 +1,6 @@
 package com.example.gameservicedemo.game.scene.bean;
 
+import com.example.gameservicedemo.base.bean.Creature;
 import lombok.Data;
 
 /**

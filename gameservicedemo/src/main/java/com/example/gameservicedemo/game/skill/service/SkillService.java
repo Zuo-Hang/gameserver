@@ -2,7 +2,7 @@ package com.example.gameservicedemo.game.skill.service;
 
 import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
-import com.example.gameservicedemo.game.scene.bean.Creature;
+import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.scene.bean.Monster;
 import com.example.gameservicedemo.game.scene.cache.MonsterCache;

@@ -15,6 +15,7 @@ import java.util.Map;
  * 3. 3000 - 3999 之间为与角色场景相关
  * 4. 4000 - 4999 之间为技能相关
  * 5. 5000 - 5999 之间为和装备有关
+ * 6. 6000 - 6999 之间为和组队有关
  */
 public enum Command {
     /**
@@ -110,7 +111,7 @@ public enum Command {
     /**
      * 查看角色属性
      */
-    SEE_PLAYER_ABILITY("see_player_ability",4003,"查看角色属性"),
+    SEE_PLAYER_ABILITY("see_player_ability", 4003, "查看角色属性"),
 
 
     /**
@@ -150,7 +151,34 @@ public enum Command {
     /**
      * buffer开始
      **/
-    START_BUFFER("start_buffer", 3004, "buffer开始");
+    START_BUFFER("start_buffer", 3004, "buffer开始"),
+
+
+
+    /**
+     * 邀请组队 publishTeamRequest
+     **/
+    PUBLISH_TEAM_REQUEST("publish_team_request", 6000, "邀请组队"),
+    /**
+     * 加入队伍 accept Team request
+     **/
+    ACCEPT_TEAM_REQUEST("accept", 6010, "接受组队请求->加入队伍  accept 请求id"),
+    /**
+     * 离开队伍
+     **/
+    LEAVE_TEAM("leave", 6020, "离开队伍"),
+    /**
+     * 查看队伍
+     **/
+    TEAM_SHOW("team", 6030, "查看队伍"),
+    /**
+     * 创建队伍，开房间。默认自己是房主
+     */
+    CREAT_TEAM("creat_team", 6040, "创建队伍，开房间。默认自己是房主"),
+    KICK_FROM_TEAM("kick",6050,"将某一成员踢出自己的队伍  tick playerId")
+    ;
+
+
     private String command;
 
     private Integer requestCode;

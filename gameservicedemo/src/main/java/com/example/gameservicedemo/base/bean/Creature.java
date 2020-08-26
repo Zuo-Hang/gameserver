@@ -1,4 +1,4 @@
-package com.example.gameservicedemo.game.scene.bean;
+package com.example.gameservicedemo.base.bean;
 
 
 import com.example.gameservicedemo.game.buffer.bean.Buffer;
@@ -26,6 +26,12 @@ public interface Creature {
     Integer getShield();
     void setMagicShield(Integer magicShield);
     void setShield(Integer shield);
+    Integer getPHurt();
+    Integer getMHurt();
+    Integer getPDefense();
+    Integer getMDefense();
+    Integer getPPenetration();
+    Integer getMPenetration();
     Integer getState();
     void setState(Integer state);
     Creature getTarget();

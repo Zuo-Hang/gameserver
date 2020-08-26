@@ -1,6 +1,7 @@
-package com.example.gameservicedemo.game.scene.bean;
+package com.example.gameservicedemo.game.copy.bean;
 
 
+import com.example.gameservicedemo.game.scene.bean.Monster;
 import lombok.Data;
 
 /**
@@ -8,8 +9,9 @@ import lombok.Data;
  *
  * @author: hang hang
  * @Date: 2020/08/25/20:25
- * @Description:
+ * @Description: Boss实体类
  */
 @Data
 public class BOSS extends Monster {
+
 }

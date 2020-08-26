@@ -1,6 +1,6 @@
 package com.example.gameservicedemo.game.skill.service;
 
-import com.example.gameservicedemo.game.scene.bean.Creature;
+import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.skill.bean.Skill;
 import com.example.gameservicedemo.game.scene.bean.Scene;
 

@@ -1,5 +1,7 @@
 package com.example.gameservicedemo.util;
 
+import org.springframework.stereotype.Component;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -11,7 +13,6 @@ import java.util.Date;
  * @Date: 2020/08/25/20:03
  * @Description:
  */
-
 public class SnowFlake {
 
     /**

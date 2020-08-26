@@ -232,4 +232,10 @@ public class PlayerLoginService {
         }
         return true;
     }
+
+    public PlayerBeCache getPlayerById(Integer playerId){
+        ChannelHandlerContext cxtByPlayerId = playerCache.getCxtByPlayerId(playerId);
+        PlayerBeCache playerByCtx = playerCache.getPlayerByCtx(cxtByPlayerId);
+        return playerByCtx;
+    }
 }
