@@ -8,6 +8,8 @@ import com.example.gameservicedemo.game.scene.bean.Monster;
 import com.example.gameservicedemo.game.scene.bean.Pet;
 import com.example.gameservicedemo.game.scene.bean.Scene;
 import com.example.gameservicedemo.game.skill.bean.Skill;
+import com.example.gameservicedemo.game.skill.bean.SkillHurtType;
+import com.example.gameservicedemo.game.skill.service.GetHurtNum;
 import com.example.gameservicedemo.game.skill.service.SkillService;
 import com.example.gameservicedemo.manager.NotificationManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,16 +46,18 @@ public class MonsterAiService {
      */
     private void monsterAttack(Monster monster, Creature target, Scene gameScene) {
         Integer physicalAttack = monster.getPhysicalAttack();
-        //调用伤害计算系统
-
-        //target.setHp(target.getHp() - attack);
-        notificationManager.notifyScene(gameScene.getId(),
+        //调用伤害计算系统-------------------------------------------------------------------
+        GetHurtNum getHurtNum = new GetHurtNum();
+        getHurtNum.getHurtNum(monster,target,monster.getPHurt(), SkillHurtType.PHYSICS.getType());
+        target.setHp(target.getHp() - getHurtNum.hurt);
+        notificationManager.notifyScene(gameScene,
                 MessageFormat.format("{0}在攻击{1}，造成了{2}点伤害，{3}当前的hp为 {4} \n",
                         monster.getName(),
                         target.getName(),
                         monster.getPhysicalAttack(),
                         target.getName(),
-                        target.getHp()),RequestCode.SUCCESS.getCode());
+                        target.getHp()
+                ),RequestCode.SUCCESS.getCode());
         if (target instanceof PlayerBeCache) {
             playerDataService.isPlayerDead((PlayerBeCache) target,monster);
         } else {
@@ -70,7 +74,7 @@ public class MonsterAiService {
      * @param damage    伤害
      */
     public void notifyMonsterBeAttack(Creature creature,Monster monster,Scene gameScene,Integer damage) {
-        notificationManager.notifyScene(gameScene.getId(),
+        notificationManager.notifyScene(gameScene,
                 MessageFormat.format("{0} 受到 {1} 攻击，hp减少{2},当前hp为 {3} \n",
                         monster.getName(),
                         creature.getName(),

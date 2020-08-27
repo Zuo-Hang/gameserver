@@ -1,6 +1,8 @@
 package com.example.gameservicedemo.game.team.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.game.copy.bean.GameCopyScene;
+import com.example.gameservicedemo.game.copy.service.GameCopyService;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerDataService;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
@@ -33,6 +35,8 @@ public class TeamService {
     PlayerLoginService playerLoginService;
     @Autowired
     PlayerDataService playerDataService;
+    @Autowired
+    GameCopyService gameCopyService;
     @Autowired
     NotificationManager notificationManager;
 
@@ -233,5 +237,21 @@ public class TeamService {
                     playerLoginService.getPlayerById(Integer.valueOf(team.getCaptainId().toString())).getName()
             ), RequestCode.SUCCESS.getCode());
         }
+    }
+
+    public void enterGameCopy(ChannelHandlerContext context, Integer copyId) {
+        Team team = checkPlayerHaveTeam(context);
+        if (Objects.isNull(team)) {
+            return;
+        }
+        PlayerBeCache playerByContext = playerLoginService.getPlayerByContext(context);
+        if(!team.getCaptainId().equals(Long.valueOf(playerByContext.getId()))){
+            notificationManager.notifyPlayer(playerByContext,"你不是队长，只有队长才可以使队伍进入副本！",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        //调用进入副本的方法
+        gameCopyService.enterGameCopyByTeam(team,copyId);
+        notificationManager.notifyTeam(team,"队伍正在进入副本……",RequestCode.SUCCESS.getCode());
+
     }
 }

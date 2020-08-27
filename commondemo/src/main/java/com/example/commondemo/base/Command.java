@@ -16,6 +16,7 @@ import java.util.Map;
  * 4. 4000 - 4999 之间为技能相关
  * 5. 5000 - 5999 之间为和装备有关
  * 6. 6000 - 6999 之间为和组队有关
+ * 7. 7000 - 7500 之间为和副本有关
  */
 public enum Command {
     /**
@@ -175,7 +176,15 @@ public enum Command {
      * 创建队伍，开房间。默认自己是房主
      */
     CREAT_TEAM("creat_team", 6040, "创建队伍，开房间。默认自己是房主"),
-    KICK_FROM_TEAM("kick",6050,"将某一成员踢出自己的队伍  tick playerId")
+    KICK_FROM_TEAM("kick",6050,"将某一成员踢出自己的队伍  tick playerId"),
+    /**
+     * 队长令队伍进入副本
+     */
+    TEAM_ENTER_GAME_COPY("team_enter_copy",6060,"队长令队伍进入副本"),
+
+    ENTER_GAME_COPY("enter_copy",7000,"独自进入副本"),
+    EXIT_GAME_COPY("exit_copy",7010,"退出副本"),
+    SHOW_GAME_COPY("show_copy",7020,"查看副本")
     ;
 
 

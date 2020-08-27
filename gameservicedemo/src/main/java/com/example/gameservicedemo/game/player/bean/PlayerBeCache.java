@@ -4,6 +4,8 @@ import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.buffer.bean.Buffer;
 import com.example.gameservicedemo.base.bean.Creature;
+import com.example.gameservicedemo.game.scene.bean.Pet;
+import com.example.gameservicedemo.game.scene.bean.Scene;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.tools.bean.ToolsProperty;
 import com.example.gameservicedemo.game.skill.bean.Skill;
@@ -53,6 +55,10 @@ public class PlayerBeCache extends Player implements Creature {
      * 魔法，物理护盾
      */
     private Integer Shield = 0;
+
+    Scene sceneNowAt=null;
+
+    Pet pet=null;
 
     /**
      * 是否可以使用技能  （某些情况下不能使用技能，如修理装备的时候，使用金身的时候）

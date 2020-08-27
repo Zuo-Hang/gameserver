@@ -23,25 +23,23 @@ public class Scene {
 
     @EntityName(column = "ID")
     private Integer id;
-
-    @EntityName(column = "名字")
-    private String name;
-
     @EntityName(column = "相邻场景")
     private String neighbors = "";
-
-    @EntityName(column = "场景描述")
-    private String describe;
-
+    @EntityName(column = "名字")
+    private String name;
+    @EntityName(column = "状态")
+    private Integer state;
     @EntityName(column = "地图类型")
-    private String type;
-
+    private Integer type;
     /**
      * 场景对象，由","分割
      */
     @EntityName(column = "场景对象")
     private String gameObjectIds;
-
+    @EntityName(column = "副本时间")
+    private Long copySceneTime;
+    @EntityName(column = "场景描述")
+    private String describe;
     /**
      * 处于场景的玩家,key为player_id
      */

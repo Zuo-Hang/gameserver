@@ -151,7 +151,7 @@ public class SkillService {
             TimedTaskManager.singleThreadSchedule( skill.getCastTime(),
                     () -> scene.getSingleThreadSchedule().execute(
                             () -> {
-                                notificationManager.notifyScene(scene.getId(),
+                                notificationManager.notifyScene(scene,
                                         MessageFormat.format(" {0}  对 {1} 使用了技能  {2} ",
                                                 initiator.getName(),target.getName(),skill.getName()), RequestCode.SUCCESS.getCode());
                                 // 注意，这里的技能进行还是要用场景执行器执行，不然会导致多线程问题
@@ -160,7 +160,7 @@ public class SkillService {
                     )
             );
         }else{
-            notificationManager.notifyScene(scene.getId(),
+            notificationManager.notifyScene(scene,
                     MessageFormat.format(" {0}  对 {1} 使用了技能  {2} ",
                             initiator.getName(),target.getName(),skill.getName()),RequestCode.SUCCESS.getCode());
             skillEffect.castSkill(skill.getSkillInfluenceType(),initiator,target,scene,skill);

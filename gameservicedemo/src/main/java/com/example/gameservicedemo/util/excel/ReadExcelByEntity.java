@@ -58,8 +58,6 @@ public class ReadExcelByEntity<T>{
         String lastName = filepath.substring(filepath.lastIndexOf("."));
         try {
             FileInputStream fileInputStream = new FileInputStream(filepath);
-//            ClassPathResource resource = new ClassPathResource(filepath);
-//            InputStream is = resource.getInputStream();
             if(".xls".equals(lastName)){
                 wb = new HSSFWorkbook(fileInputStream);
             }else if(".xlsx".equals(lastName)){

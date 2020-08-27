@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,7 +43,7 @@ public class SceneCache {
      */
     @PostConstruct
     private void init() {
-        SceneExcelUtil sceneExcelUtil = new SceneExcelUtil("C:\\java_project\\mmodemo\\gameservicedemo\\src\\main\\resources\\game_configuration_excel\\scene.xls");
+        SceneExcelUtil sceneExcelUtil = new SceneExcelUtil("C:\\java_project\\mmodemo\\gameservicedemo\\src\\main\\resources\\game_configuration_excel\\scene.xlsx");
         Map<Integer, Scene> map = sceneExcelUtil.getMap();
         for (Scene  gameScene: map.values()) {
             Scene scene = sceneObjectService.initSceneObject(gameScene);
@@ -59,5 +61,9 @@ public class SceneCache {
      */
     public Scene getScene(Integer key) {
         return sceneCache.getIfPresent(key);
+    }
+
+    public Collection<Scene> getAllScene(){
+        return sceneCache.asMap().values();
     }
 }

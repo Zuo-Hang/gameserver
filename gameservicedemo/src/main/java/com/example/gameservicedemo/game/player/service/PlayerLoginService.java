@@ -105,6 +105,7 @@ public class PlayerLoginService {
         //将玩家加入场景缓存当中
         Map<Integer, PlayerBeCache> players = sceneService.getScene(player1.getNowAt()).getPlayers();
         players.put(player1.getPlayerId(), playerBeCache);
+        playerBeCache.setSceneNowAt(sceneService.getScene(playerBeCache.getNowAt()));
         result.append(playerBeCache.getPlayerName()).append(",角色登陆成功")
                 .append("\n 你所在位置为: ")
                 .append(playerBeCache.getNowAt()).append("\n");
@@ -188,7 +189,7 @@ public class PlayerLoginService {
         Optional.ofNullable(playerByCtx).ifPresent(
                 p -> {
                     Integer nowAt = playerByCtx.getNowAt();
-                    notificationManager.notifyScene(nowAt,
+                    notificationManager.notifyScene(sceneService.getScene(nowAt),
                             MessageFormat.format("玩家 {0} 正在退出", playerByCtx.getPlayerName())
                             , RequestCode.SUCCESS.getCode());
                     // 重点，从缓存中移除（缓存持久化、缓存删除）

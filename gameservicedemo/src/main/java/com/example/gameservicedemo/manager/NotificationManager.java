@@ -8,6 +8,7 @@ import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.cache.PlayerCache;
+import com.example.gameservicedemo.game.scene.bean.Scene;
 import com.example.gameservicedemo.game.scene.service.SceneService;
 import com.example.gameservicedemo.game.team.bean.Team;
 import io.netty.channel.ChannelHandlerContext;
@@ -63,12 +64,12 @@ public class NotificationManager {
     /**
      * 通知场景内的所有玩家
      *
-     * @param sceneId
+     * @param scene
      * @param e
      * @param <E>
      */
-    public <E> void notifyScene(Integer sceneId, E e, Integer code) {
-        List<Player> allPlayer = sceneService.getAllPlayer(sceneId);
+    public <E> void notifyScene(Scene scene, E e, Integer code) {
+        List<Player> allPlayer = sceneService.getAllPlayer(scene.getId());
         for (Player player : allPlayer) {
             notifyByCtx(playerCache.getCxtByPlayerId(player.getPlayerId()), e, code);
         }

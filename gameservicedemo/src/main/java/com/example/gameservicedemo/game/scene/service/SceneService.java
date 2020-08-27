@@ -4,6 +4,8 @@ import com.example.commondemo.base.RequestCode;
 import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.player.service.PlayerService;
+import com.example.gameservicedemo.game.scene.bean.CommonSceneId;
+import com.example.gameservicedemo.game.scene.bean.SceneType;
 import com.example.gameservicedemo.game.scene.cache.SceneCache;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.scene.bean.Scene;
@@ -12,6 +14,8 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -134,5 +138,53 @@ public class SceneService {
         } else {
             notificationManager.notifyByCtx(context, "输入的场景名称错误", RequestCode.BAD_REQUEST.getCode());
         }
+    }
+
+    /**
+     * 当化身进入场景（改变）时触发
+     * @param player
+     */
+    public void initPlayerScene(PlayerBeCache player) {
+        Scene scene = sceneCache.getScene(player.getNowAt());
+        if (Objects.isNull(scene)) {
+            scene = sceneCache.getScene(CommonSceneId.CEMETERY.getId());
+        }
+        // 如果玩家场景id显示在副本但是身上却没关联副本实例，返回墓地的场景
+        if (scene.getType().equals(SceneType.INSTANCE_SCENE.getCode()) && Objects.isNull(player.getSceneNowAt())){
+            Scene cemetery = sceneCache.getScene(CommonSceneId.CEMETERY.getId());
+            player.setNowAt(CommonSceneId.CEMETERY.getId());
+            player.setSceneNowAt(cemetery);
+            cemetery.getPlayers().put(player.getId(),player);
+            return;
+        }
+        scene.getPlayers().put(player.getId(),player);
+        player.setSceneNowAt(scene);
+        // 广播
+        notificationManager.notifyScene(scene,
+                MessageFormat.format("{0}进入{1}场景",player.getName(),scene.getName()),
+                RequestCode.WARNING.getCode());
+    }
+
+    /**
+     *  移动到某个场景
+     * @param player 玩家
+     * @param targetScene 场景
+     */
+    public void moveToScene(PlayerBeCache player, Scene targetScene) {
+        // 从旧场景移除
+        Scene formScene = player.getSceneNowAt();
+        formScene.getPlayers().remove(player.getId());
+        player.setNowAt(targetScene.getId());
+        // 宠物相关
+        if (Objects.nonNull(player.getPet())) {
+            player.getSceneNowAt().getMonsters().remove(Integer.valueOf(player.getPet().getPetId().toString()));
+            targetScene.getMonsters().put(Integer.valueOf(player.getPet().getPetId().toString()),player.getPet());
+        }
+        // 放入目的场景
+        targetScene.getPlayers().put(player.getId(), player);
+        player.setSceneNowAt(targetScene);
+        // 进入场景广播
+        notificationManager.notifyScene(targetScene,"有玩家进入",RequestCode.WARNING.getCode());
+        notificationManager.notifyScene(formScene,"有玩家离开",RequestCode.WARNING.getCode());
     }
 }

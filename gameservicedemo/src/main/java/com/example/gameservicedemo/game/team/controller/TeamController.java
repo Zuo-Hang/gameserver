@@ -32,6 +32,15 @@ public class TeamController {
         ControllerManager.add(Command.ACCEPT_TEAM_REQUEST.getRequestCode(), this::acceptTeamRequest);
         ControllerManager.add(Command.CREAT_TEAM.getRequestCode(), this::creatTeam);
         ControllerManager.add(Command.KICK_FROM_TEAM.getRequestCode(),this::kickFromTeam);
+        ControllerManager.add(Command.TEAM_ENTER_GAME_COPY.getRequestCode(),this::teamEnterGameCopy);
+    }
+
+    private void teamEnterGameCopy(ChannelHandlerContext context, Message message) {
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
+        if (Objects.isNull(strings)) {
+            return;
+        }
+        teamService.enterGameCopy(context,Integer.valueOf(strings[1]));
     }
 
 

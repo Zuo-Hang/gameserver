@@ -76,10 +76,9 @@ public class SkillEffect {
             PlayerBeCache player = (PlayerBeCache) initiator;
             player.setMp(player.getMp() - skill.getMpConsumption());
         }
-
         target.setHp(target.getHp() - skill.getHurt());
-        target.setHp(target.getHp() + skill.getHeal());
-        notificationManager.notifyScene(gameScene.getId(),
+        //target.setHp(target.getHp() + skill.getHeal());
+        notificationManager.notifyScene(gameScene,
                 MessageFormat.format(" {0} 受到 {1} 群体攻击技能 {2}攻击，  hp减少{3},当前hp为 {4}\n",
                         target.getName(), initiator.getName(), skill.getName(), skill.getHurt(), target.getHp()), RequestCode.SUCCESS.getCode());
     }
@@ -129,7 +128,7 @@ public class SkillEffect {
             skill1.setAddHurtPercentage(0);
             attackSingle(target, initiator, gameScene, skill1);
         }
-        notificationManager.notifyScene(gameScene.getId(),
+        notificationManager.notifyScene(gameScene,
                 MessageFormat.format(" {0} 受到 {1} 技能 {2}攻击，  hp减少{3},当前hp为 {4}\n",
                         target.getName(), initiator.getName(), skill.getName(), skill.getHurt(), target.getHp()), RequestCode.SUCCESS.getCode());
     }
@@ -155,10 +154,10 @@ public class SkillEffect {
         Integer nowHp = target.getHp() + skill.getHeal() > target.getMaxHp() ? target.getMaxHp() : target.getHp() + skill.getHeal();
         target.setHp(nowHp);
         //释放技能音效
-        notificationManager.notifyScene(gameScene.getId(), skill.getSound(), RequestCode.SUCCESS.getCode());
+        notificationManager.notifyScene(gameScene, skill.getSound(), RequestCode.SUCCESS.getCode());
         //场景内通知
         if (skill.getHeal() > 0) {
-            notificationManager.notifyScene(gameScene.getId(), MessageFormat.format("{0} 受到 {1} 的治疗,hp增加了 {2}，当前hp是 {3}",
+            notificationManager.notifyScene(gameScene, MessageFormat.format("{0} 受到 {1} 的治疗,hp增加了 {2}，当前hp是 {3}",
                     target.getName(), initiator.getName(), skill.getHeal(), target.getHp()), RequestCode.SUCCESS.getCode());
         }
     }
