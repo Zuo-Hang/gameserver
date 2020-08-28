@@ -2,6 +2,7 @@ package com.example.gameservicedemo.game.scene.service;
 
 import com.example.commondemo.base.RequestCode;
 import com.example.gamedatademo.bean.Player;
+import com.example.gameservicedemo.game.player.service.PlayerDataService;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.player.service.PlayerService;
 import com.example.gameservicedemo.game.scene.bean.CommonSceneId;
@@ -37,6 +38,8 @@ public class SceneService {
     PlayerService playerService;
     @Autowired
     PlayerLoginService playerLoginService;
+    @Autowired
+    PlayerDataService playerDataService;
     @Autowired
     NotificationManager notificationManager;
 
@@ -163,6 +166,7 @@ public class SceneService {
         notificationManager.notifyScene(scene,
                 MessageFormat.format("{0}进入{1}场景",player.getName(),scene.getName()),
                 RequestCode.WARNING.getCode());
+        playerDataService.showPlayerPosition(player);
     }
 
     /**

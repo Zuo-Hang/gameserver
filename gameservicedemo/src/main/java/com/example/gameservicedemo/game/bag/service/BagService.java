@@ -57,6 +57,7 @@ public class BagService {
             }
             bagBeCache.getToolsMap().put(newTools.getId(),newTools);
         }
+        playerDataService.showPlayerBag(player);
         return true;
     }
 

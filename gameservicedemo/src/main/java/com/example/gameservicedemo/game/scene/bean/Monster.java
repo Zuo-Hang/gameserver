@@ -1,11 +1,13 @@
 package com.example.gameservicedemo.game.scene.bean;
 
 import com.example.gameservicedemo.base.bean.Creature;
+import com.example.gameservicedemo.game.skill.bean.Skill;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.text.MessageFormat;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,7 +24,6 @@ public class Monster extends SceneObject implements Creature {
     //标识缓存中唯一的对象
     Long uuid;
     //攻击速度
-
     private Integer attackSpeed = 10000;
     private long attackTime = System.currentTimeMillis();
 

@@ -183,7 +183,7 @@ public class SkillService {
         //设置上次使用技能的时间
         skillWillCD.setActiveTime(System.currentTimeMillis());
         creature.getHasUseSkillMap().put(skill.getId(), skillWillCD);
-        //定时器——>移除CD完成的技能
+        //定时器——>移除CD完成的技能---------------------------------------------------需优化
         TimedTaskManager.schedule(skill.getCd(), () -> creature.getHasUseSkillMap().remove(skill.getId()));
     }
 

@@ -36,8 +36,8 @@ public interface Creature {
     void setState(Integer state);
     Creature getTarget();
     void setTarget(Creature target);
-    Map<Integer,Skill> getCanUseSkillMap();
-    void setCanUseSkillMap(Map<Integer,Skill> map);
+    Map<Integer,Skill> getSkillHaveMap();
+    void setSkillHaveMap(Map<Integer,Skill> map);
     Map<Integer, Skill> getHasUseSkillMap();
     void setHasUseSkillMap(Map<Integer, Skill> skillMap);
     ConcurrentHashMap<Integer, Buffer> getBufferMap();

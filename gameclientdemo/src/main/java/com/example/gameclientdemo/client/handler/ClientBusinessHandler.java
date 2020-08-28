@@ -25,6 +25,7 @@ import java.text.MessageFormat;
 public class ClientBusinessHandler extends ChannelInboundHandlerAdapter {
     /**
      * 连接成功后发送消息测试
+     *
      * @param ctx
      * @throws Exception
      */
@@ -34,28 +35,37 @@ public class ClientBusinessHandler extends ChannelInboundHandlerAdapter {
 
     /**
      * 读取服务端返回的消息
+     *
      * @param ctx
      * @param msg
      * @throws Exception
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if(msg instanceof Message){
-            String format = MessageFormat.format("服务器返回了:{0}", ((Message) msg).getMessage());
-            log.info(format);
-            //追加输出显示
-            MainView.outputAppend(((Message) msg).getRequestCode(),format);
-            if(((Message) msg).getRequestCode()== RequestCode.ABOUT_PLAYER.getCode()){
-                MainView.INFORMATION.setText(((Message) msg).getMessage());
+        if (msg instanceof Message) {
+            if (((Message) msg).getRequestCode() == RequestCode.SUCCESS.getCode() ||
+                    ((Message) msg).getRequestCode() == RequestCode.BAD_REQUEST.getCode() ||
+                    ((Message) msg).getRequestCode() == RequestCode.WARNING.getCode()
+            ) {
+                String format = MessageFormat.format("服务器返回了:{0}", ((Message) msg).getMessage());
+                log.info(format);
+                //追加输出显示
+                MainView.outputAppend(((Message) msg).getRequestCode(), format);
             }
-            if(((Message) msg).getRequestCode()== RequestCode.ABOUT_SCENE.getCode()){
-                MainView.MAP.setText(((Message) msg).getMessage());
+            if (((Message) msg).getRequestCode() == RequestCode.ABOUT_PLAYER.getCode()) {
+                MainView.INFORMATION.setText(MainView.PLAYER_INFO + ((Message) msg).getMessage());
             }
-            if(((Message) msg).getRequestCode()== RequestCode.ABOUT_BAG.getCode()){
-                MainView.BAG.setText(((Message) msg).getMessage());
+            if (((Message) msg).getRequestCode() == RequestCode.ABOUT_SCENE.getCode()) {
+                MainView.MAP.setText(MainView.PLACE + ((Message) msg).getMessage());
             }
-            if(((Message) msg).getRequestCode()== RequestCode.ABOUT_EQU.getCode()){
-                MainView.EQUIPMENT.setText(((Message) msg).getMessage());
+            if (((Message) msg).getRequestCode() == RequestCode.ABOUT_BAG.getCode()) {
+                MainView.BAG.setText(MainView.BAG_INFO + ((Message) msg).getMessage());
+            }
+            if (((Message) msg).getRequestCode() == RequestCode.ABOUT_EQU.getCode()) {
+                MainView.EQUIPMENT.setText(MainView.EQU + ((Message) msg).getMessage());
+            }
+            if (((Message) msg).getRequestCode() == RequestCode.ABOUT_SKILL.getCode()) {
+                MainView.SKILL.setText(MainView.SKILL_INFO + ((Message) msg).getMessage());
             }
         }
     }

@@ -73,7 +73,7 @@ public class PlayerService {
      */
     public void buyTools(ChannelHandlerContext context,Integer toolsId){
         //判断是否登录
-        if(!playerLoginService.isLoad(context)){return;}
+        if(Objects.isNull(playerLoginService.isLoad(context))){return;}
         PlayerBeCache playerByContext = playerLoginService.getPlayerByContext(context);
         Tools toolsById = toolsService.getToolsById(toolsId);
         //判断金币是否足够

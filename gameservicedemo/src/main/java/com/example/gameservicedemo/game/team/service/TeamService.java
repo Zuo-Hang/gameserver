@@ -46,9 +46,8 @@ public class TeamService {
      * @param context
      */
     public void creatTeam(ChannelHandlerContext context) {
-        PlayerBeCache playerByContext = playerLoginService.getPlayerByContext(context);
+        PlayerBeCache playerByContext = playerLoginService.isLoad(context);
         if (Objects.isNull(playerByContext)) {
-            notificationManager.notifyByCtx(context, "你还未加载角色！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
         Team team = new Team();
@@ -113,9 +112,8 @@ public class TeamService {
      * @return
      */
     public Team checkPlayerHaveTeam(ChannelHandlerContext context) {
-        PlayerBeCache playerByContext = playerLoginService.getPlayerByContext(context);
+        PlayerBeCache playerByContext = playerLoginService.isLoad(context);
         if (Objects.isNull(playerByContext)) {
-            notificationManager.notifyByCtx(context, "你还未加载角色！", RequestCode.BAD_REQUEST.getCode());
             return null;
         }
         Long teamId = playerByContext.getTeamId();
@@ -179,9 +177,8 @@ public class TeamService {
      * @param teamRequestId
      */
     public void acceptTeamRequest(ChannelHandlerContext context, Long teamRequestId) {
-        PlayerBeCache playerByContext = playerLoginService.getPlayerByContext(context);
+        PlayerBeCache playerByContext = playerLoginService.isLoad(context);
         if (Objects.isNull(playerByContext)) {
-            notificationManager.notifyByCtx(context, "你还未加载角色！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
         TeamRequest teamRequest = teamCache.getTeamRequest(teamRequestId);

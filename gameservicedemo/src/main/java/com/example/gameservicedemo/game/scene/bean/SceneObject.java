@@ -72,7 +72,7 @@ public class SceneObject implements Creature {
     //需初始化
     private volatile boolean canUseSkill=true; //不能使用技能即被沉默
     private Map<Integer, Skill> hasUseSkillMap = new ConcurrentHashMap<>();
-    private Map<Integer,Skill> canUseSkillMap = new ConcurrentHashMap<>();
+    private Map<Integer,Skill> skillHaveMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, Buffer> bufferMap =  new ConcurrentHashMap<>();
 
     @Override

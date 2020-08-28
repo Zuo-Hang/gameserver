@@ -4,6 +4,7 @@ import com.example.commondemo.base.Command;
 import com.example.commondemo.base.RequestCode;
 import com.example.commondemo.message.Message;
 import com.example.gameservicedemo.base.controller.ControllerManager;
+import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerDataService;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.player.service.PlayerService;
@@ -154,8 +155,9 @@ public class PlayerController {
      * @param message
      */
     public void seePlayerBag(ChannelHandlerContext context,Message message){
-        CheckParametersUtil.checkParameter(context,message,1);
-        playerDataService.seePlayerBag(context);
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 1);
+        if(Objects.isNull(strings)){return;}
+        playerDataService.showPlayerBag(playerLoginService.isLoad(context));
     }
 
     /**
@@ -164,8 +166,9 @@ public class PlayerController {
      * @param message
      */
     public void seePlayerEqu(ChannelHandlerContext context,Message message){
-        CheckParametersUtil.checkParameter(context,message,1);
-        playerDataService.seePlayerEquipmentBar(context);
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 1);
+        if(Objects.isNull(strings)){return;}
+        playerDataService.showPlayerEqu(playerLoginService.isLoad(context));
     }
 
     /**
@@ -174,8 +177,9 @@ public class PlayerController {
      * @param message
      */
     public void seePlayerAbility(ChannelHandlerContext context,Message message){
-        CheckParametersUtil.checkParameter(context,message,1);
-        playerDataService.seePlayerAbility(context);
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 1);
+        if(Objects.isNull(strings)){return;}
+        playerDataService.showPlayerInfo(playerLoginService.isLoad(context));
 
 
 

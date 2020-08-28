@@ -184,13 +184,12 @@ public class UserService {
         //校验用户是否存在
         User user = userMapper.selectByUserId(userId);
         List<Player> players = null;
-        if (!Objects.isNull(user)) {
-            players = playerMapper.selectByUserId(userId);
-            return players;
-        } else {
+        if(Objects.isNull(user)){
             notificationManager.notifyByCtx(context, "此用户不存在！", RequestCode.BAD_REQUEST.getCode());
             return null;
         }
+        players = playerMapper.selectByUserId(userId);
+        return players;
     }
 
     /**
@@ -226,6 +225,8 @@ public class UserService {
             notificationManager.notifyByCtx(context,"你的信息已经重新加载完毕，继续你的操作吧！",RequestCode.SUCCESS.getCode());
         }
     }
+
+
 
     /**
      * 查看当前账户下的所有角色

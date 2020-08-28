@@ -10,6 +10,7 @@ import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.bean.RoleType;
 import com.example.gameservicedemo.game.player.cache.PlayerCache;
 import com.example.gameservicedemo.game.scene.service.SceneService;
+import com.example.gameservicedemo.game.skill.bean.Skill;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.tools.bean.ToolsProperty;
 import com.example.gameservicedemo.game.user.bean.UserBeCache;
@@ -21,6 +22,7 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -48,6 +50,8 @@ public class PlayerLoginService {
     BagMapper bagMapper;
     @Autowired
     RoleTypeService roleTypeService;
+    @Autowired
+    PlayerDataService playerDataService;
     @Autowired
     NotificationManager notificationManager;
     /**
@@ -79,7 +83,6 @@ public class PlayerLoginService {
      * @param playerId
      */
     public void playerLogin(ChannelHandlerContext context, Integer playerId) {
-        StringBuilder result = new StringBuilder();
         //获取对应上下文的缓存角色
         Player playerByCtx = playerCache.getPlayerByCtx(context);
         //如果当前化身为待登录化身角色
@@ -106,16 +109,19 @@ public class PlayerLoginService {
         Map<Integer, PlayerBeCache> players = sceneService.getScene(player1.getNowAt()).getPlayers();
         players.put(player1.getPlayerId(), playerBeCache);
         playerBeCache.setSceneNowAt(sceneService.getScene(playerBeCache.getNowAt()));
-        result.append(playerBeCache.getPlayerName()).append(",角色登陆成功")
-                .append("\n 你所在位置为: ")
-                .append(playerBeCache.getNowAt()).append("\n");
-        result.append("使用指令 `aoi` 可查看周围环境");
-        notificationManager.notifyByCtx(context, result.toString(), RequestCode.ABOUT_PLAYER.getCode());
+        String format = MessageFormat.format("角色登陆成功,当前角色：{0}。使用指令 `aoi` 可查看周围环境", playerBeCache.getPlayerName());
+        notificationManager.notifyPlayer(playerBeCache,format,RequestCode.SUCCESS.getCode());
+        playerDataService.showPlayerPosition(playerBeCache);
+        playerDataService.showPlayerInfo(playerBeCache);
+        playerDataService.showPlayerEqu(playerBeCache);
+        playerDataService.showPlayerBag(playerBeCache);
+        playerDataService.showSkill(playerBeCache);
     }
 
     /**
      * 在化身加入缓存之前对其进行初始化
      * 对于背包初始化
+     * 初始化技能
      * 初始化影响列表：
      *
      * @param playerBeCache
@@ -124,7 +130,16 @@ public class PlayerLoginService {
         //获取角色类型
         Integer roleTypeId = playerBeCache.getRoleClass();
         RoleType roleTypeById = roleTypeService.getRoleTypeById(roleTypeId);
-        //将要放进缓存中的player 根据角色类型将 mp hp 初始化
+        //初始化技能
+        Map<Integer, Skill> skillMap = roleTypeById.getSkillMap();
+        Map<Integer, Skill> skillHaveMap = playerBeCache.getSkillHaveMap();
+        skillMap.values().forEach(skill->{
+            Skill newSkill = new Skill();
+            BeanUtils.copyProperties(skill,newSkill);
+            newSkill.setActiveTime(System.currentTimeMillis()-newSkill.getCd());
+            skillHaveMap.put(newSkill.getId(),newSkill);
+        });
+        //根据角色类型将要放进缓存中的player属性初始化
         playerBeCache.setHp(roleTypeById.getBaseHp());
         playerBeCache.setMaxHp(roleTypeById.getBaseHp());
         playerBeCache.setMp(roleTypeById.getBaseMp());
@@ -133,14 +148,13 @@ public class PlayerLoginService {
         Map<Integer, ToolsProperty> toolsInfluence1 = playerBeCache.getToolsInfluence();
         String attribute = roleTypeById.getGainAttribute();
         Gson gson1 = new Gson();
-        ArrayList<ToolsProperty> ToolsPropertylist = (ArrayList<ToolsProperty>) gson1.fromJson(attribute, new TypeToken<ArrayList<ToolsProperty>>() {}.getType());
+        ArrayList<ToolsProperty> ToolsPropertylist = gson1.fromJson(attribute, new TypeToken<ArrayList<ToolsProperty>>() {}.getType());
         if(!Objects.isNull(ToolsPropertylist)){
             ToolsPropertylist.forEach(v->{
                 toolsInfluence1.put(v.getId(),v);
             });
         }
-        //-------------------------------------------------------------------------------------------------------
-        //初始化背包
+        //初始化背包-------------------------------------------------------------------------------------------------------
         Bag bag = bagMapper.selectByBagId(playerBeCache.getBagId());
         BagBeCache bagBeCache = new BagBeCache();
         bagBeCache.setPlayerId(playerBeCache.getPlayerId());
@@ -148,7 +162,7 @@ public class PlayerLoginService {
         //获取背包中的物品信息并转化为对象
         String json = bagBeCache.getItems();
         Gson gson = new Gson();
-        ArrayList<Tools> toolslist = (ArrayList<Tools>) gson.fromJson(json, new TypeToken<ArrayList<Tools>>() {}.getType());
+        ArrayList<Tools> toolslist = gson.fromJson(json, new TypeToken<ArrayList<Tools>>() {}.getType());
         if(!Objects.isNull(toolslist)){
             toolslist.forEach(v->{
                 //放入被缓存的背包中
@@ -193,18 +207,13 @@ public class PlayerLoginService {
                             MessageFormat.format("玩家 {0} 正在退出", playerByCtx.getPlayerName())
                             , RequestCode.SUCCESS.getCode());
                     // 重点，从缓存中移除（缓存持久化、缓存删除）
-                    Player player = new Player();
-                    player.setUserId(playerByCtx.getUserId());
-                    player.setNowAt(playerByCtx.getNowAt());
-                    player.setPlayerName(playerByCtx.getPlayerName());
-                    player.setPlayerId(playerByCtx.getPlayerId());
                     //更新数据库
-                    playerMapper.updateByPlayerId(player);
+                    playerMapper.updateByPlayerId(playerByCtx);
                     //清除缓存
                     playerCache.removePlayerByChannelId(context.channel().id().asLongText());
                     playerCache.removePlayerCxt(playerByCtx.getPlayerId());
                     //从场景缓存中移除
-                    sceneService.getScene(player.getNowAt()).getPlayers().remove(player.getPlayerId());
+                    sceneService.getScene(playerByCtx.getNowAt()).getPlayers().remove(playerByCtx.getPlayerId());
                 }
         );
 
@@ -225,13 +234,13 @@ public class PlayerLoginService {
      * @param context
      * @return
      */
-    public boolean isLoad(ChannelHandlerContext context){
+    public PlayerBeCache isLoad(ChannelHandlerContext context){
         PlayerBeCache playerByContext = getPlayerByContext(context);
         if(Objects.isNull(playerByContext)){
             notificationManager.notifyByCtx(context,"你还未登录，请使用\"load\"登录角色",RequestCode.BAD_REQUEST.getCode());
-            return false;
+            return null;
         }
-        return true;
+        return playerByContext;
     }
 
     public PlayerBeCache getPlayerById(Integer playerId){

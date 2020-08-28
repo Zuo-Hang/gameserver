@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import java.util.Objects;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -90,6 +92,7 @@ public class ToolsController {
      */
     public void wearTools(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
+        if(Objects.isNull(strings)){return;}
         Tools toolsById = toolsService.getToolsById(Integer.valueOf(strings[1]));
         toolsService.wearTools(playerLoginService.getPlayerByContext(context), toolsById);
     }
@@ -102,6 +105,7 @@ public class ToolsController {
      */
     public void takeOffTools(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
+        if(Objects.isNull(strings)){return;}
         Tools toolsById = toolsService.getToolsById(Integer.valueOf(strings[1]));
         toolsService.takeOffTools(playerLoginService.getPlayerByContext(context), toolsById);
     }

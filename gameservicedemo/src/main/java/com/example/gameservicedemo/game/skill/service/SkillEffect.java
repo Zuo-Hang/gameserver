@@ -121,7 +121,7 @@ public class SkillEffect {
             );
         }
         //如果是受到物理伤害进行反伤
-        if (skill.getSkillType().equals(SkillHurtType.PHYSICS) && target.getCanUseSkillMap().containsKey(24)) {
+        if (skill.getSkillType().equals(SkillHurtType.PHYSICS) && target.getSkillHaveMap().containsKey(24)) {
             Skill skill1 = new Skill();
             BeanUtils.copyProperties(skillService.getSkillById(24), skill1);
             skill1.setHurt((skillHurtNum.hurt + skillHurtNum.hurtToShield) * skill1.getAddHurtPercentage() / 100);

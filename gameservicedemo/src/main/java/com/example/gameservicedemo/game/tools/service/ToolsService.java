@@ -1,9 +1,12 @@
 package com.example.gameservicedemo.game.tools.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.buffer.service.BufferService;
+import com.example.gameservicedemo.game.player.service.PlayerDataService;
+import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.shop.bean.Shop;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.tools.bean.ToolsProperty;
@@ -41,6 +44,10 @@ public class ToolsService {
     NotificationManager notificationManager;
     @Autowired
     BufferService bufferService;
+    @Autowired
+    PlayerDataService playerDataService;
+    @Autowired
+    PlayerLoginService playerLoginService;
     @Autowired
     SkillService skillService;
 
@@ -109,13 +116,24 @@ public class ToolsService {
         //计算装备对玩家属性的影响
         Map<Integer, ToolsProperty> toolsInfluence = player.getToolsInfluence();
         //添加装备的唯一被动，如名刀、金身、复活甲等技能
-        Integer passiveSkills = tools.getPassiveSkills();
-        if(passiveSkills!=null){
-            Skill skill = new Skill();
-            BeanUtils.copyProperties(skillService.getSkillById(passiveSkills),skill);
-            Skill put = player.getCanUseSkillMap().put(skill.getId(), skill);
-            if(put!=null){
-                log.info("{}添加了被动技能{}", player.getName(), skill.getName());
+        Integer skillId = tools.getPassiveSkills();
+        if(Objects.nonNull(skillId)){
+            //判断之前是否装配过
+            Skill hasUse = player.getHasUseSkillMap().get(skillId);
+            if(Objects.isNull(hasUse)){
+                //之前没有添加过或者cd在移除前已好
+                Skill skill = new Skill();
+                BeanUtils.copyProperties(skillService.getSkillById(skillId),skill);
+                //设置上次使用的时间
+                skill.setActiveTime(System.currentTimeMillis()- skill.getCd());
+                Skill put = player.getSkillHaveMap().put(skill.getId(), skill);
+                if(put!=null){
+                    log.info("{}添加了被动技能{}", player.getName(), skill.getName());
+                }
+            }else{
+                //之前添加过，并且上次移除时cd并未冷却
+                player.getHasUseSkillMap().remove(hasUse.getId());
+                player.getSkillHaveMap().put(hasUse.getId(),hasUse);
             }
         }
         //性能影响
@@ -129,6 +147,10 @@ public class ToolsService {
             });
         }
         notificationManager.notifyPlayer(player,MessageFormat.format("穿戴装备：{0} 成功",tools1.getName()),RequestCode.SUCCESS.getCode());
+        //调用回显
+        playerDataService.showPlayerEqu(player);
+        playerDataService.showPlayerBag(player);
+        playerDataService.showPlayerInfo(player);
         return true;
     }
 
@@ -136,7 +158,7 @@ public class ToolsService {
      * 卸载某个装备
      * 1.判断此装备是否被装配
      * 2.移除装备放入背包
-     * 3.用户加成减去装备的影响值，去除装备带来的buf
+     * 3.用户加成减去装备的影响值，去除装备带来的被动技能
      *
      * @param player
      * @param tools
@@ -150,7 +172,16 @@ public class ToolsService {
         Tools remove = player.getEquipmentBar().remove(tools.getId());
         List<ToolsProperty> toolsPropertie = remove.getToolsPropertie();
         //线程安全问题-----------------------------------------------------------------------------------------
-        //移去被动技能
+        //移去被动技能------------------------------------------
+        Integer skillId = remove.getPassiveSkills();
+        if(Objects.nonNull(skillId)){
+            //在技能列表移除
+            Skill skill = player.getSkillHaveMap().remove(skillId);
+            //如果未冷却完成，则移到未冷却列表
+            if(skill.getCd()>System.currentTimeMillis()-skill.getActiveTime()){
+                player.getHasUseSkillMap().put(skill.getId(),skill);
+            }
+        }
         //更新影响
         if (!Objects.isNull(toolsPropertie)) {
             toolsPropertie.forEach(v -> {
@@ -162,6 +193,9 @@ public class ToolsService {
         //判断背包容量
         player.getBagBeCache().getToolsMap().put(remove.getId(), remove);
         notificationManager.notifyPlayer(player,MessageFormat.format("脱下装备：{0} 成功",tools1.getName()),RequestCode.SUCCESS.getCode());
+        playerDataService.showPlayerBag(player);
+        playerDataService.showPlayerEqu(player);
+        playerDataService.showSkill(player);
         return true;
     }
 

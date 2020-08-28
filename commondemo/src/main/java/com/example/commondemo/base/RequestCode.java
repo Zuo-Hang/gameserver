@@ -21,6 +21,8 @@ public enum RequestCode {
 
     WARNING(1216,"警告"),
 
+    ABOUT_SKILL(1217,"有关技能"),
+
     BAD_REQUEST(400, "Bad Request"),
     /**找不到 */
     NOT_FOUND(404, "Not Found"),
