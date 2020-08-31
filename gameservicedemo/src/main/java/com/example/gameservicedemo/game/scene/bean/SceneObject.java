@@ -1,5 +1,6 @@
 package com.example.gameservicedemo.game.scene.bean;
 
+import com.example.gameservicedemo.base.bean.BeUse;
 import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.buffer.bean.Buffer;
 import com.example.gameservicedemo.game.skill.bean.Skill;
@@ -17,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Description: 场景内的实体，所具有的共性。可以从Excel中配置
  */
 @Data
-public class SceneObject implements Creature {
+public class SceneObject extends BeUse implements Creature {
     @EntityName(column = "id")
     private Integer id;
     @EntityName(column = "名字")

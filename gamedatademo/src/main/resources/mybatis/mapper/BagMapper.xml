@@ -10,13 +10,13 @@
 
     <insert id="insert" parameterType="com.example.gamedatademo.bean.Bag" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO bag
-    (size, name,items)
+    (size, name,items,tools)
     VALUES
-    (#{size},#{name}, #{items});
+    (#{size},#{name}, #{items},#tools);
     </insert>
 
     <update id="updateByBagId" parameterType="com.example.gamedatademo.bean.Bag">
-        UPDATE bag SET size = #{size}, name = #{name},items = #{items}
+        UPDATE bag SET size = #{size}, name = #{name},items = #{items},tools=#{tools}
         WHERE id = #{id};
     </update>
 

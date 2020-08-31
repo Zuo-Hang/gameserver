@@ -29,7 +29,7 @@ public class UserCache {
      * 以上下文为key，以用户实例为值的缓存实例
      * 软引用会在发生OOM之前，回收其中的对象
      */
-    private  Cache<ChannelHandlerContext, UserBeCache> ctxUserCache = CacheBuilder.newBuilder().weakValues()
+    private  Cache<ChannelHandlerContext, UserBeCache> ctxUserCache = CacheBuilder.newBuilder()//.weakValues()
             // 设置并发级别，最多8个线程同时写
             .concurrencyLevel(10)
             // 设置写缓存后，三小时过期

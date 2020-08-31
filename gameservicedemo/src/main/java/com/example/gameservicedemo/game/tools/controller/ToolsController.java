@@ -1,7 +1,9 @@
 package com.example.gameservicedemo.game.tools.controller;
 
 import com.example.commondemo.base.Command;
+import com.example.commondemo.base.RequestCode;
 import com.example.commondemo.message.Message;
+import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.base.controller.ControllerManager;
@@ -93,8 +95,14 @@ public class ToolsController {
     public void wearTools(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
         if(Objects.isNull(strings)){return;}
-        Tools toolsById = toolsService.getToolsById(Integer.valueOf(strings[1]));
-        toolsService.wearTools(playerLoginService.getPlayerByContext(context), toolsById);
+        //从用户获取背包后从背包中再获取到装备
+        PlayerBeCache playerByContext = playerLoginService.getPlayerByContext(context);
+        Tools tools = playerByContext.getBagBeCache().getToolsMap().get(Long.valueOf(strings[1]));
+        if (Objects.isNull(tools)) {
+            notificationManager.notifyPlayer(playerByContext, "你的背包中还没有这件装备哦", RequestCode.BAD_REQUEST.getCode());
+            return ;
+        }
+        toolsService.wearTools(playerByContext, tools);
     }
 
     /**
@@ -106,8 +114,13 @@ public class ToolsController {
     public void takeOffTools(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
         if(Objects.isNull(strings)){return;}
-        Tools toolsById = toolsService.getToolsById(Integer.valueOf(strings[1]));
-        toolsService.takeOffTools(playerLoginService.getPlayerByContext(context), toolsById);
+        PlayerBeCache playerByContext = playerLoginService.getPlayerByContext(context);
+        Tools tools = playerByContext.getEquipmentBar().get(Long.valueOf(strings[1]));
+        if (Objects.isNull(tools)) {
+            notificationManager.notifyPlayer(playerByContext, "你的装备栏并没有这件装备哦", RequestCode.BAD_REQUEST.getCode());
+            return ;
+        }
+        toolsService.takeOffTools(playerByContext, tools);
     }
 
     /**
@@ -131,8 +144,8 @@ public class ToolsController {
      */
     public void fixTools(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
-        Integer tollsId = Integer.valueOf(strings[1]);
-        toolsService.fixTools(playerLoginService.getPlayerByContext(context),tollsId);
+        Long toolsUuid = Long.valueOf(strings[1]);
+        toolsService.fixTools(playerLoginService.getPlayerByContext(context),toolsUuid);
     }
 
     /**
@@ -144,6 +157,6 @@ public class ToolsController {
     public void sellTools(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
         Integer tollsId = Integer.valueOf(strings[1]);
-        toolsService.sellTools(playerLoginService.getPlayerByContext(context),tollsId);
+        //toolsService.sellTools(playerLoginService.getPlayerByContext(context),tollsId);
     }
 }

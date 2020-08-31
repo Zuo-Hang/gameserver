@@ -5,6 +5,7 @@ import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +26,13 @@ import java.util.Optional;
 public class  PlayerCache {
     @Autowired
     NotificationManager notificationManager;
-
+    Channel channel;
     /**
      * 以上下文为键，玩家信息为值的缓存
      */
-    private Cache<ChannelHandlerContext, PlayerBeCache> ctxPlayerCache = CacheBuilder.newBuilder()
+    private Cache<Channel, PlayerBeCache> channelPlayerCache = CacheBuilder.newBuilder()
             // 设置并发级别，最多8个线程同时写
             .concurrencyLevel(10)
-
             // 设置缓存容器的初始容量为100
             .initialCapacity(100)
             .maximumSize(5000)
@@ -51,35 +51,35 @@ public class  PlayerCache {
      * 键为channel id
      */
 
-    public PlayerBeCache getPlayerByCtx(ChannelHandlerContext ctx) {
-        return ctxPlayerCache.getIfPresent(ctx);
+    public PlayerBeCache getPlayerByChannel(Channel channel) {
+        return channelPlayerCache.getIfPresent(channel);
     }
 
 
     /**
      * ctx为键  值为玩家
      */
-    public void putCtxPlayer(ChannelHandlerContext ctx, PlayerBeCache playerBeCache) {
+    public void putCtxPlayer(Channel channel, PlayerBeCache playerBeCache) {
         //获取老的上下文信息
         ChannelHandlerContext old = getCxtByPlayerId(playerBeCache.getPlayerId());
         Optional.ofNullable(old).ifPresent(o -> {
-                    ctxPlayerCache.invalidate(o);
-                    if (!old.equals(ctx)) {
+            channelPlayerCache.invalidate(o);
+                    if (!old.equals(channel)) {
                         String s="角色在其他敌方登陆，你已不能进行正常角色操作，除非重新登陆用户加载角色";
                         notificationManager.notifyByCtx(old, s, RequestCode.BAD_REQUEST.getCode());
                     }
                 }
         );
 
-        ctxPlayerCache.put(ctx, playerBeCache);
+        channelPlayerCache.put(channel, playerBeCache);
     }
 
 
     /**
      * 通过 channel Id 清除玩家信息
      */
-    public void removePlayerByChannelId(String channelId) {
-        ctxPlayerCache.invalidate(channelId);
+    public void removePlayerByChannelId(Channel channel) {
+        channelPlayerCache.invalidate(channel);
     }
 
 
@@ -114,8 +114,8 @@ public class  PlayerCache {
      *
      * @return
      */
-    public Map<ChannelHandlerContext, PlayerBeCache> getAllPlayerCache() {
-        return ctxPlayerCache.asMap();
+    public Map<Channel, PlayerBeCache> getAllPlayerCache() {
+        return channelPlayerCache.asMap();
     }
 
 }

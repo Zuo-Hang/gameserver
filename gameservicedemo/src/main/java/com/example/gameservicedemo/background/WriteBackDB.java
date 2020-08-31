@@ -3,10 +3,12 @@ package com.example.gameservicedemo.background;
 import com.example.gamedatademo.mapper.BagMapper;
 import com.example.gamedatademo.mapper.PlayerMapper;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
+import com.example.gameservicedemo.game.bag.bean.Item;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.player.cache.PlayerCache;
 import com.google.gson.Gson;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,14 +39,17 @@ public class WriteBackDB {
      */
     @Scheduled(fixedRate=1000*15)
     public void writeBackPlayer(){
-        Map<ChannelHandlerContext, PlayerBeCache> allPlayerCache = playerCache.getAllPlayerCache();
+        Map<Channel, PlayerBeCache> allPlayerCache = playerCache.getAllPlayerCache();
         for( PlayerBeCache player: allPlayerCache.values()){
             Integer integer = playerMapper.updateByPlayerId(player);
             BagBeCache bagBeCache = player.getBagBeCache();
-            Map<Integer, Tools> toolsMap = bagBeCache.getToolsMap();
+            Map<Long, Tools> toolsMap = bagBeCache.getToolsMap();
             Gson gson = new Gson();
-            String s = gson.toJson(toolsMap.values());
-            bagBeCache.setItems(s);
+            String tools = gson.toJson(toolsMap.values());
+            Map<Integer, Item> itemMap = bagBeCache.getItemMap();
+            String items = gson.toJson(itemMap.values());
+            bagBeCache.setItems(items);
+            bagBeCache.setTools(tools);
             Integer integer1 = bagMapper.updateByBagId(bagBeCache);
             if(integer!=0){
                 log.info("数据更新成功");
@@ -57,7 +62,7 @@ public class WriteBackDB {
      */
     @Scheduled(fixedRate = 1000*5)
     public void recoveryHpMp(){
-        Map<ChannelHandlerContext, PlayerBeCache> allPlayerCache = playerCache.getAllPlayerCache();
+        Map<Channel, PlayerBeCache> allPlayerCache = playerCache.getAllPlayerCache();
         allPlayerCache.values().forEach(v->{
             //防止线程安全问题
             synchronized (v){

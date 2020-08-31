@@ -15,7 +15,6 @@ import java.text.MessageFormat;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class NPC extends SceneObject {
-    Long uuid;
     /**
      * 向用户展示数据
      * @return

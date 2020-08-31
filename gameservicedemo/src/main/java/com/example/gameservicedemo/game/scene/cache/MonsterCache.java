@@ -1,5 +1,6 @@
 package com.example.gameservicedemo.game.scene.cache;
 
+import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.scene.bean.Monster;
 import com.example.gameservicedemo.game.scene.bean.NPC;
 import com.example.gameservicedemo.game.scene.bean.SceneObject;
@@ -26,7 +27,7 @@ public class MonsterCache {
         Monster newMonster = new Monster();
         BeanUtils.copyProperties(monster,newMonster);
         //生成一个uuid
-        Long uuid = sceneObjectService.generateObjectId();
+        Long uuid = IdGenerator.getAnId();
         newMonster.setUuid(uuid);
         monsterCache.put(newMonster.getUuid(), newMonster);
     }

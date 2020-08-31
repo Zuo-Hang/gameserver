@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.game.player.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.bag.service.BagService;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.tools.bean.Tools;
@@ -48,7 +49,7 @@ public class PlayerService {
      */
     public void aoi(ChannelHandlerContext context) {
         //获取当前场景的所有实体信息
-        PlayerBeCache playerByCtx = playerCache.getPlayerByCtx(context);
+        PlayerBeCache playerByCtx = playerCache.getPlayerByChannel(context.channel());
         Integer nowAt = playerByCtx.getNowAt();
         Map<Integer, NPC> npcs = sceneService.getScene(nowAt).getNpcs();
         Collection<NPC> values = npcs.values();
@@ -84,7 +85,8 @@ public class PlayerService {
         //创建一个新的道具放入背包，因为后期可能改变这个道具的某些属性，所以不能使用缓存中的道具对象
         Tools newTools = new Tools();
         BeanUtils.copyProperties(toolsById,newTools);
-        newTools.setCount(1);
+        //设置唯一的UUID
+        newTools.setUuid(IdGenerator.getAnId());
         String msg="不能放入背包，购买失败！";
         //放入背包
         if(bagService.putInBag(playerByContext,newTools)){

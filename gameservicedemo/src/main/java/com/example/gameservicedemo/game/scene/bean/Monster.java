@@ -21,8 +21,6 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @ToString(exclude = {"target"})
 public class Monster extends SceneObject implements Creature {
-    //标识缓存中唯一的对象
-    Long uuid;
     //攻击速度
     private Integer attackSpeed = 10000;
     private long attackTime = System.currentTimeMillis();

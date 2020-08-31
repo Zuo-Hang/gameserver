@@ -82,11 +82,11 @@ public class PlayerBeCache extends Player implements Creature {
     /**
      * 装备栏 装备id 装备 最大值为6 小于6则可以进行装配，否则只能换装
      */
-    private Map<Integer, Tools> equipmentBar = new ConcurrentHashMap<>();
+    private Map<Long, Tools> equipmentBar = new ConcurrentHashMap<>();
     /**
      * 需要被修理的装备的id列表
      */
-    private List<Integer> needFix = new ArrayList<Integer>();
+    private List<Long> needFix = new ArrayList<Long>();
     // 背包栏
     private BagBeCache bagBeCache = null;
     /**

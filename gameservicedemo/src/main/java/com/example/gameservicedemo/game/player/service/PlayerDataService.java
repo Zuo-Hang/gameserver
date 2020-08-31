@@ -3,6 +3,7 @@ package com.example.gameservicedemo.game.player.service;
 import com.example.commondemo.base.RequestCode;
 import com.example.commondemo.message.Message;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
+import com.example.gameservicedemo.game.bag.bean.Item;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.player.cache.PlayerCache;
@@ -120,19 +121,29 @@ public class PlayerDataService {
         }
         BagBeCache bagBeCache = playerByContext.getBagBeCache();
         StringBuilder stringBuilder = new StringBuilder(MessageFormat.format("这个背包容量为：{0}，当前可用位置：{1},背包中有：\n",
-                bagBeCache.getSize(),bagBeCache.getSize()-bagBeCache.getToolsMap().size()));
-        Map<Integer, Tools> toolsMap = bagBeCache.getToolsMap();
-        if(!Objects.isNull(toolsMap)){
-            toolsMap.values().forEach(v->{
-                stringBuilder.append(MessageFormat.format("物品id:{0} 名称：{1} 数量：{2} ",v.getId(),v.getName(),v.getCount()));
-                if(v.getType()<4){
-                    stringBuilder.append("当前耐久度："+v.getDurability());
+                bagBeCache.getSize(),
+                bagBeCache.getSize()-bagBeCache.getItemMap().size()));
+        Map<Long, Tools> toolsMap = bagBeCache.getToolsMap();
+        if(toolsMap.size()==0){
+            stringBuilder.append("哦，空空如也！");
+            notificationManager.notifyPlayer(playerByContext,stringBuilder.toString(),RequestCode.ABOUT_BAG.getCode());
+            return;
+        }
+        Map<Integer, Item> itemMap = bagBeCache.getItemMap();
+        itemMap.values().forEach(item -> {
+             stringBuilder.append(MessageFormat.format("背包第{0}格： 物品数量：{1} 详细信息如下：\n",
+                    item.getIndexInBag(),
+                    item.getToolsUuidS().size()));
+             item.getToolsUuidS().forEach(uuid->{
+                 stringBuilder.append(MessageFormat.format("uuid:{0} 名称：{1} ",
+                         toolsMap.get(uuid).getUuid(),
+                         toolsMap.get(uuid).getName()));
+                 if(toolsMap.get(uuid).getType()<4){
+                    stringBuilder.append("当前耐久度："+toolsMap.get(uuid).getDurability());
                 }
                 stringBuilder.append("\n");
-            });
-        }else{
-            stringBuilder.append("哦，空空如也！");
-        }
+             });
+        });
         notificationManager.notifyPlayer(playerByContext,stringBuilder.toString(),RequestCode.ABOUT_BAG.getCode());
     }
     /**
@@ -143,14 +154,17 @@ public class PlayerDataService {
         if (Objects.isNull(playerByContext)) {
             return;
         }
-        Map<Integer, Tools> equipmentBar = playerByContext.getEquipmentBar();
+        Map<Long, Tools> equipmentBar = playerByContext.getEquipmentBar();
         if(equipmentBar.values().size()==0){
             notificationManager.notifyPlayer(playerByContext,"你还没有装配任何装备！",RequestCode.ABOUT_EQU.getCode());
             return;
         }
         StringBuilder stringBuilder = new StringBuilder();
         equipmentBar.values().forEach(v->{
-            stringBuilder.append(MessageFormat.format("id:{0} 名称：{1} 当前耐久度：{2}\n",v.getId(), v.getName(),v.getDurability()));
+            stringBuilder.append(MessageFormat.format("uuid:{0} 名称：{1} 当前耐久度：{2}\n",
+                    v.getUuid(),
+                    v.getName(),
+                    v.getDurability()));
             if(v.getDurability()==0){
                 stringBuilder.append("当前耐久度过低，该装备处于无效状态，需要更换或修理！");
             }

@@ -17,6 +17,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 @Data
 public class BagBeCache extends Bag {
     private Integer playerId;
-    /** 背包中的物品 */
-    Map<Integer, Tools> toolsMap=new ConcurrentSkipListMap<>();
+    /** 背包中的所有物品物品  <uuid,tools> */
+    Map<Long, Tools> toolsMap=new ConcurrentSkipListMap<>();
+    /** index,item */
+    Map<Integer,Item> itemMap = new ConcurrentSkipListMap<>();
 }

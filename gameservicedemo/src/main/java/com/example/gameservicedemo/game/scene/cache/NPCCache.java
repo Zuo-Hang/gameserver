@@ -1,5 +1,6 @@
 package com.example.gameservicedemo.game.scene.cache;
 
+import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.scene.bean.NPC;
 import com.example.gameservicedemo.game.scene.bean.SceneObject;
 import com.example.gameservicedemo.game.scene.service.SceneObjectService;
@@ -27,7 +28,7 @@ public class NPCCache {
         NPC newNpc = new NPC();
         BeanUtils.copyProperties(npc,newNpc);
         //生成一个uuid
-        Long uuid = sceneObjectService.generateObjectId();
+        Long uuid = IdGenerator.getAnId();
         newNpc.setUuid(uuid);
         npcCache.put(newNpc.getUuid(), newNpc);
     }

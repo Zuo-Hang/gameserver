@@ -143,7 +143,7 @@ public class UserService {
         userCache.removeCtxByUserId(userId);
         notificationManager.notifyByCtx(context, "退出成功，期待再次登录", RequestCode.SUCCESS.getCode());
         //关闭连接
-        context.close();
+        //context.close();
     }
 
     /**
@@ -213,12 +213,12 @@ public class UserService {
             userCache.putCtxUser(context,userByCtx);
             userCache.putUserIdCtx(userId,context);
             log.info("用户缓存更新完毕");
-            PlayerBeCache playerByCtx = playerCache.getPlayerByCtx(ctxByUserId);
+            PlayerBeCache playerByCtx = playerCache.getPlayerByChannel(ctxByUserId.channel());
             if(Objects.isNull(playerByCtx)){
                 log.info("此用户断线前并未加载角色");
             }else{
-                playerCache.removePlayerByChannelId(ctxByUserId.channel().id().asLongText());
-                playerCache.putCtxPlayer(context,playerByCtx);
+                playerCache.removePlayerByChannelId(playerCache.getCxtByPlayerId(playerByCtx.getId()).channel());
+                playerCache.putCtxPlayer(context.channel(),playerByCtx);
                 playerCache.savePlayerCtx(playerByCtx.getPlayerId(),context);
                 log.info("加载的角色缓存更新完毕！");
             }

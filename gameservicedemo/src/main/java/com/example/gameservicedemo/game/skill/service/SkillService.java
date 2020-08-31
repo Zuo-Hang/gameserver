@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.game.skill.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.game.player.service.PlayerDataService;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
@@ -43,6 +44,8 @@ public class SkillService {
     @Autowired
     RoleTypeCache roleTypeCache;
     @Autowired
+    PlayerDataService playerDataService;
+    @Autowired
     MonsterCache monsterCache;
     @Autowired
     SceneObjectService sceneObjectService;
@@ -66,7 +69,16 @@ public class SkillService {
             notificationManager.notifyPlayer(player, "你现在不可以使用这个技能", RequestCode.NOT_SUPPORTED_OPERATION.getCode());
             return ;
         }
+        skill=player.getSkillHaveMap().get(skill.getId());
         castSkill(player,player,scene,skill);
+        skill.setActiveTime(System.currentTimeMillis());
+        //将全部的装备耐久度减一
+        player.getEquipmentBar().values().forEach(tools->{
+            tools.setDurability(tools.getDurability()-1);
+        });
+        playerDataService.showPlayerEqu(player);
+        playerDataService.showSkill(player);
+        playerDataService.showPlayerInfo(player);
     }
 
 
@@ -93,9 +105,7 @@ public class SkillService {
         if(creature instanceof PlayerBeCache){
             PlayerBeCache player = (PlayerBeCache) creature;
             if (player.getMp() < skill.getMpConsumption()) {
-                if (creature instanceof PlayerBeCache) {
-                    notificationManager.notifyPlayer(player, "你的mp不足", RequestCode.BAD_REQUEST.getCode());
-                }
+                notificationManager.notifyPlayer(player, "你的mp不足", RequestCode.BAD_REQUEST.getCode());
                 return false;
             }
         }
@@ -105,7 +115,7 @@ public class SkillService {
                 notificationManager.notifyPlayer((PlayerBeCache) creature, "这个职业没有这个技能，使用 \" see_player_skill \"查看当前角色的技能与CD状态", RequestCode.BAD_REQUEST.getCode());
             }
         }
-        if (inCD(creature, skill.getId())) {
+        if (!inCd(creature, skill.getId())) {
             if (creature instanceof PlayerBeCache) {
                 notificationManager.notifyPlayer((PlayerBeCache) creature, "该技能正处于CD当中，使用\" see_player_skill \" 查看当前角色的技能与CD状态", RequestCode.BAD_REQUEST.getCode());
             }
@@ -119,10 +129,12 @@ public class SkillService {
      *
      * @param creature
      * @param skillId
-     * @return 为null表示可用, 不为null表示正在cd
+     * @return true可用 false不可用
      */
-    public boolean inCD(Creature creature, Integer skillId) {
-        return !Objects.isNull(creature.getHasUseSkillMap().get(skillId));
+    public boolean inCd(Creature creature, Integer skillId) {
+        Skill skill = creature.getSkillHaveMap().get(skillId);
+        boolean b = System.currentTimeMillis() - skill.getActiveTime() > skill.getCd();
+        return b;
     }
 
     /**
@@ -177,14 +189,7 @@ public class SkillService {
      * @param skill
      */
     public void startSkillCd(Creature creature, Skill skill) {
-        //创建一个新的对象来存入map
-        Skill skillWillCD = new Skill();
-        BeanUtils.copyProperties(skill,skillWillCD);
-        //设置上次使用技能的时间
-        skillWillCD.setActiveTime(System.currentTimeMillis());
-        creature.getHasUseSkillMap().put(skill.getId(), skillWillCD);
-        //定时器——>移除CD完成的技能---------------------------------------------------需优化
-        TimedTaskManager.schedule(skill.getCd(), () -> creature.getHasUseSkillMap().remove(skill.getId()));
+        skill.setActiveTime(System.currentTimeMillis());
     }
 
     public Skill getSkillById(Integer skillId){
@@ -193,8 +198,8 @@ public class SkillService {
 
     public boolean useSkillToMonster(ChannelHandlerContext context,Integer skillId, Long monsterUUId) {
         //获取技能、玩家、使用技能的场景
-        Skill skill = SkillCache.get(skillId);
         PlayerBeCache player = playerLoginService.getPlayerByContext(context);
+        Skill skill = player.getSkillHaveMap().get(skillId);
         Scene scene = sceneService.getScene(player.getNowAt());
         if (!canUseSkill(player, skill)) {
             notificationManager.notifyPlayer(player, "你现在不可以使用这个技能", RequestCode.NOT_SUPPORTED_OPERATION.getCode());

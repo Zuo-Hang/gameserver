@@ -102,11 +102,4 @@ public class SceneObjectService {
             return false;
         }
     }
-
-    public Long generateObjectId() {
-        // 使用推特的雪花算法
-        SnowFlake snowFlake = new SnowFlake(1, 1);
-        return snowFlake.nextId();
-    }
-
 }

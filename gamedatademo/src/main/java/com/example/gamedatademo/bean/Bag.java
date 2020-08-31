@@ -17,5 +17,10 @@ public class Bag {
     /**
      * 存放的物品,最终以json的格式落库
      */
+    private String tools;
+    /**
+     * 格子
+     */
     private String items;
+
 }

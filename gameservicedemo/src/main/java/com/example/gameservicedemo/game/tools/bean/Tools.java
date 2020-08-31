@@ -1,5 +1,6 @@
 package com.example.gameservicedemo.game.tools.bean;
 
+import com.example.gameservicedemo.base.bean.BeUse;
 import com.example.gameservicedemo.util.excel.EntityName;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ import java.util.List;
  * @Description: 道具  可以在商店中出售，并且可以被放在背包当中
  */
 @Data
-public class Tools {
+public class Tools extends BeUse {
 
     @EntityName(column="物品编号")
     private Integer  id;
@@ -44,15 +45,14 @@ public class Tools {
 
     @EntityName(column = "描述")
     private String describe;
+    @EntityName(column = "叠加类型")
+    private Integer repeatType;
 
     /** 属于哪种物品（装备由此属性和repeatKind共同决定） 装备、药品、宠物*/
     @EntityName(column = "类型")
     private Integer type;
-
-    /** 物品状态，1为已装备，2为未装备 */
-    private Integer state;
     /** 物品在背包中被叠加的数量 */
-    private Integer count;
+    //private Integer count;
     /** 物品属性,此装备可以带来的加成、效果 */
     private List<ToolsProperty> toolsPropertie=null;
 }

@@ -171,7 +171,7 @@ public class MonsterAiService {
                 .findAny().ifPresent(
                 skillId -> {
                     // 如果技能存在，则释放技能
-                    Skill skill = skillService.getSkillById(skillId);
+                    Skill skill = monster.getSkillHaveMap().get(skillId);
                     if (skillService.castSkill(monster,target,gameScene,skill)) {
                         if (target instanceof PlayerBeCache) {
                             playerDataService.isPlayerDead((PlayerBeCache) target,monster);
