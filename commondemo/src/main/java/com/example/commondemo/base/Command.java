@@ -17,6 +17,7 @@ import java.util.Map;
  * 5. 5000 - 5999 之间为和装备有关
  * 6. 6000 - 6999 之间为和组队有关
  * 7. 7000 - 7500 之间为和副本有关
+ * 8. 7600 - 7999 之间为和游戏中的通讯有关
  */
 public enum Command {
     /**
@@ -155,7 +156,6 @@ public enum Command {
     START_BUFFER("start_buffer", 3004, "buffer开始"),
 
 
-
     /**
      * 邀请组队 publishTeamRequest
      **/
@@ -176,16 +176,52 @@ public enum Command {
      * 创建队伍，开房间。默认自己是房主
      */
     CREAT_TEAM("creat_team", 6040, "创建队伍，开房间。默认自己是房主"),
-    KICK_FROM_TEAM("kick",6050,"将某一成员踢出自己的队伍  tick playerId"),
+    KICK_FROM_TEAM("kick", 6050, "将某一成员踢出自己的队伍  tick playerId"),
     /**
      * 队长令队伍进入副本
      */
-    TEAM_ENTER_GAME_COPY("team_enter_copy",6060,"队长令队伍进入副本"),
+    TEAM_ENTER_GAME_COPY("team_enter_copy", 6060, "队长令队伍进入副本"),
+    /**
+     * 独自进入副本
+     */
+    ENTER_GAME_COPY("enter_copy", 7000, "独自进入副本"),
+    /**
+     * 退出副本
+     */
+    EXIT_GAME_COPY("exit_copy", 7010, "退出副本"),
+    /**
+     * 查看副本
+     */
+    SHOW_GAME_COPY("show_copy", 7020, "查看副本"),
 
-    ENTER_GAME_COPY("enter_copy",7000,"独自进入副本"),
-    EXIT_GAME_COPY("exit_copy",7010,"退出副本"),
-    SHOW_GAME_COPY("show_copy",7020,"查看副本")
-    ;
+    /**
+     * 私聊
+     **/
+    WHISPER("whisper", 7610, "私聊"),
+
+    /**
+     * 公共聊天
+     **/
+    PUBLIC_CHAT("public_chat", 7620, "公共聊天"),
+
+    /**
+     * 发送邮件
+     **/
+    SEND_MAIL("send_mail", 7710, "发送邮件"),
+
+    /**
+     * 邮件列表
+     **/
+    MAIL_LIST("mail_list", 7720, "邮件列表"),
+
+    /**
+     * 接收邮件
+     **/
+    GET_MAIL("get_mail", 7730, "接收邮件"),
+    /**
+     * 删除邮件
+     */
+    DELETE_MAIL("delete_mail", 7740, "删除邮件");
 
 
     private String command;

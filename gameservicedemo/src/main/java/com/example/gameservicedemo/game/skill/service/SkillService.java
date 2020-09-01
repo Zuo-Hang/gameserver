@@ -6,7 +6,6 @@ import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.scene.bean.Monster;
-import com.example.gameservicedemo.game.scene.cache.MonsterCache;
 import com.example.gameservicedemo.game.skill.bean.Skill;
 import com.example.gameservicedemo.game.scene.bean.Scene;
 import com.example.gameservicedemo.game.player.cache.RoleTypeCache;
@@ -45,8 +44,6 @@ public class SkillService {
     RoleTypeCache roleTypeCache;
     @Autowired
     PlayerDataService playerDataService;
-    @Autowired
-    MonsterCache monsterCache;
     @Autowired
     SceneObjectService sceneObjectService;
     @Autowired
@@ -196,6 +193,13 @@ public class SkillService {
         return  SkillCache.get(skillId);
     }
 
+    /**
+     * 对场景内的怪物使用技能
+     * @param context
+     * @param skillId
+     * @param monsterUUId
+     * @return
+     */
     public boolean useSkillToMonster(ChannelHandlerContext context,Integer skillId, Long monsterUUId) {
         //获取技能、玩家、使用技能的场景
         PlayerBeCache player = playerLoginService.getPlayerByContext(context);
@@ -206,8 +210,8 @@ public class SkillService {
             return false;
         }
         //-------------------------------------------------------------------------------------------
-        Monster monsterById = monsterCache.getMonsterByUUId(monsterUUId);
-        castSkill(player,monsterById,scene,skill);
+        Monster monster = player.getSceneNowAt().getMonsters().get(monsterUUId);
+        castSkill(player,monster,scene,skill);
         return true;
     }
 

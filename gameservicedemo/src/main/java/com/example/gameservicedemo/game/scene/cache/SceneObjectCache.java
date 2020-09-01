@@ -22,15 +22,12 @@ import java.util.Map;
 @Slf4j
 @Component
 public class SceneObjectCache {
-    @Autowired
-    NPCCache npcCache;
-    @Autowired
-    MonsterCache monsterCache;
 
     /**
      * 缓存不过期
+     * 这个缓存只是一个备份，并非场景内会用到的实体。
      */
-    private Cache<Integer, SceneObject> sceneObjectCache = CacheBuilder.newBuilder()
+    private final Cache<Integer, SceneObject> sceneObjectCache = CacheBuilder.newBuilder()
             .removalListener(
                     notification -> System.out.println(notification.getKey() + "场景对象被移除, 原因是" + notification.getCause())
             ).build();
@@ -44,19 +41,8 @@ public class SceneObjectCache {
         Map<Integer, SceneObject> sceneObjectMap = sceneObjectExcelUtil.getMap();
         sceneObjectMap.values().forEach(sceneObject -> {
             sceneObjectCache.put(sceneObject.getId(), sceneObject);
-            initCacheByType(sceneObject);
         });
         log.info("游戏对象资源加载完毕");
-    }
-
-    //这些的初始化不应该放在这里，初始化应该放在场景的加载里面。然后场景配置中应当配置这些NPC、怪物的数量和种类
-    private void initCacheByType(SceneObject sceneObject) {
-        Integer roleType = sceneObject.getRoleType();
-        if (SceneObjectType.NPC.getType().equals(roleType)) {
-            npcCache.putCahce(sceneObject);
-        } else if (SceneObjectType.WILD_MONSTER.getType().equals(roleType)) {
-            monsterCache.putCahce(sceneObject);
-        }
     }
 
     /**

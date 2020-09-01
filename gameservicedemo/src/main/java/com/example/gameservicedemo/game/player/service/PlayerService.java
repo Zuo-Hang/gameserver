@@ -1,9 +1,12 @@
 package com.example.gameservicedemo.game.player.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.bag.service.BagService;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
+import com.example.gameservicedemo.game.scene.bean.Monster;
+import com.example.gameservicedemo.game.scene.bean.Scene;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.player.cache.PlayerCache;
 import com.example.gameservicedemo.game.scene.bean.NPC;
@@ -52,17 +55,38 @@ public class PlayerService {
     public void aoi(ChannelHandlerContext context) {
         //获取当前场景的所有实体信息
         PlayerBeCache playerByCtx = playerCache.getPlayerByChannel(context.channel());
-        Integer nowAt = playerByCtx.getNowAt();
-        Map<Integer, NPC> npcs = sceneService.getScene(nowAt).getNpcs();
+        Scene sceneNowAt = sceneService.getScene(playerByCtx.getNowAt());
+        Map<Long, NPC> npcs = sceneNowAt.getNpcs();
+        Map<Integer, PlayerBeCache> players = sceneNowAt.getPlayers();
+        Map<Long, Monster> monsters = sceneNowAt.getMonsters();
+        Collection<Monster> monsters1 = monsters.values();
         Collection<NPC> values = npcs.values();
-        if (values == null) {
-            notificationManager.notifyByCtx(context, "这里空无一人！", RequestCode.SUCCESS.getCode());
-            return;
-        }
+        Collection<PlayerBeCache> playerBeCaches = players.values();
         StringBuffer ret = new StringBuffer();
         ret.append("\nnpc如下：\n");
-        if (values != null) {
+        if (Objects.isNull(values)) {
+            notificationManager.notifyByCtx(context, "这里空无一人！", RequestCode.SUCCESS.getCode());
+            return;
+        }else{
             for (NPC objectsId : values) {
+                ret.append(objectsId.displayData() + "\n");
+            }
+        }
+        ret.append("\n玩家列表如下：\n");
+        if (Objects.isNull(players)) {
+            notificationManager.notifyByCtx(context, "这里空无一人！", RequestCode.SUCCESS.getCode());
+            return;
+        }else{
+            for (PlayerBeCache objectsId : playerBeCaches) {
+                ret.append(objectsId.displayData() + "\n");
+            }
+        }
+        ret.append("\n怪物列表如下：\n");
+        if (Objects.isNull(monsters1)) {
+            notificationManager.notifyByCtx(context, "这里空无一人！", RequestCode.SUCCESS.getCode());
+            return;
+        }else{
+            for (Monster objectsId : monsters1) {
                 ret.append(objectsId.displayData() + "\n");
             }
         }

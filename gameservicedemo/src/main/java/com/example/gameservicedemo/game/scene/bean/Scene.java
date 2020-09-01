@@ -53,12 +53,12 @@ public class Scene {
     /**
      * 处于场景中的NPC
      */
-    private Map<Integer, NPC> npcs = new ConcurrentHashMap<>();
+    private Map<Long, NPC> npcs = new ConcurrentHashMap<>();
 
     /**
      * 处于场景中的怪物
      */
-    private Map<Integer, Monster> monsters = new ConcurrentHashMap<>();
+    private Map<Long, Monster> monsters = new ConcurrentHashMap<>();
 
     /**
      * 展示场景

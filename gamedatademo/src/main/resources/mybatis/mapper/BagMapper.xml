@@ -12,7 +12,7 @@
     INSERT INTO bag
     (size, name,items,tools)
     VALUES
-    (#{size},#{name}, #{items},#tools);
+    (#{size},#{name}, #{items},#{tools});
     </insert>
 
     <update id="updateByBagId" parameterType="com.example.gamedatademo.bean.Bag">

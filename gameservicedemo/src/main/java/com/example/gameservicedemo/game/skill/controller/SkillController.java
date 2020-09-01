@@ -8,7 +8,6 @@ import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.scene.bean.Monster;
 import com.example.gameservicedemo.game.scene.bean.Scene;
-import com.example.gameservicedemo.game.scene.cache.MonsterCache;
 import com.example.gameservicedemo.game.scene.service.MonsterAiService;
 import com.example.gameservicedemo.game.scene.service.SceneService;
 import com.example.gameservicedemo.game.skill.service.SkillService;
@@ -29,8 +28,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class SkillController {
-    @Autowired
-    MonsterCache monsterCache;
     @Autowired
     PlayerLoginService playerLoginService;
     @Autowired
@@ -75,10 +72,11 @@ public class SkillController {
             notificationManager.notifyPlayer(playerByContext, "攻击失败", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        Monster monsterById = monsterCache.getMonsterByUUId(monsterUuid);
-        monsterAiService.notifyMonsterBeAttack(playerByContext, monsterById, scene, 100);
-        monsterById.setTarget(playerByContext);
-        monsterAiService.startAI(monsterById, scene);
+        Monster monster = playerByContext.getSceneNowAt().getMonsters().get(monsterUuid);
+
+        monsterAiService.notifyMonsterBeAttack(playerByContext, monster, scene, 100);
+        monster.setTarget(playerByContext);
+        monsterAiService.startAI(monster, scene);
     }
 
 public void useSkillCall(ChannelHandlerContext context,Message message){

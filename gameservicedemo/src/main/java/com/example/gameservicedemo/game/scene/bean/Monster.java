@@ -26,7 +26,7 @@ public class Monster extends SceneObject implements Creature {
     private long attackTime = System.currentTimeMillis();
 
     public String displayData() {
-        return MessageFormat.format("id:{0}  name:{1}  hp:{2}  mp:{3} "
-                , this.getId(), this.getName(), this.getHp(), this.getState() == -1 ? "死亡" : "存活");
+        return MessageFormat.format("uuid:{0}  name:{1}  hp:{2}  mp:{3} "
+                , this.getUuid(), this.getName(), this.getHp(), this.getState() == -1 ? "死亡" : "存活");
     }
 }

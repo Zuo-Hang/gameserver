@@ -279,4 +279,8 @@ public class PlayerLoginService {
         PlayerBeCache playerByCtx = playerCache.getPlayerByChannel(cxtByPlayerId.channel());
         return playerByCtx;
     }
+
+    public Map<Channel, PlayerBeCache> getAllPlayerLoaded(){
+        return playerCache.getAllPlayerCache();
+    }
 }

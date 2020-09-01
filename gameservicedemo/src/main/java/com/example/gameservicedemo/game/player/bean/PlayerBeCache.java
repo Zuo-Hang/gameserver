@@ -14,6 +14,7 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -136,6 +137,9 @@ public class PlayerBeCache extends Player implements Creature {
     public Integer getMPenetration() {
         return toolsInfluence.get(ToolsPropertyInfo.Spell_penetration.getId()).getValue();
     }
-
+    public String displayData() {
+        return MessageFormat.format("id:{0}  name:{1}  hp:{2}  mp:{3}  {4}"
+                ,this.getId(),this.getName(), this.getHp(), this.getMp(), this.getState()==-1?"死亡":"存活");
+    }
 
 }

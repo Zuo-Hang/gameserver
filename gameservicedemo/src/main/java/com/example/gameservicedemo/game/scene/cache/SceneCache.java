@@ -46,6 +46,7 @@ public class SceneCache {
         SceneExcelUtil sceneExcelUtil = new SceneExcelUtil("C:\\java_project\\mmodemo\\gameservicedemo\\src\\main\\resources\\game_configuration_excel\\scene.xlsx");
         Map<Integer, Scene> map = sceneExcelUtil.getMap();
         for (Scene  gameScene: map.values()) {
+            //初始化场景对象，NPC，怪物
             Scene scene = sceneObjectService.initSceneObject(gameScene);
             sceneService.initNeighborScene(scene);
             //存入缓存

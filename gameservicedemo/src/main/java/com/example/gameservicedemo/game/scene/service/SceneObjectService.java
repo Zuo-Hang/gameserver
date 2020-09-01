@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.game.scene.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.cache.PlayerCache;
 import com.example.gameservicedemo.game.scene.bean.*;
@@ -58,15 +59,18 @@ public class SceneObjectService {
                 .map(Integer::valueOf)
                 .map(this::getSceneObject)
                 .forEach(sceneObject -> {
+                    //以从副本拷贝一个新对象的方式初始化场景内的实体对象
                             if (sceneObject.getRoleType().equals(SceneObjectType.NPC.getType())) {
                                 NPC npc = new NPC();
                                 BeanUtils.copyProperties(sceneObject, npc);
-                                scene.getNpcs().put(sceneObject.getId(), npc);
+                                npc.setUuid(IdGenerator.getAnId());
+                                scene.getNpcs().put(npc.getUuid(), npc);
                             }
                             if (sceneObject.getRoleType().equals(SceneObjectType.WILD_MONSTER.getType())) {
                                 Monster monster = new Monster();
                                 BeanUtils.copyProperties(sceneObject, monster);
-                                scene.getMonsters().put(sceneObject.getId(), monster);
+                                monster.setUuid(IdGenerator.getAnId());
+                                scene.getMonsters().put(monster.getUuid(), monster);
                             }
                         }
                 );

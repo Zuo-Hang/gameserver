@@ -12,7 +12,7 @@ import lombok.Data;
  */
 @Data
 public class Pet extends Monster{
-    private Long petId;
+    private Long petUuid;
 
     /** 宠物主人 */
     private Creature master;

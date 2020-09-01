@@ -6,6 +6,7 @@ import com.example.gameservicedemo.server.adapter.ServerBusinessHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LoggingHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -19,7 +20,7 @@ import javax.annotation.Resource;
  */
 @Component
 public class ServerSocketChannelInitializer extends ChannelInitializer<SocketChannel> {
-    @Resource
+    @Autowired
     ServerBusinessHandler businessHandler;
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {//绑定通道参数
@@ -30,6 +31,6 @@ public class ServerSocketChannelInitializer extends ChannelInitializer<SocketCha
         //解码器，接收消息时候用
         ch.pipeline().addLast("decode",new DecoderHandler());
         //业务处理类，最终的消息会在这个handler中进行业务处理
-        ch.pipeline().addLast("handler",new ServerBusinessHandler());
+        ch.pipeline().addLast("handler",businessHandler);
     }
 }

@@ -20,7 +20,7 @@ public class NPC extends SceneObject {
      * @return
      */
     public String displayData() {
-        return MessageFormat.format("id:{0}  name:{1}  hp:{2}  mp:{3}  {4}"
-                ,this.getId(),this.getName(), this.getHp(), this.getMp(), this.getState()==-1?"死亡":"存活");
+        return MessageFormat.format("uuid:{0}  name:{1}  hp:{2}  mp:{3}  {4}"
+                ,this.getUuid(),this.getName(), this.getHp(), this.getMp(), this.getState()==-1?"死亡":"存活");
     }
 }

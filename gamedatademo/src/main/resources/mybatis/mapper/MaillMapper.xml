@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.gamedatademo.mapper.MailMapper">
+
+    <select id="selectByMailId" resultType="com.example.gamedatademo.bean.Mail">
+    select * from mail where id = #{mailId};
+    </select>
+
+    <select id="selectBySenderId" resultType="com.example.gamedatademo.bean.Mail">
+    select * from mail where sender = #{senderId};
+    </select>
+
+    <select id="selectByReceiverId" resultType="com.example.gamedatademo.bean.Mail">
+    select * from mail where receiver = #{receiverId};
+    </select>
+
+    <insert id="insert" parameterType="com.example.gamedatademo.bean.Mail" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO mail
+    (subject, content,sender,receiver,has_Read,attachment)
+    VALUES
+    (#{subject},#{content}, #{sender},#{receiver},#{hasRead},#{attachment});
+    </insert>
+
+    <update id="updateByMailId" parameterType="com.example.gamedatademo.bean.Mail">
+        UPDATE mail SET has_Read = #{hasRead}, attachment = #{attachment}
+        WHERE id = #{id};
+    </update>
+
+    <delete id="deleteByMailId">
+        DELETE from mail WHERE id = #{mailId};
+    </delete>
+</mapper>

@@ -7,6 +7,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -22,9 +23,10 @@ import javax.annotation.Resource;
 @Slf4j
 @Component
 public class TcpServer {
-    @Resource
+
+    @Autowired
     ServerSocketChannelInitializer serverSocketChannelInitializer;
-    private  int port;
+    private  int port=8779;
     public  void init(){
         log.info("正在启动tcp服务器……");
         //主线程组
@@ -38,7 +40,7 @@ public class TcpServer {
             bootstrap.group(boss,work);
             //配置为NIO的socket通道
             bootstrap.channel(NioServerSocketChannel.class);
-            bootstrap.childHandler(new ServerSocketChannelInitializer());
+            bootstrap.childHandler(serverSocketChannelInitializer);
             //缓冲区
             bootstrap.option(ChannelOption.SO_BACKLOG,1024);
             //ChannelOption对象设置TCP套接字的参数，非必须步骤
@@ -59,7 +61,7 @@ public class TcpServer {
     }
 
     public void start() {
-        new TcpServer(8779).init();
+        init();
 
     }
 

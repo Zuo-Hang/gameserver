@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.game.copy.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.copy.bean.BOSS;
 import com.example.gameservicedemo.game.copy.bean.GameCopyScene;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
@@ -117,6 +118,7 @@ public class GameCopyService {
                             if (sceneObject.getRoleType().equals(SceneObjectType.BOSS.getType())) {
                                 BOSS boss = new BOSS();
                                 BeanUtils.copyProperties(sceneObject, boss);
+                                boss.setUuid(IdGenerator.getAnId());
                                 gameCopyScene.getBossList().add(boss);
                             }
                         }
@@ -142,7 +144,7 @@ public class GameCopyService {
             nextBoss = monsterList.remove(0);
             log.debug("下一个boss {} ,当前boss列表 {}", nextBoss.getName(), monsterList);
             // 将Boss放入怪物集合中
-            gameCopyScene.getMonsters().put(nextBoss.getId(), nextBoss);
+            gameCopyScene.getMonsters().put(nextBoss.getUuid(), nextBoss);
             // 设置当前守关Boos
             gameCopyScene.setGuardBoss(nextBoss);
             // boss出场台词
@@ -161,7 +163,7 @@ public class GameCopyService {
         // 副本60ms进行心跳一次
         ScheduledFuture<?> attackTask = gameCopyScene.getSingleThreadSchedule().scheduleWithFixedDelay(() -> {
             Monster guardBoss = gameCopyScene.getGuardBoss();
-            Map<Integer, Monster> monsterMap = gameCopyScene.getMonsters();
+            Map<Long, Monster> monsterMap = gameCopyScene.getMonsters();
             if (guardBoss == null && gameCopyScene.getBossList().size() == 0) {
                 // 所有Boss死亡，挑战成功
                 gameCopyScene.getPlayers().values().forEach(
@@ -176,7 +178,7 @@ public class GameCopyService {
                         // 如果守关boss死亡，下一个Boss出场，将守关boos移除怪物列表
                         if (boss.getHp() <= 0) {
                             gameCopyScene.setGuardBoss(nextBoss(gameCopyScene));
-                            monsterMap.remove(guardBoss.getId());
+                            monsterMap.remove(guardBoss.getUuid());
                         } else {
                             // 如果boss尚未死亡，检测玩家玩家状态
                             if (!gameCopyScene.getFail()) {

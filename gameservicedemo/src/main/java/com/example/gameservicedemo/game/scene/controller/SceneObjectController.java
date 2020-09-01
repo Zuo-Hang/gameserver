@@ -47,6 +47,6 @@ public class SceneObjectController {
         //判断是否登录
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
         PlayerBeCache player = playerLoginService.getPlayerByContext(context);
-        npcService.talkWithNPC(context, Integer.valueOf(strings[1]));
+        npcService.talkWithNPC(context, Long.valueOf(strings[1]));
     }
 }
