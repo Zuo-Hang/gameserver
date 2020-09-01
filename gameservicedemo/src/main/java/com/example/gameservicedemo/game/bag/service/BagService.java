@@ -55,6 +55,7 @@ public class BagService {
                     bagBeCache.getToolsMap().put(newTools.getUuid(),newTools);
                     item.getToolsUuidS().add(newTools.getUuid());
                     notificationManager.notifyPlayer(player, "放入成功", RequestCode.SUCCESS.getCode());
+                    packBag(bagBeCache);
                     playerDataService.showPlayerBag(player);
                     return true;
                 }
@@ -67,6 +68,7 @@ public class BagService {
             item.getToolsUuidS().add(newTools.getUuid());
             bagBeCache.getToolsMap().put(newTools.getUuid(),newTools);
             bagBeCache.getItemMap().put(item.getIndexInBag(),item);
+            packBag(bagBeCache);
             playerDataService.showPlayerBag(player);
             return true;
         }else{
@@ -87,6 +89,7 @@ public class BagService {
             if (item.getToolsUuidS().contains(toolsUuid)) {
                 item.getToolsUuidS().remove(toolsUuid);
                 bag.getToolsMap().remove(toolsUuid);
+                packBag(bag);
                 return true;
             }
         }
@@ -114,7 +117,7 @@ public class BagService {
      */
     public void packBag(BagBeCache bag){
         Map<Integer, Item> itemMap = bag.getItemMap();
-        int i=0;
+        int i=1;
         for (Item item : itemMap.values()) {
             if (item.getToolsUuidS().size() == 0) {
                 itemMap.remove(item.getIndexInBag());

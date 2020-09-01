@@ -156,7 +156,7 @@ public class ToolsController {
      */
     public void sellTools(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
-        Integer tollsId = Integer.valueOf(strings[1]);
-        //toolsService.sellTools(playerLoginService.getPlayerByContext(context),tollsId);
+        Long tollsUuid = Long.valueOf(strings[1]);
+        toolsService.sellTools(playerLoginService.getPlayerByContext(context),tollsUuid);
     }
 }

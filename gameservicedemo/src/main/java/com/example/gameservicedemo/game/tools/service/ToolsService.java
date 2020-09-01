@@ -106,12 +106,22 @@ public class ToolsService {
             notificationManager.notifyPlayer(player, "你的装备栏已满，使用指令\"\"替换装备", RequestCode.BAD_REQUEST.getCode());
             return false;
         }
-        //将背包中的装备添加到装备栏
+        //将背包中的装备添加到装备栏，将背包中的装备移除
         player.getEquipmentBar().put(tools.getUuid(), tools);
-        //将背包中的装备移除
         bagService.removeFromBag(player.getBagBeCache(),tools.getUuid());
         //计算装备对玩家属性的影响
         Map<Integer, ToolsProperty> toolsInfluence = player.getToolsInfluence();
+        //性能影响
+        List<ToolsProperty> toolsPropertie = tools.getToolsPropertie();
+        if (!Objects.isNull(toolsPropertie)) {
+            toolsPropertie.forEach(v -> {
+                //安全问题-----------------------------------------------------------------------
+                //将装备的影响叠加到用户的影响集合数值上
+                int value = toolsInfluence.get(v.getId()).getValue() + v.getValue();
+                toolsInfluence.get(v.getId()).setValue(value);
+            });
+        }
+
         //添加装备的唯一被动，如名刀、金身、复活甲等技能
         Integer skillId = tools.getPassiveSkills();
         if (Objects.nonNull(skillId)) {
@@ -132,16 +142,6 @@ public class ToolsService {
                 player.getHasUseSkillMap().remove(hasUse.getId());
                 player.getSkillHaveMap().put(hasUse.getId(), hasUse);
             }
-        }
-        //性能影响
-        List<ToolsProperty> toolsPropertie = tools.getToolsPropertie();
-        if (!Objects.isNull(toolsPropertie)) {
-            toolsPropertie.forEach(v -> {
-                //安全问题-----------------------------------------------------------------------
-                //将装备的影响叠加到用户的影响集合数值上
-                int value = toolsInfluence.get(v.getId()).getValue() + v.getValue();
-                toolsInfluence.get(v.getId()).setValue(value);
-            });
         }
         notificationManager.notifyPlayer(player, MessageFormat.format("穿戴装备：{0} 成功", tools.getName()), RequestCode.SUCCESS.getCode());
         //调用回显
@@ -184,9 +184,9 @@ public class ToolsService {
         //判断背包容量
         player.getEquipmentBar().remove(remove.getUuid());
         bagService.putInBag(player, remove);
-        bagService.packBag(player.getBagBeCache());
         notificationManager.notifyPlayer(player, MessageFormat.format("脱下装备：{0} 成功", remove.getName()), RequestCode.SUCCESS.getCode());
         playerDataService.showPlayerBag(player);
+        playerDataService.showPlayerInfo(player);
         playerDataService.showPlayerEqu(player);
         playerDataService.showSkill(player);
         return true;
@@ -313,5 +313,6 @@ public class ToolsService {
         player.setMoney(player.getMoney() + toolsInBag.getPriceOut());
         notificationManager.notifyPlayer(player, MessageFormat.format("{0}出售成功，获得金{1}币",
                 toolsInBag.getName(), toolsInBag.getPriceOut()), RequestCode.SUCCESS.getCode());
+
     }
 }
