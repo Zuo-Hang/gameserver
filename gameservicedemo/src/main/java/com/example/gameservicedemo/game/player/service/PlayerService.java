@@ -38,6 +38,8 @@ public class PlayerService {
     @Autowired
     BagService bagService;
     @Autowired
+    PlayerDataService playerDataService;
+    @Autowired
     PlayerLoginService playerLoginService;
     @Autowired
     NotificationManager notificationManager;
@@ -95,5 +97,6 @@ public class PlayerService {
             msg=MessageFormat.format("你已成功购买了道具{0}，新道具已经放入你的背包了，你可以使用\"see_player_bag\"查看",toolsService.getToolsById(toolsId).getName());
         }
         notificationManager.notifyByCtx(context,msg,RequestCode.SUCCESS.getCode());
+        playerDataService.showPlayerInfo(playerByContext);
     }
 }

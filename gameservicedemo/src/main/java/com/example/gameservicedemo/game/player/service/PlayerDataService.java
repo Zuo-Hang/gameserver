@@ -131,7 +131,7 @@ public class PlayerDataService {
         }
         Map<Integer, Item> itemMap = bagBeCache.getItemMap();
         itemMap.values().forEach(item -> {
-             stringBuilder.append(MessageFormat.format("背包第{0}格： 物品数量：{1} 详细信息如下：\n",
+             stringBuilder.append(MessageFormat.format("-------背包第{0}格： 物品数量：{1} 详细信息如下：\n",
                     item.getIndexInBag(),
                     item.getToolsUuidS().size()));
              item.getToolsUuidS().forEach(uuid->{

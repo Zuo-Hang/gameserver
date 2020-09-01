@@ -125,7 +125,9 @@ public class BagService {
                 item.setToolsIdType(null);
                 item.setId(null);
             } else {
+                itemMap.remove(item.getIndexInBag());
                 item.setIndexInBag(i++);
+                itemMap.put(item.getIndexInBag(),item);
             }
         }
     }
