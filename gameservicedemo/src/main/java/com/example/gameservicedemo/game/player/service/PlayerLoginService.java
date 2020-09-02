@@ -78,6 +78,11 @@ public class PlayerLoginService {
         player.setMoney(0);
         player.setState(1);
         player.setRoleClass(roleClass);
+        Bag bag = new Bag();
+        bag.setName(playerName+"的背包");
+        bag.setSize(16);
+        Integer insert1 = bagMapper.insert(bag);
+        player.setBagId(bag.getId());
         Integer insert = playerMapper.insert(player);
         log.info("成功创建角色{}", player.toString());
         notificationManager.notifyByCtx(context, "你已成功创建角色：" + playerName + "，快使用 load 命令去登录吧", RequestCode.SUCCESS.getCode());

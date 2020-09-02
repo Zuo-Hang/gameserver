@@ -10,7 +10,7 @@ package com.example.gameservicedemo.util;
 public class ProbabilityUtil {
     public static boolean getProbability(int chance){
         double v = Math.random() * 100;
-        if (v >= chance) {
+        if (v < chance) {
             return true;
         }
         return false;

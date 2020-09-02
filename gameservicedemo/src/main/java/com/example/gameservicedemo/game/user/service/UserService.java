@@ -70,7 +70,7 @@ public class UserService {
         Integer insert = userMapper.insert(user);
         log.info(user.toString());
         //通知用户
-        String format = MessageFormat.format("你已成功注册！你的登录账号是：{1}，快使用\" login 账号 密码 \"去登录吧", user.getUserId());
+        String format = MessageFormat.format("你已成功注册！你的登录账号是：{0}，快使用\" login 账号 密码 \"去登录吧", user.getUserId());
         notificationManager.notifyByCtx(ctx, format, RequestCode.SUCCESS.getCode());
     }
 

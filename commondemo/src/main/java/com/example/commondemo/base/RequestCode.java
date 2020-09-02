@@ -23,6 +23,8 @@ public enum RequestCode {
 
     ABOUT_SKILL(1217,"有关技能"),
 
+    ABOUT_AIM(1218,"有关目标"),
+
     BAD_REQUEST(400, "Bad Request"),
     /**找不到 */
     NOT_FOUND(404, "Not Found"),

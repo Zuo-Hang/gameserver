@@ -101,7 +101,16 @@ public enum Command {
     /**
      * 技能攻击玩家
      **/
-    SKILL_TO_PVP("skill_to_PVP", 4300, "技能攻击玩家"),
+    SKILL_TO_PVP("skill_to_pvp", 4300, "技能攻击玩家"),
+    /**
+     * 使用群体攻击技能
+     */
+    SKILL_TO_GROUP("skill_to_group",4400,"使用群体攻击技能"),
+    /**
+     * 使用召唤技能
+     */
+    SKILL_CALL("skill_call",4500,"使用召唤技能"),
+
     /**
      * 查看背包当前情况
      */

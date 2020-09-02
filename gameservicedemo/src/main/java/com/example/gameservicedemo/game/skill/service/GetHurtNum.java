@@ -1,11 +1,14 @@
 package com.example.gameservicedemo.game.skill.service;
 
+import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.tools.bean.ToolsProperty;
 import com.example.gameservicedemo.game.tools.bean.ToolsPropertyInfo;
 import com.example.gameservicedemo.game.skill.bean.SkillHurtType;
+import com.example.gameservicedemo.manager.NotificationManager;
 import com.example.gameservicedemo.util.ProbabilityUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
@@ -17,7 +20,6 @@ import java.util.Map;
  * @Description: 伤害运算器
  */
 public class GetHurtNum {
-
     /**
      * 对血量造成的伤害(真伤)
      * 对魔法护盾造成的伤害
@@ -26,6 +28,7 @@ public class GetHurtNum {
     public int hurt=0;
     public int hurtToMaShield=0;
     public int hurtToShield=0;
+    public boolean isMarkUp=false;
 
     /**
      * 获取某一伤害对目标造成的各方面损伤
@@ -91,6 +94,7 @@ public class GetHurtNum {
         //暴击效果
         Integer effect = map.get(ToolsPropertyInfo.Critical_hit_effect.getId()).getValue();
         if (ProbabilityUtil.getProbability(probability)) {
+            isMarkUp=true;
             baseHurt = baseHurt * effect / 100 + baseHurt;
         }
         return baseHurt;

@@ -60,6 +60,7 @@ public class MonsterAiService {
                 ),RequestCode.SUCCESS.getCode());
         if (target instanceof PlayerBeCache) {
             playerDataService.isPlayerDead((PlayerBeCache) target,monster);
+            playerDataService.showPlayerInfo((PlayerBeCache) target);
         } else {
             monsterBeAttack(monster,(Monster)target,gameScene,physicalAttack);
         }
@@ -74,12 +75,6 @@ public class MonsterAiService {
      * @param damage    伤害
      */
     public void notifyMonsterBeAttack(Creature creature,Monster monster,Scene gameScene,Integer damage) {
-        notificationManager.notifyScene(gameScene,
-                MessageFormat.format("{0} 受到 {1} 攻击，hp减少{2},当前hp为 {3} \n",
-                        monster.getName(),
-                        creature.getName(),
-                        damage ,
-                        monster.getHp()), RequestCode.SUCCESS.getCode());
         monsterBeAttack(creature,monster,gameScene,damage);
     }
 

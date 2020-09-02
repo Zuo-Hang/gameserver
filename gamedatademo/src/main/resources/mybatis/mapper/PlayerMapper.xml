@@ -10,9 +10,9 @@
 
     <insert id="insert" parameterType="com.example.gamedatademo.bean.Player" useGeneratedKeys="true" keyProperty="playerId">
     INSERT INTO player
-    (player_name, user_id,now_at,bag_id)
+    (player_name, user_id,exp,now_at,state,role_class,bag_id,money)
     VALUES
-    (#{playerName},#{userId}, #{nowAt},{bagId});
+    (#{playerName},#{userId}, #{exp},#{nowAt},#{state},#{roleClass},#{bagId},#{money});
     </insert>
 
     <select id="selectByUserId" resultType="com.example.gamedatademo.bean.Player">

@@ -9,6 +9,7 @@ import com.example.gameservicedemo.game.scene.bean.Monster;
 import com.example.gameservicedemo.game.skill.bean.Skill;
 import com.example.gameservicedemo.game.scene.bean.Scene;
 import com.example.gameservicedemo.game.player.cache.RoleTypeCache;
+import com.example.gameservicedemo.game.skill.bean.SkillInfluenceType;
 import com.example.gameservicedemo.game.skill.cache.SkillCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.example.gameservicedemo.manager.TimedTaskManager;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -64,20 +66,19 @@ public class SkillService {
         Scene scene = sceneService.getScene(player.getNowAt());
         if (!canUseSkill(player, skill)) {
             notificationManager.notifyPlayer(player, "你现在不可以使用这个技能", RequestCode.NOT_SUPPORTED_OPERATION.getCode());
-            return ;
+            return;
         }
-        skill=player.getSkillHaveMap().get(skill.getId());
-        castSkill(player,player,scene,skill);
+        skill = player.getSkillHaveMap().get(skill.getId());
+        castSkill(player, player, scene, skill);
         skill.setActiveTime(System.currentTimeMillis());
         //将全部的装备耐久度减一
-        player.getEquipmentBar().values().forEach(tools->{
-            tools.setDurability(tools.getDurability()-1);
+        player.getEquipmentBar().values().forEach(tools -> {
+            tools.setDurability(tools.getDurability() - 1);
         });
         playerDataService.showPlayerEqu(player);
         playerDataService.showSkill(player);
         playerDataService.showPlayerInfo(player);
     }
-
 
 
     /**
@@ -99,7 +100,7 @@ public class SkillService {
             return false;
         }
         //只有玩家角色释放技能才需要魔法消耗
-        if(creature instanceof PlayerBeCache){
+        if (creature instanceof PlayerBeCache) {
             PlayerBeCache player = (PlayerBeCache) creature;
             if (player.getMp() < skill.getMpConsumption()) {
                 notificationManager.notifyPlayer(player, "你的mp不足", RequestCode.BAD_REQUEST.getCode());
@@ -157,24 +158,24 @@ public class SkillService {
             // 开启技能冷却
             startSkillCd(initiator, skill);
             // 按吟唱时间延迟执行
-            TimedTaskManager.singleThreadSchedule( skill.getCastTime(),
+            TimedTaskManager.singleThreadSchedule(skill.getCastTime(),
                     () -> scene.getSingleThreadSchedule().execute(
                             () -> {
                                 notificationManager.notifyScene(scene,
                                         MessageFormat.format(" {0}  对 {1} 使用了技能  {2} ",
-                                                initiator.getName(),target.getName(),skill.getName()), RequestCode.SUCCESS.getCode());
+                                                initiator.getName(), target.getName(), skill.getName()), RequestCode.SUCCESS.getCode());
                                 // 注意，这里的技能进行还是要用场景执行器执行，不然会导致多线程问题
                                 skillEffect.castSkill(skill.getSkillInfluenceType(), initiator, target, scene, skill);
                             }
                     )
             );
-        }else{
+        } else {
             notificationManager.notifyScene(scene,
                     MessageFormat.format(" {0}  对 {1} 使用了技能  {2} ",
-                            initiator.getName(),target.getName(),skill.getName()),RequestCode.SUCCESS.getCode());
-            skillEffect.castSkill(skill.getSkillInfluenceType(),initiator,target,scene,skill);
+                            initiator.getName(), target.getName(), skill.getName()), RequestCode.SUCCESS.getCode());
+            skillEffect.castSkill(skill.getSkillInfluenceType(), initiator, target, scene, skill);
             // 开启技能冷却
-            startSkillCd(initiator,skill);
+            startSkillCd(initiator, skill);
         }
         return true;
     }
@@ -189,18 +190,19 @@ public class SkillService {
         skill.setActiveTime(System.currentTimeMillis());
     }
 
-    public Skill getSkillById(Integer skillId){
-        return  SkillCache.get(skillId);
+    public Skill getSkillById(Integer skillId) {
+        return SkillCache.get(skillId);
     }
 
     /**
      * 对场景内的怪物使用技能
+     *
      * @param context
      * @param skillId
      * @param monsterUUId
      * @return
      */
-    public boolean useSkillToMonster(ChannelHandlerContext context,Integer skillId, Long monsterUUId) {
+    public boolean useSkillToMonster(ChannelHandlerContext context, Integer skillId, Long monsterUUId) {
         //获取技能、玩家、使用技能的场景
         PlayerBeCache player = playerLoginService.getPlayerByContext(context);
         Skill skill = player.getSkillHaveMap().get(skillId);
@@ -211,16 +213,81 @@ public class SkillService {
         }
         //-------------------------------------------------------------------------------------------
         Monster monster = player.getSceneNowAt().getMonsters().get(monsterUUId);
-        castSkill(player,monster,scene,skill);
+        castSkill(player, monster, scene, skill);
         return true;
     }
 
+    public boolean skillToPvP(PlayerBeCache player, Integer skillId, Integer targetId) {
+        Skill skill = player.getSkillHaveMap().get(skillId);
+        Scene scene = sceneService.getScene(player.getNowAt());
+        if (!canUseSkill(player, skill)) {
+            notificationManager.notifyPlayer(player, "你现在不可以使用这个技能", RequestCode.BAD_REQUEST.getCode());
+            return false;
+        }
+        PlayerBeCache target = scene.getPlayers().get(targetId);
+        if (Objects.isNull(target)) {
+            notificationManager.notifyPlayer(player, "目标与你不在同一场景内无法攻击！", RequestCode.BAD_REQUEST.getCode());
+            return false;
+        }
+        if (target.equals(player)) {
+            notificationManager.notifyPlayer(player, "不能攻击自己！", RequestCode.BAD_REQUEST.getCode());
+            return false;
+        }
+        castSkill(player, target, scene, skill);
+        return true;
+    }
 
-    public void useSkillCall(ChannelHandlerContext context, Integer petId, Long targetUuid) {
-        PlayerBeCache playerByContext = playerLoginService.getPlayerByContext(context);
-        //检验是否有召唤技能
-       // roleTypeCache.getRoleType(playerByContext.getRoleClass()).getSkillMap().containsKey();
+    /**
+     * 群体攻击
+     *
+     * @param player
+     * @param skillId
+     * @param targetIds
+     */
+    public boolean skillToGroup(PlayerBeCache player, Integer skillId, String targetIds) {
+        Skill skill = player.getSkillHaveMap().get(skillId);
+        if (!canUseSkill(player, skill)) {
+            notificationManager.notifyPlayer(player, "你现在不可以使用这个技能", RequestCode.BAD_REQUEST.getCode());
+            return false;
+        }
+        if (!skill.getSkillInfluenceType().equals(SkillInfluenceType.ATTACK_MULTI.getTypeId())) {
+            notificationManager.notifyPlayer(player, "这个技能并非多人技能", RequestCode.BAD_REQUEST.getCode());
+            return false;
+        }
+        Scene scene = player.getSceneNowAt();
+        String[] targetIdArr = targetIds.split(",");
+        ArrayList<PlayerBeCache> targets = new ArrayList<>();
+        for (String s : targetIdArr) {
+            PlayerBeCache target = scene.getPlayers().get(Integer.valueOf(s));
+            if (Objects.isNull(target)) {
+                notificationManager.notifyPlayer(player, "目标与你不在同一场景内无法攻击！", RequestCode.BAD_REQUEST.getCode());
+                return false;
+            }
+            targets.add(target);
+        }
+        targets.forEach(t -> {
+            castSkill(player, t, scene, skill);
+        });
+        return true;
+    }
 
-
+    /**
+     * 召唤技能
+     * @param player
+     * @param skillId
+     */
+    public boolean useSkillCall(PlayerBeCache player, Integer skillId) {
+        Skill skill = player.getSkillHaveMap().get(skillId);
+        if (!canUseSkill(player, skill)) {
+            notificationManager.notifyPlayer(player, "你现在不可以使用这个技能", RequestCode.BAD_REQUEST.getCode());
+            return false;
+        }
+        notificationManager.notifyScene(player.getSceneNowAt(),
+                MessageFormat.format(" {0} 使用了召唤技能:{1} ",
+                        player.getName(), skill.getName()), RequestCode.SUCCESS.getCode());
+        skillEffect.castSkill(skill.getSkillInfluenceType(), player, null, player.getSceneNowAt(), skill);
+        // 开启技能冷却
+        startSkillCd(player, skill);
+        return true;
     }
 }

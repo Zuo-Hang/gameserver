@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -43,6 +45,38 @@ public class SkillController {
     {
         ControllerManager.add(Command.SKILL_TO_SELF.getRequestCode(), this::useSkillToSelf);
         ControllerManager.add(Command.SKILL_TO_MONSTER.getRequestCode(), this::useSkillToMonster);
+        ControllerManager.add(Command.SKILL_TO_PVP.getRequestCode(),this::skillToPvP);
+        ControllerManager.add(Command.SKILL_TO_GROUP.getRequestCode(),this::skillToGroup);
+        ControllerManager.add(Command.SKILL_CALL.getRequestCode(),this::useSkillCall);
+    }
+
+    private void skillToGroup(ChannelHandlerContext context, Message message) {
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 3);
+        PlayerBeCache player = playerLoginService.isLoad(context);
+        if(Objects.isNull(player)){
+            notificationManager.notifyByCtx(context,"还未加载化身！",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        if(Objects.isNull(strings)){
+            notificationManager.notifyByCtx(context,"输入参数个数错误！",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        skillService.skillToGroup(player,Integer.valueOf(strings[1]),strings[2]);
+    }
+
+    private void skillToPvP(ChannelHandlerContext context, Message message) {
+        //指令 技能 目标id
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 3);
+        PlayerBeCache player = playerLoginService.isLoad(context);
+        if(Objects.isNull(player)){
+            notificationManager.notifyByCtx(context,"还未加载化身！",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        if(Objects.isNull(strings)){
+            notificationManager.notifyByCtx(context,"输入参数个数错误！",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        skillService.skillToPvP(player, Integer.valueOf(strings[1]), Integer.valueOf(strings[2]));
     }
 
     /**
@@ -73,21 +107,23 @@ public class SkillController {
             return;
         }
         Monster monster = playerByContext.getSceneNowAt().getMonsters().get(monsterUuid);
+        //这个100有问题
 
-        monsterAiService.notifyMonsterBeAttack(playerByContext, monster, scene, 100);
-        monster.setTarget(playerByContext);
-        monsterAiService.startAI(monster, scene);
     }
 
-public void useSkillCall(ChannelHandlerContext context,Message message){
-        //判断是否加载用户
-        //命令 召唤兽 攻击目标
-    String[] strings = CheckParametersUtil.checkParameter(context, message, 3);
-    Integer petId = Integer.valueOf(strings[1]);
-    Long targetUuid = Long.valueOf(strings[2]);
-    skillService.useSkillCall(context,petId,targetUuid);
+    public void useSkillCall(ChannelHandlerContext context, Message message) {
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
+        PlayerBeCache player = playerLoginService.isLoad(context);
+        if(Objects.isNull(player)){
+            notificationManager.notifyByCtx(context,"还未加载化身！",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        if(Objects.isNull(strings)){
+            notificationManager.notifyByCtx(context,"输入参数个数错误！",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        skillService.useSkillCall(player,Integer.valueOf(strings[1]));
 
 
-
-}
+    }
 }

@@ -67,6 +67,9 @@ public class ClientBusinessHandler extends ChannelInboundHandlerAdapter {
             if (((Message) msg).getRequestCode() == RequestCode.ABOUT_SKILL.getCode()) {
                 MainView.SKILL.setText(MainView.SKILL_INFO + ((Message) msg).getMessage());
             }
+            if (((Message) msg).getRequestCode() == RequestCode.ABOUT_AIM.getCode()) {
+                MainView.TARGET.setText(((Message) msg).getMessage());
+            }
         }
     }
 

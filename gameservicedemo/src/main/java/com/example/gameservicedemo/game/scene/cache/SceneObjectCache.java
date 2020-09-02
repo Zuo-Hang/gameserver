@@ -40,6 +40,7 @@ public class SceneObjectCache {
         SceneObjectExcelUtil sceneObjectExcelUtil = new SceneObjectExcelUtil("C:\\java_project\\mmodemo\\gameservicedemo\\src\\main\\resources\\game_configuration_excel\\sceneObject.xlsx");
         Map<Integer, SceneObject> sceneObjectMap = sceneObjectExcelUtil.getMap();
         sceneObjectMap.values().forEach(sceneObject -> {
+            sceneObject.setMaxHp(sceneObject.getHp());
             sceneObjectCache.put(sceneObject.getId(), sceneObject);
         });
         log.info("游戏对象资源加载完毕");

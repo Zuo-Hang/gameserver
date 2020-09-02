@@ -181,8 +181,8 @@ public class SceneService {
         player.setNowAt(targetScene.getId());
         // 宠物相关
         if (Objects.nonNull(player.getPet())) {
-            player.getSceneNowAt().getMonsters().remove(player.getPet().getPetUuid());
-            targetScene.getMonsters().put(player.getPet().getPetUuid(),player.getPet());
+            player.getSceneNowAt().getMonsters().remove(player.getPet().getUuid());
+            targetScene.getMonsters().put(player.getPet().getUuid(),player.getPet());
         }
         // 放入目的场景
         targetScene.getPlayers().put(player.getId(), player);
