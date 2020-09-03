@@ -343,6 +343,6 @@ public class ToolsService {
         }
         Buffer buffer = bufferService.getBuffer(skillById.getBuffer());
         bufferService.startBuffer(player,buffer);
-
+        bagService.removeFromBag(player.getBagBeCache(),toolsId);
     }
 }

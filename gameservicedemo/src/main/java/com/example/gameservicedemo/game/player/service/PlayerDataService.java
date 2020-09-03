@@ -41,6 +41,7 @@ public class PlayerDataService {
     PlayerCache playerCache;
     @Autowired
     NotificationManager notificationManager;
+
     /**
      * 查看当前角色的技能状况
      *
@@ -48,6 +49,14 @@ public class PlayerDataService {
      */
     public void seePlayerSkill(ChannelHandlerContext context) {
         showSkill(playerLoginService.isLoad(context));
+    }
+
+    public boolean checkIsDead(PlayerBeCache playerBeCache) {
+        if (playerBeCache.getHp() <= 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -58,16 +67,23 @@ public class PlayerDataService {
      * @return
      */
     public boolean isPlayerDead(PlayerBeCache playerBeCache, Creature murderer) {
-        if (playerBeCache.getHp() < 0) {
+        if (playerBeCache.getHp() <= 0) {
             playerBeCache.setHp(0);
             playerBeCache.setState(-1);
             //广播通知玩家死亡
+            notificationManager.notifyScene(playerBeCache.getSceneNowAt(),
+                    MessageFormat.format("{0}击败了{1}", murderer.getName(), playerBeCache.getName()),
+                    RequestCode.BAD_REQUEST.getCode());
+            notificationManager.notifyPlayer(playerBeCache, MessageFormat.format("{0} 你已死亡，目前在冥府了,十秒后复活",
+                    playerBeCache.getName()), RequestCode.WARNING.getCode());
             //从场景中移除
+            sceneService.moveToScene(playerBeCache, sceneService.getScene(7));
             //开启复活操作
             TimedTaskManager.schedule(10000, () -> {
                 playerBeCache.setState(1);
-                //初始化玩家
-                //initPlayer(casualty);
+                playerBeCache.setHp(playerBeCache.getMaxHp());
+                playerBeCache.setMp(playerBeCache.getMaxMp());
+                sceneService.moveToScene(playerBeCache, sceneService.getScene(1));
                 notificationManager.notifyPlayer(playerBeCache, playerBeCache.getName() + "  你已经复活 \n", RequestCode.SUCCESS.getCode());
             });
             return true;
@@ -75,11 +91,13 @@ public class PlayerDataService {
             return false;
         }
     }
+
     /**
      * 展示玩家信息：血量 攻击力防御力……
+     *
      * @param playerByContext
      */
-    public void showPlayerInfo(PlayerBeCache playerByContext){
+    public void showPlayerInfo(PlayerBeCache playerByContext) {
         if (Objects.isNull(playerByContext)) {
             return;
         }
@@ -93,100 +111,107 @@ public class PlayerDataService {
                 playerByContext.getMaxMp(),
                 playerByContext.getMp(),
                 playerByContext.getMoney()));
-        playerByContext.getToolsInfluence().values().forEach(v->{
+        playerByContext.getToolsInfluence().values().forEach(v -> {
             stringBuilder.append(MessageFormat.format("{0}:{1}\n",
                     ToolsPropertyInfoCache.toolsPropertyInfoCache.get(v.getId()),
                     v.getValue())
             );
         });
-        notificationManager.notifyPlayer(playerByContext,stringBuilder.toString(),RequestCode.ABOUT_PLAYER.getCode());
+        notificationManager.notifyPlayer(playerByContext, stringBuilder.toString(), RequestCode.ABOUT_PLAYER.getCode());
     }
 
     /**
      * 更新玩家位置
+     *
      * @param playerBeCache
      */
-    public void showPlayerPosition(PlayerBeCache playerBeCache){
+    public void showPlayerPosition(PlayerBeCache playerBeCache) {
         notificationManager.notifyPlayer(playerBeCache,
                 sceneService.getScene(playerBeCache.getNowAt()).getName(),
                 RequestCode.ABOUT_SCENE.getCode());
     }
+
     /**
      * 更新玩家背包显示
+     *
      * @param playerByContext
      */
-    public void showPlayerBag(PlayerBeCache playerByContext){
+    public void showPlayerBag(PlayerBeCache playerByContext) {
         if (Objects.isNull(playerByContext)) {
             return;
         }
         BagBeCache bagBeCache = playerByContext.getBagBeCache();
         StringBuilder stringBuilder = new StringBuilder(MessageFormat.format("这个背包容量为：{0}，当前可用位置：{1},背包中有：\n",
                 bagBeCache.getSize(),
-                bagBeCache.getSize()-bagBeCache.getItemMap().size()));
+                bagBeCache.getSize() - bagBeCache.getItemMap().size()));
         Map<Long, Tools> toolsMap = bagBeCache.getToolsMap();
-        if(toolsMap.size()==0){
+        if (toolsMap.size() == 0) {
             stringBuilder.append("哦，空空如也！");
-            notificationManager.notifyPlayer(playerByContext,stringBuilder.toString(),RequestCode.ABOUT_BAG.getCode());
+            notificationManager.notifyPlayer(playerByContext, stringBuilder.toString(), RequestCode.ABOUT_BAG.getCode());
             return;
         }
         Map<Integer, Item> itemMap = bagBeCache.getItemMap();
         itemMap.values().forEach(item -> {
-             stringBuilder.append(MessageFormat.format("-------背包第{0}格： 物品数量：{1} 详细信息如下：\n",
+            stringBuilder.append(MessageFormat.format("-------背包第{0}格： 物品数量：{1} 详细信息如下：\n",
                     item.getIndexInBag(),
                     item.getToolsUuidS().size()));
-             item.getToolsUuidS().forEach(uuid->{
-                 stringBuilder.append(MessageFormat.format("uuid:{0} 名称：{1} ",
-                         toolsMap.get(uuid).getUuid(),
-                         toolsMap.get(uuid).getName()));
-                 if(toolsMap.get(uuid).getType()<4){
-                    stringBuilder.append("当前耐久度："+toolsMap.get(uuid).getDurability());
+            item.getToolsUuidS().forEach(uuid -> {
+                stringBuilder.append(MessageFormat.format("uuid:{0} 名称：{1} ",
+                        toolsMap.get(uuid).getUuid(),
+                        toolsMap.get(uuid).getName()));
+                if (toolsMap.get(uuid).getType() < 4) {
+                    stringBuilder.append("当前耐久度：" + toolsMap.get(uuid).getDurability());
                 }
                 stringBuilder.append("\n");
-             });
+            });
         });
-        notificationManager.notifyPlayer(playerByContext,stringBuilder.toString(),RequestCode.ABOUT_BAG.getCode());
+        notificationManager.notifyPlayer(playerByContext, stringBuilder.toString(), RequestCode.ABOUT_BAG.getCode());
     }
+
     /**
      * 更新玩家装备栏显示
+     *
      * @param playerByContext
      */
-    public void showPlayerEqu(PlayerBeCache playerByContext){
+    public void showPlayerEqu(PlayerBeCache playerByContext) {
         if (Objects.isNull(playerByContext)) {
             return;
         }
         Map<Long, Tools> equipmentBar = playerByContext.getEquipmentBar();
-        if(equipmentBar.values().size()==0){
-            notificationManager.notifyPlayer(playerByContext,"你还没有装配任何装备！",RequestCode.ABOUT_EQU.getCode());
+        if (equipmentBar.values().size() == 0) {
+            notificationManager.notifyPlayer(playerByContext, "你还没有装配任何装备！", RequestCode.ABOUT_EQU.getCode());
             return;
         }
         StringBuilder stringBuilder = new StringBuilder();
-        equipmentBar.values().forEach(v->{
+        equipmentBar.values().forEach(v -> {
             stringBuilder.append(MessageFormat.format("uuid:{0} 名称：{1} 当前耐久度：{2}\n",
                     v.getUuid(),
                     v.getName(),
                     v.getDurability()));
-            if(v.getDurability()==0){
+            if (v.getDurability() == 0) {
                 stringBuilder.append("当前耐久度过低，该装备处于无效状态，需要更换或修理！");
             }
         });
-        notificationManager.notifyPlayer(playerByContext,stringBuilder.toString(),RequestCode.ABOUT_EQU.getCode());
+        notificationManager.notifyPlayer(playerByContext, stringBuilder.toString(), RequestCode.ABOUT_EQU.getCode());
     }
 
-    public void showSkill(PlayerBeCache player){
-        if (Objects.isNull(player)) {return;}
+    public void showSkill(PlayerBeCache player) {
+        if (Objects.isNull(player)) {
+            return;
+        }
         //获取化身的所有技能
         Map<Integer, Skill> skillHaveMap = player.getSkillHaveMap();
         //显示可用的和不可用的技能
-        String s="------------------------------\n";
+        String s = "------------------------------\n";
         StringBuilder skillCanUse = new StringBuilder("可以使用的技能有：\n");
         StringBuilder skillInCd = new StringBuilder("正在CD的技能有：\n");
         StringBuilder activeSkill = new StringBuilder("其中主动技能有：\n");
         StringBuilder passiveSkill = new StringBuilder("被动技能有：\n");
-        skillHaveMap.values().forEach(skill->{
-            if (System.currentTimeMillis()- skill.getActiveTime()<skill.getCd()) {//表明cd还未好
+        skillHaveMap.values().forEach(skill -> {
+            if (System.currentTimeMillis() - skill.getActiveTime() < skill.getCd()) {//表明cd还未好
                 String format = MessageFormat.format("id：{0} 名称：{1} 等级：{2} 耗蓝:{3} cd:{4}  冷却完成时间还剩:{5}秒 \n",
                         skill.getId(), skill.getName(), skill.getLevel(), skill.getMpConsumption(), skill.getCd(),
-                        (skill.getCd() - (System.currentTimeMillis() - skill.getActiveTime()))/1000);
+                        (skill.getCd() - (System.currentTimeMillis() - skill.getActiveTime())) / 1000);
                 skillInCd.append(format);
 
             } else {
@@ -196,14 +221,14 @@ public class PlayerDataService {
                 }
                 skillCanUse.append("\n");
             }
-            if(skill.getSkillActiveOrPassiveType().equals(SkillActiveAndPassiveType.ACTIVE.getCode())){
-                activeSkill.append(MessageFormat.format("id:{0} {1}  ",skill.getId(),skill.getName()));
-            }else{
-                passiveSkill.append(MessageFormat.format("id:{0} {1}  ",skill.getId(),skill.getName()));
+            if (skill.getSkillActiveOrPassiveType().equals(SkillActiveAndPassiveType.ACTIVE.getCode())) {
+                activeSkill.append(MessageFormat.format("id:{0} {1}  ", skill.getId(), skill.getName()));
+            } else {
+                passiveSkill.append(MessageFormat.format("id:{0} {1}  ", skill.getId(), skill.getName()));
             }
         });
         notificationManager.notifyPlayer(player,
-                skillCanUse.toString() +s+ skillInCd.toString()+s+activeSkill.toString()+"\n"+s+passiveSkill.toString(),
+                skillCanUse.toString() + s + skillInCd.toString() + s + activeSkill.toString() + "\n" + s + passiveSkill.toString(),
                 RequestCode.ABOUT_SKILL.getCode());
     }
 }

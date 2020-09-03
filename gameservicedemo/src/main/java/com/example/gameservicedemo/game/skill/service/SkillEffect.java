@@ -2,6 +2,7 @@ package com.example.gameservicedemo.game.skill.service;
 
 import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.base.IdGenerator;
+import com.example.gameservicedemo.game.bag.service.BagService;
 import com.example.gameservicedemo.game.buffer.bean.Buffer;
 import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
@@ -15,6 +16,7 @@ import com.example.gameservicedemo.game.skill.bean.Skill;
 import com.example.gameservicedemo.game.skill.bean.SkillHurtType;
 import com.example.gameservicedemo.game.skill.bean.SkillInfluenceType;
 import com.example.gameservicedemo.game.scene.bean.Scene;
+import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.example.gameservicedemo.game.buffer.service.BufferService;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +46,8 @@ public class SkillEffect {
     SkillService skillService;
     @Autowired
     MonsterAiService monsterAiService;
+    @Autowired
+    BagService bagService;
     @Autowired
     SceneObjectService sceneObjectService;
     @Autowired
@@ -140,6 +144,17 @@ public class SkillEffect {
             if(Objects.nonNull((player).getPet())){
                 (player).getPet().setTarget(target);
             }
+            if(target instanceof PlayerBeCache){
+                PlayerBeCache target1 = (PlayerBeCache) target;
+                //击败后获取对方所有的装备
+                if(playerDataService.checkIsDead(target1)){
+                    Map<Long, Tools> equipmentBar = target1.getEquipmentBar();
+                    equipmentBar.values().forEach(v->{
+                        bagService.putInBag(player,v);
+                    });
+                    equipmentBar.clear();
+                }
+            }
         }
         target.setMagicShield(target.getMagicShield() - skillHurtNum.hurtToMaShield);
         target.setShield(target.getShield() - skillHurtNum.hurtToShield);
@@ -162,6 +177,8 @@ public class SkillEffect {
         }
         if(target instanceof PlayerBeCache){
             PlayerBeCache targetPlayer = (PlayerBeCache) target;
+            //判断是否死亡，死亡则进行死亡处理
+            playerDataService.isPlayerDead(targetPlayer,initiator);
             if(Objects.nonNull((targetPlayer).getPet())){
                 (targetPlayer).getPet().setTarget(initiator);
             }

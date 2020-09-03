@@ -188,7 +188,9 @@ public class SceneService {
         targetScene.getPlayers().put(player.getId(), player);
         player.setSceneNowAt(targetScene);
         // 进入场景广播
-        notificationManager.notifyScene(targetScene,"有玩家进入",RequestCode.WARNING.getCode());
-        notificationManager.notifyScene(formScene,"有玩家离开",RequestCode.WARNING.getCode());
+        if(!targetScene.equals(getScene(7))){
+            notificationManager.notifyScene(targetScene,"有玩家进入",RequestCode.WARNING.getCode());
+            notificationManager.notifyScene(formScene,"有玩家离开",RequestCode.WARNING.getCode());
+        }
     }
 }
