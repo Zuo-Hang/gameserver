@@ -157,6 +157,10 @@ public enum Command {
      * 出售装备 sell_tools 5700
      */
     SELL_TOOLS("sell_tools", 5700, "出售不再需要的装备 sell_tools 装备id"),
+    /**
+     * 使用药品
+     */
+    USE_MEDICINE("use_medicine",5800,"使用药品 use_medicine 药品uuid"),
 
 
     /**

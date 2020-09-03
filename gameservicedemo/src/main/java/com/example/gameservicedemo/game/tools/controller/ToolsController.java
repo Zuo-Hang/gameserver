@@ -50,7 +50,21 @@ public class ToolsController {
         ControllerManager.add(Command.REPLACE_TOOLS.getRequestCode(), this::replaceTools);
         ControllerManager.add(Command.FIX_TOOLS.getRequestCode(), this::fixTools);
         ControllerManager.add(Command.SELL_TOOLS.getRequestCode(), this::sellTools);
+ControllerManager.add(Command.USE_MEDICINE.getRequestCode(),this::useMedicine);
+    }
 
+    private void useMedicine(ChannelHandlerContext context, Message message) {
+        String[] parameter = CheckParametersUtil.checkParameter(context, message, 2);
+        PlayerBeCache load = playerLoginService.isLoad(context);
+        if(Objects.isNull(load)){
+            notificationManager.notifyByCtx(context,"你还未加载化身！",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        if(Objects.isNull(parameter)){
+            notificationManager.notifyPlayer(load,"你输入的参数个数错误！",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        toolsService.useMedicine(load,Long.valueOf(parameter[1]));
     }
 
     /**

@@ -142,4 +142,28 @@ public class PlayerBeCache extends Player implements Creature {
                 ,this.getId(),this.getName(), this.getHp(), this.getMp(), this.getState()==-1?"死亡":"存活");
     }
 
+    @Override
+    public String toString() {
+        return "PlayerBeCache{" +
+                "context=" + context +
+                ", target=" + target +
+                ", maxHp=" + maxHp +
+                ", maxMp=" + maxMp +
+                ", mp=" + mp +
+                ", hp=" + hp +
+                ", magicShield=" + magicShield +
+                ", Shield=" + Shield +
+                ", sceneNowAt=" + sceneNowAt +
+                ", pet=" + pet +
+                ", canUseSkill=" + canUseSkill +
+                ", hasUseSkillMap=" + hasUseSkillMap +
+                ", skillHaveMap=" + skillHaveMap +
+                ", bufferMap=" + bufferMap +
+                ", equipmentBar=" + equipmentBar +
+                ", needFix=" + needFix +
+                ", bagBeCache=" + bagBeCache +
+                ", toolsInfluence=" + toolsInfluence +
+                ", teamId=" + teamId +
+                '}';
+    }
 }

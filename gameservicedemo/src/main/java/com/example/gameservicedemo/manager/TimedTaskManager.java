@@ -18,6 +18,10 @@ import java.util.concurrent.*;
 @Component
 public class TimedTaskManager {
 
+    /**
+     * 使用带有ThreadFactory参数的ThreadPoolExecutor构造方法，这样就可以方便的设置线程名称，方便出错时回溯
+     * 由于ScheduledThreadPoolExecutor并未提供更改最大线程数的构造器，所以自建和调用Executors其实没有太大区别
+     */
     private static ThreadFactory scheduledThreadPoolFactory = new ThreadFactoryBuilder()
             .setNameFormat("scheduledThreadPool-%d").setUncaughtExceptionHandler((t,e) -> e.printStackTrace()).build();
     private static ScheduledExecutorService ScheduledThreadPool =

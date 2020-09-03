@@ -3,6 +3,7 @@ package com.example.gameservicedemo.game.tools.service;
 import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.service.BagService;
+import com.example.gameservicedemo.game.buffer.bean.Buffer;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.buffer.service.BufferService;
 import com.example.gameservicedemo.game.player.service.PlayerDataService;
@@ -11,6 +12,7 @@ import com.example.gameservicedemo.game.shop.bean.Shop;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.tools.bean.ToolsProperty;
 import com.example.gameservicedemo.game.skill.bean.Skill;
+import com.example.gameservicedemo.game.tools.bean.ToolsType;
 import com.example.gameservicedemo.game.tools.cache.ToolsCache;
 import com.example.gameservicedemo.game.tools.cache.ToolsPropertyInfoCache;
 import com.example.gameservicedemo.manager.NotificationManager;
@@ -313,6 +315,34 @@ public class ToolsService {
         player.setMoney(player.getMoney() + toolsInBag.getPriceOut());
         notificationManager.notifyPlayer(player, MessageFormat.format("{0}出售成功，获得金{1}币",
                 toolsInBag.getName(), toolsInBag.getPriceOut()), RequestCode.SUCCESS.getCode());
+
+    }
+
+    /**
+     * 使用药品
+     * @param player
+     * @param toolsId
+     */
+    public void useMedicine(PlayerBeCache player, Long toolsId) {
+        Tools tools = bagService.containsTools(player.getBagBeCache(), toolsId);
+        if(Objects.isNull(tools)){
+            notificationManager.notifyPlayer(player,"你的背包中没有这件物品，请检查输入的uuid",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        if(!tools.getType().equals(ToolsType.MEDICINE.getCode())){
+            notificationManager.notifyPlayer(player,"这件物品并非药物！",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        Skill skillById;
+        //红药
+        if(tools.getId().equals(28)){
+            skillById = skillService.getSkillById(33);
+        }else{
+            //蓝药
+            skillById = skillService.getSkillById(34);
+        }
+        Buffer buffer = bufferService.getBuffer(skillById.getBuffer());
+        bufferService.startBuffer(player,buffer);
 
     }
 }
