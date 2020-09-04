@@ -5,6 +5,7 @@ import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.copy.bean.BOSS;
 import com.example.gameservicedemo.game.copy.bean.GameCopyScene;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
+import com.example.gameservicedemo.game.player.service.PlayerDataService;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.scene.bean.Monster;
 import com.example.gameservicedemo.game.scene.bean.Scene;
@@ -50,6 +51,8 @@ public class GameCopyService {
     SceneService sceneService;
     @Autowired
     MonsterAiService monsterAiService;
+    @Autowired
+    PlayerDataService playerDataService;
     @Autowired
     NotificationManager notificationManager;
 
@@ -165,18 +168,16 @@ public class GameCopyService {
             Monster guardBoss = gameCopyScene.getGuardBoss();
             Map<Long, Monster> monsterMap = gameCopyScene.getMonsters();
             if (guardBoss == null && gameCopyScene.getBossList().size() == 0) {
-                // 所有Boss死亡，挑战成功
-                gameCopyScene.getPlayers().values().forEach(
-                        p -> notificationManager.notifyPlayer(p, MessageFormat.format(
-                                "恭喜你挑战副本{0}成功 ", gameCopyScene.getName()), RequestCode.SUCCESS.getCode())
-                );
+                // 所有Boss死亡，通知场景内所有玩家挑战成功
+                notificationManager.notifyScene(gameCopyScene,MessageFormat.format(
+                        "恭喜你挑战副本{0}成功 ", gameCopyScene.getName()),RequestCode.SUCCESS.getCode());
                 // 退出副本
                 gameCopyScene.getPlayers().values().forEach(p -> exitGameCopy(p, gameCopyScene));
             }
             Optional.ofNullable(guardBoss).ifPresent(
                     boss -> {
-                        // 如果守关boss死亡，下一个Boss出场，将守关boos移除怪物列表
                         if (boss.getHp() <= 0) {
+                            // 如果守关boss死亡，下一个Boss出场，将守关boos移除怪物列表
                             gameCopyScene.setGuardBoss(nextBoss(gameCopyScene));
                             monsterMap.remove(guardBoss.getUuid());
                         } else {
@@ -189,7 +190,8 @@ public class GameCopyService {
                                 }
                                 gameCopyScene.getPlayers().values().forEach(
                                         player -> {
-                                            if (player.getHp() < 0) {
+                                            //如果玩家死亡则通知并移除玩家
+                                            if (playerDataService.checkIsDead(player)) {
                                                 notificationManager.notifyPlayer(player, "很遗憾，你挑战副本失败", RequestCode.BAD_REQUEST.getCode());
                                                 exitGameCopy(player, gameCopyScene);
                                             }
@@ -201,27 +203,26 @@ public class GameCopyService {
             );
             gameCopyScene.getMonsters().values().forEach(m -> {
                 if (Objects.nonNull(m.getTarget())) {
+                    //在这里进行了持续循环攻击
                     monsterAiService.startAI(m, gameCopyScene);
                 }
             });
-
         }, 20, 60, TimeUnit.MILLISECONDS);
-
-        // 副本存活时间到期， 销毁副本，传送玩家出副本。 根据副本存在时间销毁副本定时器
-        TimedTaskManager.schedule(gameCopyScene.getCopySceneTime(), () -> {
-            gameCopyScene.getPlayers().values().forEach(p -> exitGameCopy(p, gameCopyScene));
-            attackTask.cancel(false);
-            //destroyInstance(gameInstance);
-        });
-
         // 副本关闭通知,提前10000毫秒（10秒）通知
         TimedTaskManager.schedule(gameCopyScene.getCopySceneTime() - 10000,
                 () -> gameCopyScene.getPlayers().values().forEach(
                         p -> notificationManager.notifyPlayer(p, "副本将于十秒后关闭，请准备好传送。", RequestCode.WARNING.getCode())
                 )
         );
+        // 副本存活时间到期， 销毁副本，传送玩家出副本。 根据副本存在时间销毁副本定时器
+        TimedTaskManager.schedule(gameCopyScene.getCopySceneTime(), () -> {
+            if(gameCopyScene.getBossList().size()!=0){
+                notificationManager.notifyScene(gameCopyScene,"挑战副本失败！",RequestCode.BAD_REQUEST.getCode());
+            }
+            gameCopyScene.getPlayers().values().forEach(p -> exitGameCopy(p, gameCopyScene));
+            attackTask.cancel(false);
+        });
     }
-
     /**
      * 是否在副本中
      *
@@ -249,7 +250,6 @@ public class GameCopyService {
         player.setNowAt(scene.getPlayerFrom().get(Long.valueOf(player.getId())));
         sceneService.initPlayerScene(player);
         log.debug("返回原来的厂场景{}", player.getSceneNowAt().getName());
-        // 设置当前副本实例为空---------------------------------------
         notificationManager.notifyPlayer(player, "你已经退出副本", RequestCode.SUCCESS.getCode());
     }
 

@@ -69,7 +69,9 @@ public class SkillService {
             return;
         }
         skill = player.getSkillHaveMap().get(skill.getId());
+        //开启技能
         castSkill(player, player, scene, skill);
+        //开启冷却
         skill.setActiveTime(System.currentTimeMillis());
         //将全部的装备耐久度减一
         player.getEquipmentBar().values().forEach(tools -> {
@@ -175,7 +177,7 @@ public class SkillService {
                             initiator.getName(), target.getName(), skill.getName()), RequestCode.SUCCESS.getCode());
             skillEffect.castSkill(skill.getSkillInfluenceType(), initiator, target, scene, skill);
             // 开启技能冷却
-            startSkillCd(initiator, skill);
+            //startSkillCd(initiator, skill);
         }
         return true;
     }

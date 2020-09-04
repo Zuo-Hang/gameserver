@@ -102,13 +102,13 @@ public class MonsterAiService {
         }
 
         if (Objects.nonNull(player)) {
-            // 怪物被攻击的事件
-            //EventBus.publish(new AttackMonsterEvent(player,monster,gameScene,damage));
             // 如果怪物死亡
             if (sceneObjectService.sceneObjectAfterDead(monster)) {
+                notificationManager.notifyScene(gameScene,MessageFormat.format("{0}被{1}击败！",
+                        monster.getName(),player.getName()),RequestCode.WARNING.getCode());
                 // 结算掉落，这里暂时直接放到背包里
                 monsterDropsService.dropItem(player,monster);
-                // 怪物死亡的事件
+                // 怪物死亡的处理
                 //EventBus.publish(new MonsterEventDeadEvent(player,monster,gameScene,damage));
             }
         }
@@ -148,10 +148,18 @@ public class MonsterAiService {
             // 更新普通攻击的攻击时间
             monster.setAttackTime(System.currentTimeMillis());
         }
-        // 使用没有冷却的技能
-        if (monster.getHasUseSkillMap().size() < 1) {
-            monsterUseSkill(monster, target,gameScene);
-        }
+        // 技能冷却好了就使用技能
+        monster.getSkillHaveMap().values().forEach(skill -> {
+            if(System.currentTimeMillis()- skill.getActiveTime()>skill.getCd()){
+                if (skillService.castSkill(monster,target,gameScene,skill)) {
+                    if (target instanceof PlayerBeCache) {
+                        playerDataService.isPlayerDead((PlayerBeCache) target,monster);
+                    }  else {
+                        monsterBeAttack(monster,(Monster)target,gameScene,skill.getHurt());
+                    }
+                }
+            }
+        });
     }
     /**
      *     怪物使用技能，从怪物拥有的技能随机触发

@@ -22,7 +22,7 @@ import java.util.Map;
 @ToString(exclude = {"target"})
 public class Monster extends SceneObject implements Creature {
     //攻击速度
-    private Integer attackSpeed = 10000;
+    private Integer attackSpeed = 1000;
     private long attackTime = System.currentTimeMillis();
 
     public String displayData() {
