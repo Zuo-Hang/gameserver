@@ -1,9 +1,12 @@
 package com.example.gameservicedemo.game.tools.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.service.BagService;
 import com.example.gameservicedemo.game.buffer.bean.Buffer;
+import com.example.gameservicedemo.game.hurt.ChangePlayerInformation;
+import com.example.gameservicedemo.game.hurt.ChangePlayerInformationImp;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.buffer.service.BufferService;
 import com.example.gameservicedemo.game.player.service.PlayerDataService;
@@ -46,6 +49,8 @@ public class ToolsService {
     NotificationManager notificationManager;
     @Autowired
     BufferService bufferService;
+    @Autowired
+    ChangePlayerInformation changePlayerInformation;
     @Autowired
     PlayerDataService playerDataService;
     @Autowired
@@ -309,13 +314,12 @@ public class ToolsService {
             notificationManager.notifyPlayer(player, "你暂时还没有拥有这件物品哦", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        //在背包中移除物品
+        //在背包中移除物品-------------------是否有线程安全问题？
         bagService.removeFromBag(player.getBagBeCache(),toolsInBag.getUuid());
         //更新钱数
-        player.setMoney(player.getMoney() + toolsInBag.getPriceOut());
+        changePlayerInformation.changePlayerMoney(player,toolsInBag.getPriceOut());
         notificationManager.notifyPlayer(player, MessageFormat.format("{0}出售成功，获得金{1}币",
                 toolsInBag.getName(), toolsInBag.getPriceOut()), RequestCode.SUCCESS.getCode());
-
     }
 
     /**

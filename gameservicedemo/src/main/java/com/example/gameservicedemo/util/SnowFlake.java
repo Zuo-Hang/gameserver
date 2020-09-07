@@ -1,7 +1,5 @@
 package com.example.gameservicedemo.util;
 
-import org.springframework.stereotype.Component;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -113,16 +111,16 @@ public class SnowFlake {
         return format.format(new Date(id));
     }
 
-    public static void main(String[] args) {
-        SnowFlake snowFlake = new SnowFlake(2, 3);
-
-        long id = snowFlake.nextId();
-        long time = (id >> 22) + START_STMP;
-        System.out.println(id);
-        Date date = new Date(time);
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        System.out.println(format.format(new Date(START_STMP)));
-        System.out.println(format.format(date));
-        ;
-    }
+//    public static void main(String[] args) {
+//        SnowFlake snowFlake = new SnowFlake(2, 3);
+//
+//        long id = snowFlake.nextId();
+//        long time = (id >> 22) + START_STMP;
+//        System.out.println(id);
+//        Date date = new Date(time);
+//        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+//        System.out.println(format.format(new Date(START_STMP)));
+//        System.out.println(format.format(date));
+//        ;
+//    }
 }

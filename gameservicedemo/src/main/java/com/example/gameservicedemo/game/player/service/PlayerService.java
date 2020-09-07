@@ -2,8 +2,10 @@ package com.example.gameservicedemo.game.player.service;
 
 import com.example.commondemo.base.RequestCode;
 import com.example.gamedatademo.bean.Player;
+import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.bag.service.BagService;
+import com.example.gameservicedemo.game.hurt.ChangePlayerInformation;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.scene.bean.Monster;
 import com.example.gameservicedemo.game.scene.bean.Scene;
@@ -40,6 +42,8 @@ public class PlayerService {
     ToolsService toolsService;
     @Autowired
     BagService bagService;
+    @Autowired
+    ChangePlayerInformation changePlayerInformation;
     @Autowired
     PlayerDataService playerDataService;
     @Autowired
@@ -117,7 +121,7 @@ public class PlayerService {
         //放入背包
         if(bagService.putInBag(playerByContext,newTools)){
             //扣除金币
-            playerByContext.setMoney(playerByContext.getMoney()-toolsService.getToolsById(toolsId).getPriceIn());
+            changePlayerInformation.changePlayerMoney(playerByContext,-newTools.getPriceIn());
             msg=MessageFormat.format("你已成功购买了道具{0}，新道具已经放入你的背包了，你可以使用\"see_player_bag\"查看",toolsService.getToolsById(toolsId).getName());
         }
         notificationManager.notifyByCtx(context,msg,RequestCode.SUCCESS.getCode());

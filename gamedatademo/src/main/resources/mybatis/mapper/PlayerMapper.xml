@@ -19,8 +19,20 @@
     select * from player where user_id = #{userId};
     </select>
 
+<!--    <update id="updateByPlayerId" parameterType="com.example.gamedatademo.bean.Player">-->
+<!--        UPDATE player SET player_name = #{playerName}, user_id = #{userId},now_at = #{nowAt},bag_id=#{bagId},money=#{money}-->
+<!--        WHERE player_id = #{playerId};-->
+<!--    </update>-->
+
     <update id="updateByPlayerId" parameterType="com.example.gamedatademo.bean.Player">
-        UPDATE player SET player_name = #{playerName}, user_id = #{userId},now_at = #{nowAt},bag_id=#{bagId},money=#{money}
+        UPDATE player
+        <set>
+            <if test="update.contains(1)">player_name = #{playerName},</if>
+            <if test="update.contains(2)">user_id = #{userId},</if>
+            <if test="update.contains(3)">now_at = #{nowAt},</if>
+            <if test="update.contains(4)">bag_id=#{bagId},</if>
+            <if test="update.contains(5)">money=#{money}</if>
+        </set>
         WHERE player_id = #{playerId};
     </update>
 

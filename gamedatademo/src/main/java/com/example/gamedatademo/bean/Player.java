@@ -2,6 +2,9 @@ package com.example.gamedatademo.bean;
 
 import lombok.Data;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -59,4 +62,6 @@ public class Player {
      * 该角色对应的背包
      */
     private Integer bagId;
+
+    private Set<Integer> update=new ConcurrentSkipListSet<>();
 }
