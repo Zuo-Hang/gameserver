@@ -27,4 +27,30 @@ public class ChangeCreatureInformation implements ChangeInformation{
             }
         }
     }
+
+    /**
+     * 传入的是新的值
+     * @param creature
+     * @param num
+     */
+    @Override
+    public void changeMagicShield(Creature creature, Integer num) {
+        synchronized (creature){
+            creature.setMagicShield(num);
+        }
+    }
+
+    @Override
+    public void changeShield(Creature creature, Integer num) {
+        synchronized (creature){
+            creature.setShield(num);
+        }
+    }
+
+    @Override
+    public void changeTarget(Creature creature, Creature target) {
+        synchronized (creature){
+            creature.setTarget(target);
+        }
+    }
 }

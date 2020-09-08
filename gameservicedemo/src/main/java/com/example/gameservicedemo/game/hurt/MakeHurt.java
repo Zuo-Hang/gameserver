@@ -7,12 +7,16 @@ import com.example.gameservicedemo.game.buffer.bean.Buffer;
 import com.example.gameservicedemo.game.buffer.service.BufferService;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerDataService;
+import com.example.gameservicedemo.game.scene.bean.Monster;
 import com.example.gameservicedemo.game.scene.bean.Scene;
+import com.example.gameservicedemo.game.scene.service.MonsterAiService;
 import com.example.gameservicedemo.game.skill.bean.Skill;
 import com.example.gameservicedemo.game.skill.bean.SkillHurtType;
 import com.example.gameservicedemo.game.skill.service.GetHurtNum;
+import com.example.gameservicedemo.game.skill.service.SkillService;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.manager.NotificationManager;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +41,10 @@ public class MakeHurt  {
     NotificationManager notificationManager;
     @Autowired
     PlayerDataService playerDataService;
+    @Autowired
+    MonsterAiService monsterAiService;
+    @Autowired
+    SkillService skillService;
     @Autowired
     BagService bagService;
     @Autowired
@@ -75,6 +83,9 @@ public class MakeHurt  {
                 }
             }
         }
+        changeInformation.changeMagicShield(target,target.getMagicShield() - hurtNum.hurtToMaShield);
+        changeInformation.changeShield(target,target.getShield() - hurtNum.hurtToShield);
+
     }
     /**
      * 造成单体技能伤害
@@ -85,9 +96,16 @@ public class MakeHurt  {
      * @param skill
      */
     public void skillMakeHurt(Creature murderer, Creature target, Scene scene, Skill skill) {
+        //计算伤害
         GetHurtNum getHurtNum = computeSkillHurtNum(murderer, target, skill);
         //执行伤害
         makeHurt(murderer,target,scene,getHurtNum);
+        notificationManager.notifyScene(scene,
+                MessageFormat.format(" {0} 受到 {1} 技能 {2}攻击， 对魔法护盾造成{3}点伤害，对通用护盾造成{4}点伤害，对血量造成{5}点伤害。{6}现在的血量是{7}\n",
+                        target.getName(), murderer.getName(), skill.getName(),
+                        getHurtNum.hurtToMaShield, getHurtNum.hurtToShield, getHurtNum.hurt,
+                        target.getName(), target.getHp()), RequestCode.SUCCESS.getCode());
+
         // 如果技能触发的buffer不是0，则对敌方单体目标释放buffer
         if (!skill.getBuffer().equals(0)) {
             Buffer buffer = bufferService.getBuffer(skill.getBuffer());
@@ -95,6 +113,35 @@ public class MakeHurt  {
             Optional.ofNullable(buffer).map(
                     (b) -> bufferService.startBuffer(target, b)
             );
+        }
+        if (target.getHp()<=0) {
+            notificationManager.notifyScene(scene,
+                    MessageFormat.format("{0} 击败了 {1}", murderer.getName(), target.getName()), RequestCode.BAD_REQUEST.getCode());
+        }
+        if (target instanceof PlayerBeCache) {
+            PlayerBeCache targetPlayer = (PlayerBeCache) target;
+            //判断是否死亡，死亡则进行死亡处理
+            playerDataService.isPlayerDead(targetPlayer, murderer);
+            if (Objects.nonNull((targetPlayer).getPet())) {
+                (targetPlayer).getPet().setTarget(murderer);
+            }
+            notificationManager.notifyPlayer(targetPlayer, MessageFormat.format("你受到了来自{0}的攻击！", murderer.getName()), RequestCode.WARNING.getCode());
+            playerDataService.showPlayerInfo(targetPlayer);
+            //如果是受到物理伤害进行反伤
+            if (skill.getSkillHurtType().equals(SkillHurtType.PHYSICS.getType()) && target.getSkillHaveMap().containsKey(24)) {
+                Skill skill1 = new Skill();
+                BeanUtils.copyProperties(skillService.getSkillById(24), skill1);
+                skill1.setHurt((getHurtNum.hurt + getHurtNum.hurtToShield) * skill1.getAddHurtPercentage() / 100);
+                skill1.setAddHurtPercentage(0);
+                skillMakeHurt(target, murderer, scene, skill1);
+            }
+        }
+        //如果被攻击者是怪物，开启怪物ai
+        if (target instanceof Monster) {
+            Monster monster = (Monster) target;
+            monsterAiService.notifyMonsterBeAttack(murderer, monster, scene, getHurtNum.hurt);
+            monster.setTarget(murderer);
+            monsterAiService.startAI(monster, scene);
         }
     }
 

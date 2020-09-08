@@ -13,4 +13,10 @@ public interface ChangeInformation {
 
     void changeHp(Creature creature , Integer Hp);
 
+    void changeMagicShield(Creature creature , Integer num);
+
+    void changeShield(Creature creature , Integer num);
+
+    void changeTarget(Creature creature , Creature target);
+
 }
