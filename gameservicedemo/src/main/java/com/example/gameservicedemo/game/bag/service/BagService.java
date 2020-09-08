@@ -1,7 +1,7 @@
 package com.example.gameservicedemo.game.bag.service;
 
 import com.example.commondemo.base.RequestCode;
-import com.example.gamedatademo.bean.Bag;
+import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.bean.Item;
@@ -9,15 +9,11 @@ import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerDataService;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.tools.bean.ToolsRepeatKind;
-import com.example.gameservicedemo.game.tools.bean.ToolsType;
 import com.example.gameservicedemo.manager.NotificationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentSkipListMap;
-
 /**
  * Created with IntelliJ IDEA.
  *
@@ -29,6 +25,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 public class BagService {
     @Autowired
     NotificationManager notificationManager;
+    @Autowired
+    WriteBackDB writeBackDB;
     @Autowired
     PlayerDataService playerDataService;
 
@@ -57,6 +55,7 @@ public class BagService {
                     notificationManager.notifyPlayer(player, "放入成功", RequestCode.SUCCESS.getCode());
                     packBag(bagBeCache);
                     playerDataService.showPlayerBag(player);
+                    writeBackDB.delayWriteBackBag(bagBeCache);
                     return true;
                 }
             }
@@ -70,6 +69,7 @@ public class BagService {
             bagBeCache.getItemMap().put(item.getIndexInBag(),item);
             packBag(bagBeCache);
             playerDataService.showPlayerBag(player);
+            writeBackDB.delayWriteBackBag(bagBeCache);
             return true;
         }else{
             //背包容量不足
@@ -90,6 +90,7 @@ public class BagService {
                 item.getToolsUuidS().remove(toolsUuid);
                 bag.getToolsMap().remove(toolsUuid);
                 packBag(bag);
+                writeBackDB.delayWriteBackBag(bag);
                 return true;
             }
         }

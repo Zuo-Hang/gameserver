@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,4 +26,6 @@ public class GameCopyScene extends Scene {
     private BOSS guardBoss;
     // 是否已经挑战副本失败
     private volatile Boolean fail = false;
+    //用来关闭场景任务
+    private ScheduledFuture<?> attackTask;
 }

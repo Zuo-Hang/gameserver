@@ -1,6 +1,8 @@
 package com.example.gameservicedemo.game.scene.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.game.hurt.ChangePlayerInformationImp;
+import com.example.gameservicedemo.game.hurt.MakeHurt;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerDataService;
 import com.example.gameservicedemo.base.bean.Creature;
@@ -36,20 +38,19 @@ public class MonsterAiService {
     @Autowired
     SceneObjectService sceneObjectService;
     @Autowired
+    MakeHurt makeHurt;
+    @Autowired
     MonsterDropsService monsterDropsService;
     @Autowired
     PlayerDataService playerDataService;
     /**
-     *  怪物进行攻击
+     *  怪物进行普通攻击
      * @param monster 怪物
      * @param target 目标
      */
     private void monsterAttack(Monster monster, Creature target, Scene gameScene) {
-        Integer physicalAttack = monster.getPhysicalAttack();
-        //调用伤害计算系统-------------------------------------------------------------------
-        GetHurtNum getHurtNum = new GetHurtNum();
-        getHurtNum.getHurtNum(monster,target,monster.getPHurt(), SkillHurtType.PHYSICS.getType());
-        target.setHp(target.getHp() - getHurtNum.hurt);
+        //普通攻击并造成伤害
+        makeHurt.ordinaryMakeHurt(monster,target,gameScene);
         notificationManager.notifyScene(gameScene,
                 MessageFormat.format("{0}在攻击{1}，造成了{2}点伤害，{3}当前的hp为 {4} \n",
                         monster.getName(),
@@ -62,7 +63,7 @@ public class MonsterAiService {
             playerDataService.isPlayerDead((PlayerBeCache) target,monster);
             playerDataService.showPlayerInfo((PlayerBeCache) target);
         } else {
-            monsterBeAttack(monster,(Monster)target,gameScene,physicalAttack);
+            monsterBeAttack(monster,(Monster)target,gameScene,monster.getPhysicalAttack());
         }
 
     }
@@ -108,8 +109,6 @@ public class MonsterAiService {
                         monster.getName(),player.getName()),RequestCode.WARNING.getCode());
                 // 结算掉落，这里暂时直接放到背包里
                 monsterDropsService.dropItem(player,monster);
-                // 怪物死亡的处理
-                //EventBus.publish(new MonsterEventDeadEvent(player,monster,gameScene,damage));
             }
         }
     }

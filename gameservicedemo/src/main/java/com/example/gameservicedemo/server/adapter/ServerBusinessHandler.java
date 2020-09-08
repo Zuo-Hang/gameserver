@@ -28,6 +28,8 @@ import org.springframework.stereotype.Component;
 public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
     @Autowired
     private  PlayerLoginService playerLoginService;
+    @Autowired
+    ControllerManager controllerManager;
 
     /**
      * 当客户端连上服务器的时候触发此函数
@@ -53,7 +55,6 @@ public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
 
         Message message = (Message) msg;
         int requestCode = message.getRequestCode();
-        //int serviceCode = baseCommand.getServiceCode();
         // 如果发送的是心跳，直接无视
         if (requestCode == 0) {
             return;
@@ -66,7 +67,7 @@ public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
         if (controller == null) {
             new ErrorController().handle(ctx, message);
         } else {
-            new ControllerManager().execute(controller, ctx, message);
+            controllerManager.execute(controller, ctx, message);
         }
     }
 
@@ -77,13 +78,8 @@ public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("服务器内部发生错误");
-//        NotificationManager.notifyByCtx(ctx,"出现了点小意外"+cause.getMessage());
-//
-//        // 将角色信息保存到数据库
-//        playerQuitService.savePlayer(ctx);
         playerLoginService.logoutScene(ctx);
         log.error("发生错误 {}", cause.getMessage());
-
         // 打印错误
         cause.printStackTrace();
     }
@@ -93,17 +89,9 @@ public class ServerBusinessHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-
         ctx.writeAndFlush("正在断开连接");
-
-//        // 将角色信息保存到数据库
-//        playerQuitService.savePlayer(ctx);
-//
-//        // 清除缓存
-//        playerQuitService.cleanPlayerCache(ctx);
+        // 将角色信息保存到数据库
         playerLoginService.logoutScene(ctx);
         log.info("客户端: " + ctx.channel().id() + " 已经离线");
-
     }
-
 }

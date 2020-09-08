@@ -2,7 +2,7 @@ package com.example.gameservicedemo.game.scene.service;
 
 import com.alibaba.fastjson.JSON;
 import com.example.commondemo.base.RequestCode;
-import com.example.gameservicedemo.game.bag.bean.BagBeCache;
+import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.bag.service.BagService;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.scene.bean.Drop;
@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,6 +46,8 @@ public class MonsterDropsService {
         player.setMoney(player.getMoney() + sceneObject.getDropGoldCoin());
         // 掉落经验
         player.setExp(player.getExp() + sceneObject.getDropExp());
+        notificationManager.notifyPlayer(player,MessageFormat.format("掉落金币{0}，经验{1}已经拾取！",
+                sceneObject.getDropGoldCoin(),sceneObject.getDropExp()),RequestCode.WARNING.getCode());
         //额外掉落道具
         List<Drop> dropList = calculateDrop(sceneObject);
         if (Objects.isNull(dropList)) {
@@ -57,9 +60,11 @@ public class MonsterDropsService {
                 Tools toolsById = toolsService.getToolsById(drop.getToolsId());
                 Tools tools = new Tools();
                 BeanUtils.copyProperties(toolsById, tools);
+                tools.setUuid(IdGenerator.getAnId());
                 //放入背包
                 if (bagService.putInBag(player, tools)) {
-                    notificationManager.notifyPlayer(player, "掉落{}已经放入背包", RequestCode.SUCCESS.getCode());
+                    notificationManager.notifyPlayer(player, MessageFormat.format("掉落装备{0}已经放入背包！！！",
+                            tools.getName()), RequestCode.SUCCESS.getCode());
                 }
             }
         });

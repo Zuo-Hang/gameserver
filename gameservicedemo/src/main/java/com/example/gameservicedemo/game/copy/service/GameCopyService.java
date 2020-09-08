@@ -16,6 +16,8 @@ import com.example.gameservicedemo.game.scene.service.MonsterAiService;
 import com.example.gameservicedemo.game.scene.service.SceneObjectService;
 import com.example.gameservicedemo.game.scene.service.SceneService;
 import com.example.gameservicedemo.game.team.bean.Team;
+import com.example.gameservicedemo.game.team.cache.TeamCache;
+import com.example.gameservicedemo.game.team.service.TeamService;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.example.gameservicedemo.manager.TimedTaskManager;
 import io.netty.channel.ChannelHandlerContext;
@@ -49,6 +51,10 @@ public class GameCopyService {
     SceneObjectService sceneObjectService;
     @Autowired
     SceneService sceneService;
+    @Autowired
+    TeamService teamService;
+    @Autowired
+    TeamCache teamCache;
     @Autowired
     MonsterAiService monsterAiService;
     @Autowired
@@ -89,13 +95,14 @@ public class GameCopyService {
         // 初始化好的副本场景
         GameCopyScene gameCopyScene = initGameCopy(copySceneId);
         if (Objects.isNull(gameCopyScene) || Objects.isNull(gameCopyScene.getCopySceneTime())) {
-            notificationManager.notifyPlayer(playerByContext, " ", RequestCode.BAD_REQUEST.getCode());
+            notificationManager.notifyPlayer(playerByContext, " 副本id错误 ", RequestCode.BAD_REQUEST.getCode());
             return;
         }
         // 记录玩家原先的位置
         gameCopyScene.getPlayerFrom().put(Long.valueOf(playerByContext.getId()), playerByContext.getNowAt());
         // 进入副本
         sceneService.moveToScene(playerByContext, gameCopyScene);
+        return;
     }
 
     /**
@@ -110,7 +117,8 @@ public class GameCopyService {
             return null;
         }
         GameCopyScene gameCopyScene = new GameCopyScene();
-        BeanUtils.copyProperties(scene, gameCopyScene);
+        //这里是浅拷贝，内部所使用的集合为同一个集合,所以要忽略一些属性，不进行拷贝
+        BeanUtils.copyProperties(scene, gameCopyScene, new String[]{ "monsters"});
         // 加载怪物和boss
         String gameObjectIds = gameCopyScene.getGameObjectIds();
         Arrays.stream(gameObjectIds.split(","))
@@ -208,6 +216,7 @@ public class GameCopyService {
                 }
             });
         }, 20, 60, TimeUnit.MILLISECONDS);
+        gameCopyScene.setAttackTask(attackTask);
         // 副本关闭通知,提前10000毫秒（10秒）通知
         TimedTaskManager.schedule(gameCopyScene.getCopySceneTime() - 10000,
                 () -> gameCopyScene.getPlayers().values().forEach(
@@ -246,6 +255,18 @@ public class GameCopyService {
      */
     public void exitGameCopy(PlayerBeCache player, GameCopyScene scene) {
         scene.getPlayers().remove(player.getId());
+        //对队伍的状态处理
+        Long teamId = player.getTeamId();
+        if(Objects.nonNull(teamId)){
+            teamService.leaveTeam(player.getContext());
+        }
+        notificationManager.notifyScene(scene,MessageFormat.format("{0},离开了副本{1}",
+                player.getName(),scene.getName()),RequestCode.WARNING.getCode());
+        //副本的处理
+        //场景内无人时，关闭场景任务
+        if(scene.getPlayers().size()==0){
+            scene.getAttackTask().cancel(false);
+        }
         // 返回原来的场景
         player.setNowAt(scene.getPlayerFrom().get(Long.valueOf(player.getId())));
         sceneService.initPlayerScene(player);

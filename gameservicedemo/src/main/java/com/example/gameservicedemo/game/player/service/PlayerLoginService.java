@@ -7,9 +7,12 @@ import com.example.gamedatademo.mapper.BagMapper;
 import com.example.gamedatademo.mapper.PlayerMapper;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.bean.Item;
+import com.example.gameservicedemo.game.copy.bean.GameCopyScene;
+import com.example.gameservicedemo.game.copy.service.GameCopyService;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.bean.RoleType;
 import com.example.gameservicedemo.game.player.cache.PlayerCache;
+import com.example.gameservicedemo.game.scene.bean.SceneType;
 import com.example.gameservicedemo.game.scene.service.SceneService;
 import com.example.gameservicedemo.game.skill.bean.Skill;
 import com.example.gameservicedemo.game.tools.bean.Tools;
@@ -53,6 +56,8 @@ public class PlayerLoginService {
     BagMapper bagMapper;
     @Autowired
     RoleTypeService roleTypeService;
+    @Autowired
+    GameCopyService gameCopyService;
     @Autowired
     ToolsService toolsService;
     @Autowired
@@ -223,6 +228,10 @@ public class PlayerLoginService {
     public void logoutScene(ChannelHandlerContext context) {
         //获取到当前化身
         PlayerBeCache playerByCtx = playerCache.getPlayerByChannel(context.channel());
+        //如果当前处于副本先退出副本
+        if(playerByCtx.getSceneNowAt().getType().equals(SceneType.INSTANCE_SCENE.getCode())){
+            gameCopyService.exitGameCopy(playerByCtx,(GameCopyScene) playerByCtx.getSceneNowAt());
+        }
         //卸载装备
         playerByCtx.getEquipmentBar().values().forEach(v -> {
             toolsService.takeOffTools(playerByCtx, v);

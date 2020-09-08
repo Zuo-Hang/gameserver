@@ -1,13 +1,17 @@
 package com.example.gameservicedemo.background;
 
+import com.example.gamedatademo.bean.Bag;
 import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.mapper.BagMapper;
 import com.example.gamedatademo.mapper.PlayerMapper;
 import com.example.gameservicedemo.event.Event;
+import com.example.gameservicedemo.game.bag.bean.BagBeCache;
+import com.example.gameservicedemo.game.hurt.ChangePlayerInformationImp;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.cache.PlayerCache;
 import com.example.gameservicedemo.manager.TimedTaskManager;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.gson.Gson;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +38,14 @@ public class WriteBackDB{
     @Autowired
     PlayerCache playerCache;
     @Autowired
+    ChangePlayerInformationImp changePlayerInformationImp;
+    @Autowired
     BagMapper bagMapper;
 
     /**
      * 以一个set标记，避免在待回写数据库的等待期间，同一个对象提交多次回写任务
      */
-    private Set<Player> shouldWrite= new ConcurrentSkipListSet();
+    private Set<Integer> shouldWrite= new ConcurrentSkipListSet();
 
     private  ThreadFactory WriteBackDBThreadPoolFactory = new ThreadFactoryBuilder()
             .setNameFormat("WriteBackDBThreadPool-%d").setUncaughtExceptionHandler((t,e) -> e.printStackTrace()).build();
@@ -52,16 +58,28 @@ public class WriteBackDB{
      * @return
      */
     public  Future<Event> delayWriteBackPlayer(Player player){
-        if(!shouldWrite.contains(player)){
-            shouldWrite.add(player);
+        if(!shouldWrite.contains(player.getPlayerId())){
+            shouldWrite.add(player.getPlayerId());
             ScheduledThreadPool.schedule(()->{
                 //写回
                 playerMapper.updateByPlayerId(player);
                 player.getUpdate().clear();
-                shouldWrite.remove(player);
+                shouldWrite.remove(player.getPlayerId());
                 return null;
             },1000*2, TimeUnit.MILLISECONDS);
         }
+        return null;
+    }
+
+    public  Future<Event> delayWriteBackBag(BagBeCache bag){
+            ScheduledThreadPool.schedule(()->{
+                //写回
+                Gson gson = new Gson();
+                bag.setTools(gson.toJson(bag.getToolsMap().values()));
+                bag.setItems(gson.toJson(bag.getItemMap().values()));
+                bagMapper.updateByBagId(bag);
+                return null;
+            },0, TimeUnit.MILLISECONDS);
         return null;
     }
 
@@ -74,28 +92,9 @@ public class WriteBackDB{
             Map<Channel, PlayerBeCache> allPlayerCache = playerCache.getAllPlayerCache();
             allPlayerCache.values().forEach(v->{
                 //防止线程安全问题---------------------------------------在这里应该调用专门更改的方法
-                synchronized (v){
-                    //自动金币增长
-                    v.setMoney(v.getMoney()+10);
-                    //如果残血，自动回血
-                    if(v.getHp()<v.getMaxHp()){
-                        //按自身的每五秒回血值回血
-                        Integer shouldAdd=v.getHp()+v.getToolsInfluence().get(14).getValue();
-                        if(shouldAdd>v.getMaxHp()){//不能超过自身最大血量
-                            shouldAdd=v.getMaxHp();
-                        }
-                        v.setHp(shouldAdd);
-                    }
-                    //如果残蓝，回蓝
-                    if(v.getMp()<v.getMaxMp()){
-                        //按自身的每五秒回血值回血
-                        Integer shouldAdd=v.getMp()+v.getToolsInfluence().get(15).getValue();
-                        if(shouldAdd>v.getMaxMp()){//不能超过自身最大魔法值
-                            shouldAdd=v.getMaxMp();
-                        }
-                        v.setMp(shouldAdd);
-                    }
-                }
+                changePlayerInformationImp.changeHp(v,v.getToolsInfluence().get(14).getValue());
+                changePlayerInformationImp.changePlayerMagic(v,v.getToolsInfluence().get(15).getValue());
+                changePlayerInformationImp.changePlayerMoney(v,10);
             });
             log.info("-------每五秒自动恢复机制执行完毕----------");
         });

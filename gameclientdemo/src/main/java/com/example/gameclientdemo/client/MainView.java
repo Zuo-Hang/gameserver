@@ -168,10 +168,6 @@ public class MainView extends JFrame {
         JScrollPane mapBar = new JScrollPane(MAP);
         mapBar.setBounds(1024,380,380,50);
 
-//        // 装备栏
-//        JScrollPane equipmentBar = new JScrollPane(EQUIPMENT);
-//        equipmentBar.setBounds(1024, 435, 380, 170);
-
         // 背包物品栏
         JScrollPane bagsBar = new JScrollPane(BAG);
         bagsBar.setBounds(1024, 435, 380, 370);

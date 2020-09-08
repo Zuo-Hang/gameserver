@@ -170,7 +170,6 @@ public class MakeHurt  {
         //获取影响值
         GetHurtNum getHurtNum = computeOrdinaryHurtNum(murderer, target,
                 murderer.getPHurt(),SkillHurtType.PHYSICS.getType());
-        //------------------------------------------------------转换线程
         //执行伤害
         makeHurt(murderer,target,scene,getHurtNum);
     }

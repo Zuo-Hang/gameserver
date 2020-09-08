@@ -1,11 +1,9 @@
 package com.example.gameservicedemo.game.player.service;
 
 import com.example.commondemo.base.RequestCode;
-import com.example.gamedatademo.bean.Player;
-import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.bag.service.BagService;
-import com.example.gameservicedemo.game.hurt.ChangePlayerInformation;
+import com.example.gameservicedemo.game.hurt.ChangePlayerInformationImp;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.scene.bean.Monster;
 import com.example.gameservicedemo.game.scene.bean.Scene;
@@ -43,7 +41,7 @@ public class PlayerService {
     @Autowired
     BagService bagService;
     @Autowired
-    ChangePlayerInformation changePlayerInformation;
+    ChangePlayerInformationImp changePlayerInformationImp;
     @Autowired
     PlayerDataService playerDataService;
     @Autowired
@@ -59,7 +57,8 @@ public class PlayerService {
     public void aoi(ChannelHandlerContext context) {
         //获取当前场景的所有实体信息
         PlayerBeCache playerByCtx = playerCache.getPlayerByChannel(context.channel());
-        Scene sceneNowAt = sceneService.getScene(playerByCtx.getNowAt());
+        //Scene sceneNowAt = sceneService.getScene(playerByCtx.getNowAt());
+        Scene sceneNowAt = playerByCtx.getSceneNowAt();
         Map<Long, NPC> npcs = sceneNowAt.getNpcs();
         Map<Integer, PlayerBeCache> players = sceneNowAt.getPlayers();
         Map<Long, Monster> monsters = sceneNowAt.getMonsters();
@@ -121,7 +120,7 @@ public class PlayerService {
         //放入背包
         if(bagService.putInBag(playerByContext,newTools)){
             //扣除金币
-            changePlayerInformation.changePlayerMoney(playerByContext,-newTools.getPriceIn());
+            changePlayerInformationImp.changePlayerMoney(playerByContext,-newTools.getPriceIn());
             msg=MessageFormat.format("你已成功购买了道具{0}，新道具已经放入你的背包了，你可以使用\"see_player_bag\"查看",toolsService.getToolsById(toolsId).getName());
         }
         notificationManager.notifyByCtx(context,msg,RequestCode.SUCCESS.getCode());

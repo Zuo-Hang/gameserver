@@ -9,6 +9,7 @@ import com.example.gameservicedemo.manager.NotificationManager;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Objects;
@@ -23,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Description:处理、执行所有命令类和控制类的对应关系
  */
 @Slf4j
+@Component
 public class ControllerManager {
     @Autowired
     PlayerLoginService playerLoginService;
