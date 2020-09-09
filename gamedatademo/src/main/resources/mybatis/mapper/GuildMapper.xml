@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.gamedatademo.mapper.GuildMapper">
+
+    <select id="selectByGuildId" resultType="com.example.gamedatademo.bean.Guild">
+    select * from guild where id = #{id};
+    </select>
+
+    <insert id="insert" parameterType="com.example.gamedatademo.bean.Guild" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO guild
+    (name, level,member,warehouse,warehouse_Size,join_Request)
+    VALUES
+    (#{name},#{level}, #{member},#{warehouse},#{warehouseSize},#{joinRequest});
+    </insert>
+
+    <update id="updateByGuildId" parameterType="com.example.gamedatademo.bean.Guild">
+        UPDATE guild SET name = #{name}, level = #{level},member = #{member},warehouse=#{warehouse},warehouse_Size=#{warehouseSize},join_Request=#{joinRequest}
+        WHERE id = #{id};
+    </update>
+
+</mapper>

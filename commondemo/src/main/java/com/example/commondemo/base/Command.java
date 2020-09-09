@@ -16,8 +16,9 @@ import java.util.Map;
  * 4. 4000 - 4999 之间为技能相关
  * 5. 5000 - 5999 之间为和装备有关
  * 6. 6000 - 6999 之间为和组队有关
- * 7. 7000 - 7500 之间为和副本有关
- * 8. 7600 - 7999 之间为和游戏中的通讯有关
+ * 7. 7000 - 7499 之间为和副本有关
+ * 8. 7500 - 7999 之间为和游戏中的通讯有关
+ * 9. 8000 - 8499 之间为和公会有关
  */
 public enum Command {
     /**
@@ -234,7 +235,45 @@ public enum Command {
     /**
      * 删除邮件
      */
-    DELETE_MAIL("delete_mail", 7740, "删除邮件");
+    DELETE_MAIL("delete_mail", 7740, "删除邮件"),
+
+    /** 创建公会
+     *
+     */
+    GUILD_CREATE("guild_create",8000,"创建公会 guild_create 返回guildId  "),
+
+    /** 查看公会
+     *
+     */
+    GUILD_SHOW("guild_show",8010,"查看公会 guild_show"),
+
+    // 公会捐献
+    GUILD_DONATE("guild_donate",8020,"公会捐献 guild_donate 背包的index（格）"),
+
+    // 加入公会
+    GUILD_JOIN("guild_join",8030,"加入公会 guild_join 返回guildId"),
+
+    // 授权公会成员
+    GUILD_GRANT("guild_grant",8040,"授权公会成员 guild_grant playerId 等级id"),
+
+    // 获取公会物品
+    GUILD_TAKE("guild_take",8050,"获取公会物品  guild_take wareHouseIndex"),
+
+    // 允许入会
+    GUILD_PERMIT("guild_permit", 8060,"允许入会 guild_permit playerId"),
+
+    // 退出公会
+    GUILD_QUIT("guild_quit", 8070,"退出公会"),
+    /**
+     * 从公会踢出会员
+     */
+    GUILD_KICK("guild_kick",8080,"从公会踢出会员"),
+    /**
+     * 解散公会
+     */
+    GUILD_DISMISS("guild_dismiss",8090,"解散公会"),
+    ;
+
 
 
     private String command;

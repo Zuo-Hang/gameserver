@@ -5,7 +5,7 @@
 <mapper namespace="com.example.gamedatademo.mapper.BagMapper">
 
     <select id="selectByBagId" resultType="com.example.gamedatademo.bean.Bag">
-    select * from bag where id = #{bagId};
+    select * from bag where id = #{id};
     </select>
 
     <insert id="insert" parameterType="com.example.gamedatademo.bean.Bag" useGeneratedKeys="true" keyProperty="id">
