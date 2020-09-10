@@ -11,6 +11,6 @@ import com.example.gamedatademo.bean.Guild;
  */
 public interface GuildMapper {
     Integer insert(Guild guild);
-    Guild selectByGuildId(Integer GuildId);
+    Guild selectByGuildId(Long GuildId);
     Integer updateByGuildId(Guild guild);
 }

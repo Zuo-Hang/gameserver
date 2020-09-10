@@ -190,6 +190,7 @@ public enum Command {
      * 创建队伍，开房间。默认自己是房主
      */
     CREAT_TEAM("creat_team", 6040, "创建队伍，开房间。默认自己是房主"),
+
     KICK_FROM_TEAM("kick", 6050, "将某一成员踢出自己的队伍  tick playerId"),
     /**
      * 队长令队伍进入副本
@@ -237,18 +238,22 @@ public enum Command {
      */
     DELETE_MAIL("delete_mail", 7740, "删除邮件"),
 
-    /** 创建公会
-     *
+    /**
+     *创建公会
      */
     GUILD_CREATE("guild_create",8000,"创建公会 guild_create 返回guildId  "),
 
-    /** 查看公会
-     *
+    /**
+     *查看公会
      */
     GUILD_SHOW("guild_show",8010,"查看公会 guild_show"),
 
     // 公会捐献
     GUILD_DONATE("guild_donate",8020,"公会捐献 guild_donate 背包的index（格）"),
+    /**
+     * 公会捐献金币
+     */
+    GUILD_DONATE_COLD("guild_donate_cold",8110,"公会捐献金币 guild_donate_cold 金币数量"),
 
     // 加入公会
     GUILD_JOIN("guild_join",8030,"加入公会 guild_join 返回guildId"),
@@ -258,6 +263,10 @@ public enum Command {
 
     // 获取公会物品
     GUILD_TAKE("guild_take",8050,"获取公会物品  guild_take wareHouseIndex"),
+    /**
+     * 公会获取金币
+     */
+    GUILD_TAKE_COLD("GUILD_TAKE_COLD",8120,"从公会取出金币,但是每次只能获取100金币"),
 
     // 允许入会
     GUILD_PERMIT("guild_permit", 8060,"允许入会 guild_permit playerId"),
@@ -272,9 +281,11 @@ public enum Command {
      * 解散公会
      */
     GUILD_DISMISS("guild_dismiss",8090,"解散公会"),
+    /**
+     * 查看加入请求
+     */
+    GUILD_SHOW_REQ("guild_show_req",8100,"查看加入请求"),
     ;
-
-
 
     private String command;
 
@@ -335,5 +346,9 @@ public enum Command {
 
     public Integer getRequestCode() {
         return requestCode;
+    }
+
+    public String getExplain() {
+        return explain;
     }
 }

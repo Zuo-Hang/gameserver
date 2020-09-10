@@ -3,6 +3,7 @@ package com.example.gameservicedemo.game.guild.bean;
 import com.example.gamedatademo.bean.Guild;
 import com.example.gameservicedemo.game.bag.bean.Item;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
+import com.example.gameservicedemo.game.tools.bean.Tools;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -28,7 +29,7 @@ public class GuildBeCache extends Guild {
     /** 公会仓库
      *
      */
-    private Map<Integer, Item> warehouseMap =  new ConcurrentSkipListMap<>();
+    private Map<Long, Tools> warehouseMap =  new ConcurrentSkipListMap<>();
 
 
     /** 请求加入公会的列表
@@ -36,14 +37,17 @@ public class GuildBeCache extends Guild {
      */
     private Map<Integer,PlayerJoinRequest> playerJoinRequestMap =  new ConcurrentSkipListMap<>();
 
-    public GuildBeCache(Integer id,String guildName, Integer level, Integer wareHouseSize) {
-        this.setId(id);
+    public GuildBeCache(Long guildId,String guildName, Integer level, Integer wareHouseSize) {
+        this.setId(guildId);
         this.setName(guildName);
         this.setLevel(level);
         this.setWarehouseSize(wareHouseSize);
+        this.setColdNum(0);
     }
 
-    /**
+    public GuildBeCache() {
+    }
+/**
      * 向仓库中获取物品/添加物品（安全的）
      */
 }

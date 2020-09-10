@@ -14,13 +14,12 @@ public class Guild {
     /**
      * id
      */
-    private Integer id;
+    private Long id;
     /**
      * 名称
      */
     private String name;
-    /**
-     * 等级
+    /**     * 等级
      */
     private Integer level;
     /**
@@ -35,6 +34,8 @@ public class Guild {
      * 仓库大小
      */
     private Integer warehouseSize;
+
+    private Integer coldNum;
     /**
      * 加入请求
      */

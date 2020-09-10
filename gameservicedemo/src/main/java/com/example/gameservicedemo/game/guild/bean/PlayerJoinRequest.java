@@ -23,8 +23,8 @@ public class PlayerJoinRequest {
     public PlayerJoinRequest() {
     }
 
-    public PlayerJoinRequest(boolean isAgree, Date date, PlayerBeCache player) {
-        this.isAgree = isAgree;
+    public PlayerJoinRequest(Date date, PlayerBeCache player) {
+        this.isAgree = false;
         this.date = date;
         this.player = player;
     }

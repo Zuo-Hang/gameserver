@@ -10,13 +10,13 @@
 
     <insert id="insert" parameterType="com.example.gamedatademo.bean.Guild" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO guild
-    (name, level,member,warehouse,warehouse_Size,join_Request)
+    (name, level,member,warehouse,warehouse_Size,join_Request,gold_num)
     VALUES
-    (#{name},#{level}, #{member},#{warehouse},#{warehouseSize},#{joinRequest});
+    (#{name},#{level}, #{member},#{warehouse},#{warehouseSize},#{joinRequest},#{goldNum});
     </insert>
 
     <update id="updateByGuildId" parameterType="com.example.gamedatademo.bean.Guild">
-        UPDATE guild SET name = #{name}, level = #{level},member = #{member},warehouse=#{warehouse},warehouse_Size=#{warehouseSize},join_Request=#{joinRequest}
+        UPDATE guild SET name = #{name}, level = #{level},member = #{member},cold_num=#{coldNum},warehouse=#{warehouse},warehouse_Size=#{warehouseSize},join_Request=#{joinRequest}
         WHERE id = #{id};
     </update>
 

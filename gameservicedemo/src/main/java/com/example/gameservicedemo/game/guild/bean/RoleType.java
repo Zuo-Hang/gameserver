@@ -45,4 +45,14 @@ public enum RoleType {
     public Set<Integer> getPowerSet() {
         return powerSet;
     }
+
+    public static RoleType getEnumByCode(Integer code){
+        RoleType[] values = RoleType.values();
+        for (RoleType type:values) {
+            if(type.getCode().equals(code)){
+                return type;
+            }
+        }
+        return null;
+    }
 }

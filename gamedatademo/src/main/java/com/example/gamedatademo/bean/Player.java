@@ -45,7 +45,7 @@ public class Player {
     /**
      * 参加的公会
      */
-    private Integer guildId;
+    private Long guildId;
     /**
      * 角色的类型
      */
@@ -53,7 +53,7 @@ public class Player {
     /**
      * 公会类型
      */
-    private Integer guildClass;
+    private Integer guildRoleType;
     /**
      * 好友
      */
@@ -64,4 +64,5 @@ public class Player {
     private Integer bagId;
 
     private Set<Integer> update=new ConcurrentSkipListSet<>();
+
 }

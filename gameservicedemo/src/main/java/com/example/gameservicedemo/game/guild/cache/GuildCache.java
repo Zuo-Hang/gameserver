@@ -8,6 +8,7 @@ import com.example.gameservicedemo.game.bag.bean.Item;
 import com.example.gameservicedemo.game.guild.bean.GuildBeCache;
 import com.example.gameservicedemo.game.guild.bean.PlayerJoinRequest;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
+import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -34,7 +35,7 @@ import java.util.concurrent.*;
 public class GuildCache {
     @Autowired
     GuildMapper guildMapper;
-    private static Cache<Integer, GuildBeCache> guildCache = CacheBuilder.newBuilder()
+    private static Cache<Long, GuildBeCache> guildCache = CacheBuilder.newBuilder()
             .removalListener(
                     notification -> log.info(notification.getKey() + "公会被移除，原因是" + notification.getCause())
             ).build();
@@ -49,7 +50,7 @@ public class GuildCache {
      * @param guildId
      * @return
      */
-    public GuildBeCache getGuildByGuildId(Integer guildId) {
+    public GuildBeCache getGuildByGuildId(Long guildId) {
         GuildBeCache cache = guildCache.getIfPresent(guildId);
         if (Objects.nonNull(cache)) {
             return cache;
@@ -62,7 +63,7 @@ public class GuildCache {
         return null;
     }
 
-    public GuildBeCache loadFromDB(Integer guildId) {
+    public GuildBeCache loadFromDB(Long guildId) {
         Guild guild = guildMapper.selectByGuildId(guildId);
         if (Objects.isNull(guild)) {
             return null;
@@ -96,8 +97,8 @@ public class GuildCache {
      */
     private static void loadWarehouse(GuildBeCache guild) {
         if (Strings.isNullOrEmpty(guild.getWarehouse())) {
-            Map<Integer, Item> wareHouseMap = JSON.parseObject(guild.getWarehouse(),
-                    new TypeReference<Map<Integer, Item>>() {
+            Map<Long, Tools> wareHouseMap = JSON.parseObject(guild.getWarehouse(),
+                    new TypeReference<Map<Long, Tools>>() {
                     });
             guild.setWarehouseMap(wareHouseMap);
         }
