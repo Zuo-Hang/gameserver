@@ -19,6 +19,7 @@ import java.util.Map;
  * 7. 7000 - 7499 之间为和副本有关
  * 8. 7500 - 7999 之间为和游戏中的通讯有关
  * 9. 8000 - 8499 之间为和公会有关
+ * 10.8500 - 9000 之间为和交易有关
  */
 public enum Command {
     /**
@@ -285,6 +286,24 @@ public enum Command {
      * 查看加入请求
      */
     GUILD_SHOW_REQ("guild_show_req",8100,"查看加入请求"),
+
+    /** 交易的流程为：卖家发起交易，买家开始交易（同意交易）、卖家放入货物、卖家放入金币、卖家确认交易 */
+    /** 发起交易 **/
+    TRADE_INITIATE("trade",8500,"发起交易"),
+
+    /** 开始交易 **/
+    TRADE_BEGIN("trade_begin",8510,"开始交易"),
+
+    /** 交易货物 **/
+    TRADE_TOOLS("trade_tools",8520,"交易货物"),
+
+    /** 交易金币 **/
+    TRADE_MONEY("trade_money",8530,"交易金币"),
+
+    /** 确定交易 **/
+    TRADE_CONFIRM("trade_confirm",8540,"确定交易"),
+
+
     ;
 
     private String command;

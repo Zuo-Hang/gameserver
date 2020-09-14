@@ -8,7 +8,6 @@ import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.scene.bean.Monster;
 import com.example.gameservicedemo.game.scene.bean.Scene;
 import com.example.gameservicedemo.game.tools.bean.Tools;
-import com.example.gameservicedemo.game.player.cache.PlayerCache;
 import com.example.gameservicedemo.game.scene.bean.NPC;
 import com.example.gameservicedemo.manager.NotificationManager;
 import com.example.gameservicedemo.game.scene.service.SceneService;
@@ -33,8 +32,6 @@ import java.util.*;
 @Service
 public class PlayerService {
     @Autowired
-    PlayerCache playerCache;
-    @Autowired
     SceneService sceneService;
     @Autowired
     ToolsService toolsService;
@@ -56,8 +53,8 @@ public class PlayerService {
      */
     public void aoi(ChannelHandlerContext context) {
         //获取当前场景的所有实体信息
-        PlayerBeCache playerByCtx = playerCache.getPlayerByChannel(context.channel());
-        //Scene sceneNowAt = sceneService.getScene(playerByCtx.getNowAt());
+        //PlayerBeCache playerByCtx = playerCache.getPlayerByChannel(context.channel());
+        PlayerBeCache playerByCtx = playerLoginService.getPlayerByContext(context);
         Scene sceneNowAt = playerByCtx.getSceneNowAt();
         Map<Long, NPC> npcs = sceneNowAt.getNpcs();
         Map<Integer, PlayerBeCache> players = sceneNowAt.getPlayers();

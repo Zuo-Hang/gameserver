@@ -1,12 +1,10 @@
 package com.example.gameservicedemo.game.player.service;
 
 import com.example.commondemo.base.RequestCode;
-import com.example.commondemo.message.Message;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.bean.Item;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.base.bean.Creature;
-import com.example.gameservicedemo.game.player.cache.PlayerCache;
 import com.example.gameservicedemo.game.scene.service.SceneService;
 import com.example.gameservicedemo.game.skill.bean.Skill;
 import com.example.gameservicedemo.game.skill.bean.SkillActiveAndPassiveType;
@@ -37,8 +35,6 @@ public class PlayerDataService {
     RoleTypeService roleTypeService;
     @Autowired
     SceneService sceneService;
-    @Autowired
-    PlayerCache playerCache;
     @Autowired
     NotificationManager notificationManager;
 

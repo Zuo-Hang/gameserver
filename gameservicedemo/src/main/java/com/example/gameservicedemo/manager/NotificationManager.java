@@ -7,17 +7,17 @@ import com.example.commondemo.message.Message;
 import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
-import com.example.gameservicedemo.game.player.cache.PlayerCache;
+import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.scene.bean.Scene;
 import com.example.gameservicedemo.game.scene.service.SceneService;
 import com.example.gameservicedemo.game.team.bean.Team;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,8 +35,7 @@ public class NotificationManager {
     @Autowired
     SceneService sceneService;
     @Autowired
-    PlayerCache playerCache;
-
+    PlayerLoginService playerLoginService;
 
     /**
      * 通过通道上下文来通知单个玩家
@@ -46,6 +45,10 @@ public class NotificationManager {
      * @param <E> 信息的类型
      */
     public <E> void notifyByCtx(ChannelHandlerContext ctx, E e, Integer code) {
+        notifyByChannel(ctx.channel(),e,code);
+    }
+
+    public <E> void notifyByChannel(Channel channel, E e, Integer code) {
         Message message = new Message();
         message.setMessage(e.toString() + "\n");
         message.setRequestCode(code);
@@ -58,8 +61,9 @@ public class NotificationManager {
         TcpProtocol protocol = new TcpProtocol();
         protocol.setData(encode);
         protocol.setLen(encode.length);
-        ctx.writeAndFlush(protocol);
+        channel.writeAndFlush(protocol);
     }
+
 
     /**
      * 通知场景内的所有玩家
@@ -71,7 +75,7 @@ public class NotificationManager {
     public <E> void notifyScene(Scene scene, E e, Integer code) {
         List<Player> allPlayer = sceneService.getAllPlayer(scene.getId());
         for (Player player : allPlayer) {
-            notifyByCtx(playerCache.getCxtByPlayerId(player.getPlayerId()), e, code);
+            notifyByChannel(playerLoginService.getChannelByPlayer(player),e,code);
         }
     }
 
@@ -83,8 +87,8 @@ public class NotificationManager {
      * @param <E>
      */
     public <E> void notifyPlayer(PlayerBeCache playerBeCache, E e, Integer code) {
-        ChannelHandlerContext cxtByPlayerId = playerCache.getCxtByPlayerId(playerBeCache.getPlayerId());
-        Optional.ofNullable(cxtByPlayerId).ifPresent(c -> notifyByCtx(c, e, code));
+        Optional.ofNullable(playerLoginService.getChannelByPlayer(playerBeCache))
+                .ifPresent(c -> notifyByChannel(c,e,code));
     }
 
     /**

@@ -87,8 +87,8 @@ public class PlayerController {
         int id = Integer.valueOf(array[1]);
         //判断当前用户是否在线、当前用户是否拥有待登录角色、登录成功后应当返回当前角色的状态（位置）
         if (userService.isUserOnline(ctx) && playerLoginService.hasPlayer(ctx, id)) {
-            log.info("playerLogin over");
             playerLoginService.playerLogin(ctx, id);
+            log.info("playerLogin over");
         } else {
             notificationManager.notifyByCtx(ctx, "输入的id错误",RequestCode.BAD_REQUEST.getCode());
         }
@@ -180,8 +180,5 @@ public class PlayerController {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 1);
         if(Objects.isNull(strings)){return;}
         playerDataService.showPlayerInfo(playerLoginService.isLoad(context));
-
-
-
     }
 }

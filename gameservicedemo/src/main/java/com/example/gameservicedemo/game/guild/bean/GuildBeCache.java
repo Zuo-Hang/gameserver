@@ -1,7 +1,6 @@
 package com.example.gameservicedemo.game.guild.bean;
 
 import com.example.gamedatademo.bean.Guild;
-import com.example.gameservicedemo.game.bag.bean.Item;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import lombok.Data;

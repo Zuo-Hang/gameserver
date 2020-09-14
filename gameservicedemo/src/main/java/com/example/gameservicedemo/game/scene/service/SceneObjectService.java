@@ -3,22 +3,15 @@ package com.example.gameservicedemo.game.scene.service;
 import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
-import com.example.gameservicedemo.game.player.cache.PlayerCache;
 import com.example.gameservicedemo.game.scene.bean.*;
 import com.example.gameservicedemo.game.scene.cache.SceneObjectCache;
 import com.example.gameservicedemo.manager.NotificationManager;
-import com.example.gameservicedemo.util.SnowFlake;
-import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,8 +25,6 @@ import java.util.stream.Collectors;
 public class SceneObjectService {
     @Autowired
     SceneObjectCache sceneObjectCache;
-    @Autowired
-    PlayerCache playerCache;
     @Autowired
     NotificationManager notificationManager;
 

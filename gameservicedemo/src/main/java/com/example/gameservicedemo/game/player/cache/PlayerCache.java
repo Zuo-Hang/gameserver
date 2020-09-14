@@ -26,7 +26,6 @@ import java.util.Optional;
 public class  PlayerCache {
     @Autowired
     NotificationManager notificationManager;
-    Channel channel;
     /**
      * 以上下文为键，玩家信息为值的缓存
      */

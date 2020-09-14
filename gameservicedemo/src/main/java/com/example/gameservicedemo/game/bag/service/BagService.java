@@ -1,6 +1,8 @@
 package com.example.gameservicedemo.game.bag.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gamedatademo.bean.Bag;
+import com.example.gamedatademo.mapper.BagMapper;
 import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
@@ -10,10 +12,17 @@ import com.example.gameservicedemo.game.player.service.PlayerDataService;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.tools.bean.ToolsRepeatKind;
 import com.example.gameservicedemo.manager.NotificationManager;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -22,9 +31,12 @@ import java.util.Map;
  * @Description:
  */
 @Component
+@Slf4j
 public class BagService {
     @Autowired
     NotificationManager notificationManager;
+    @Autowired
+    BagMapper bagMapper;
     @Autowired
     WriteBackDB writeBackDB;
     @Autowired
@@ -131,5 +143,34 @@ public class BagService {
                 itemMap.put(item.getIndexInBag(),item);
             }
         }
+    }
+
+    public void initSomeOneBag(PlayerBeCache playerBeCache){
+        Bag bag = bagMapper.selectByBagId(playerBeCache.getBagId());
+        BagBeCache bagBeCache = new BagBeCache();
+        bagBeCache.setPlayerId(playerBeCache.getPlayerId());
+        BeanUtils.copyProperties(bag, bagBeCache);
+        //获取背包中的物品信息并转化为对象
+        String toolsJson = bagBeCache.getTools();
+        String itemsJson = bagBeCache.getItems();
+        Gson gson = new Gson();
+        ArrayList<Tools> toolslist = gson.fromJson(toolsJson, new TypeToken<ArrayList<Tools>>() {
+        }.getType());
+        ArrayList<Item> itemslist = gson.fromJson(itemsJson, new TypeToken<ArrayList<Item>>() {
+        }.getType());
+        if (!Objects.isNull(toolslist)) {
+            toolslist.forEach(v -> {
+                //放入被缓存的背包中
+                bagBeCache.getToolsMap().put(v.getUuid(), v);
+            });
+        }
+        if (!Objects.isNull(itemslist)) {
+            itemslist.forEach(v -> {
+                //放入被缓存的背包中
+                bagBeCache.getItemMap().put(v.getIndexInBag(), v);
+            });
+        }
+        playerBeCache.setBagBeCache(bagBeCache);
+        log.info("角色：{} 的背包初始化完毕！", playerBeCache.getName());
     }
 }

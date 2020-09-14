@@ -161,6 +161,7 @@ public class UserService {
      * 通过连接上下文找到用户
      */
     public UserBeCache getUserByCxt(ChannelHandlerContext ctx) {
+
         return userCache.getUserByCtx(ctx);
     }
 
@@ -213,10 +214,13 @@ public class UserService {
             userCache.putCtxUser(context,userByCtx);
             userCache.putUserIdCtx(userId,context);
             log.info("用户缓存更新完毕");
+            PlayerBeCache player = playerLoginService.getPlayerByContext(context);
+
             PlayerBeCache playerByCtx = playerCache.getPlayerByChannel(ctxByUserId.channel());
-            if(Objects.isNull(playerByCtx)){
+            if(Objects.isNull(player)){
                 log.info("此用户断线前并未加载角色");
             }else{
+
                 playerCache.removePlayerByChannelId(playerCache.getCxtByPlayerId(playerByCtx.getId()).channel());
                 playerCache.putCtxPlayer(context.channel(),playerByCtx);
                 playerCache.savePlayerCtx(playerByCtx.getPlayerId(),context);

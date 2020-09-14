@@ -1,6 +1,5 @@
 package com.example.gameservicedemo.background;
 
-import com.example.gamedatademo.bean.Bag;
 import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.mapper.BagMapper;
 import com.example.gamedatademo.mapper.PlayerMapper;
@@ -8,18 +7,15 @@ import com.example.gameservicedemo.event.Event;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.hurt.ChangePlayerInformationImp;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
-import com.example.gameservicedemo.game.player.cache.PlayerCache;
+import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.manager.TimedTaskManager;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
-import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -36,7 +32,7 @@ public class WriteBackDB{
     @Autowired
     PlayerMapper playerMapper;
     @Autowired
-    PlayerCache playerCache;
+    PlayerLoginService playerLoginService;
     @Autowired
     ChangePlayerInformationImp changePlayerInformationImp;
     @Autowired
@@ -71,6 +67,18 @@ public class WriteBackDB{
         return null;
     }
 
+    /**
+     * 向player表插入数据
+     * @param player 待插入数据
+     * @return
+     */
+    public Future<Event> insertPlayer(Player player){
+        ScheduledThreadPool.schedule(()->{
+            playerMapper.insert(player);
+        },0,TimeUnit.MILLISECONDS);
+        return null;
+    }
+
     public  Future<Event> delayWriteBackBag(BagBeCache bag){
             ScheduledThreadPool.schedule(()->{
                 //写回
@@ -83,18 +91,23 @@ public class WriteBackDB{
         return null;
     }
 
+
+
+
+
+
     /**
      * 五秒回蓝回血机制,自动金币增长
      */
     @PostConstruct
     public void recoveryHpMp(){
         TimedTaskManager.scheduleAtFixedRate(0,1000*5,()->{
-            Map<Channel, PlayerBeCache> allPlayerCache = playerCache.getAllPlayerCache();
-            allPlayerCache.values().forEach(v->{
+            playerLoginService.getAllPlayerLoaded().forEach(id->{
+                PlayerBeCache playerById = playerLoginService.getPlayerById(id);
                 //防止线程安全问题---------------------------------------在这里应该调用专门更改的方法
-                changePlayerInformationImp.changeHp(v,v.getToolsInfluence().get(14).getValue());
-                changePlayerInformationImp.changePlayerMagic(v,v.getToolsInfluence().get(15).getValue());
-                changePlayerInformationImp.changePlayerMoney(v,10);
+                changePlayerInformationImp.changeHp(playerById,playerById.getToolsInfluence().get(14).getValue());
+                changePlayerInformationImp.changePlayerMagic(playerById,playerById.getToolsInfluence().get(15).getValue());
+                changePlayerInformationImp.changePlayerMoney(playerById,10);
             });
             log.info("-------每五秒自动恢复机制执行完毕----------");
         });

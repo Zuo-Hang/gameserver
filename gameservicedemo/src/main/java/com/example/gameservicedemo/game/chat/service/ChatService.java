@@ -33,8 +33,8 @@ public class ChatService {
      * @param string
      */
     public void publicChat(PlayerBeCache player, String string) {
-        playerLoginService.getAllPlayerLoaded().values().forEach(v -> {
-            notificationManager.notifyPlayer(v, MessageFormat.format("收到 {0} 的全局广播：{1}",
+        playerLoginService.getAllPlayerLoaded().forEach(id -> {
+            notificationManager.notifyPlayer(playerLoginService.getPlayerById(id), MessageFormat.format("收到 {0} 的全局广播：{1}",
                     player.getName(),
                     string), RequestCode.WARNING.getCode());
         });
