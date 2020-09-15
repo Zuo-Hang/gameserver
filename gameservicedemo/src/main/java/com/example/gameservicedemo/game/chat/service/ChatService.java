@@ -50,8 +50,12 @@ public class ChatService {
      */
     public void whisper(PlayerBeCache player, Integer targetPlayerId, String string) {
         PlayerBeCache targetPlayer = playerLoginService.getPlayerById(targetPlayerId);
-        if (Objects.isNull(targetPlayer)) {
-            notificationManager.notifyPlayer(player, "未发现该玩家，输入的id错误或该玩家已下线。", RequestCode.BAD_REQUEST.getCode());
+        if(Objects.isNull(targetPlayer)){
+            notificationManager.notifyPlayer(player, "未发现该玩家，输入的id错误", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        if (!playerLoginService.playerIsOnLine(targetPlayerId)) {
+            notificationManager.notifyPlayer(player, "该玩家未在线。", RequestCode.BAD_REQUEST.getCode());
             return;
         }
         notificationManager.notifyPlayer(targetPlayer, MessageFormat.format("{0} 私信你说：{1}",

@@ -263,7 +263,7 @@ public enum Command {
     GUILD_GRANT("guild_grant",8040,"授权公会成员 guild_grant playerId 等级id"),
 
     // 获取公会物品
-    GUILD_TAKE("guild_take",8050,"获取公会物品  guild_take wareHouseIndex"),
+    GUILD_TAKE("guild_take",8050,"获取公会物品  guild_take toolsId"),
     /**
      * 公会获取金币
      */
@@ -299,6 +299,9 @@ public enum Command {
 
     /** 交易金币 **/
     TRADE_MONEY("trade_money",8530,"交易金币"),
+
+    /** 查看交易出价 */
+    TRADE_SEE("trade_see",8535,"查看交易出价  trade_see tradeId"),
 
     /** 确定交易 **/
     TRADE_CONFIRM("trade_confirm",8540,"确定交易"),

@@ -39,6 +39,22 @@ public class TradeController {
         ControllerManager.add(Command.TRADE_TOOLS.getRequestCode(), this::tradeTools);
         ControllerManager.add(Command.TRADE_MONEY.getRequestCode(), this::tradeMoney);
         ControllerManager.add(Command.TRADE_CONFIRM.getRequestCode(), this::tradeConfirm);
+        ControllerManager.add(Command.TRADE_SEE.getRequestCode(),this::tradeSee);
+    }
+
+    private void tradeSee(ChannelHandlerContext context, Message message) {
+        PlayerBeCache load = playerLoginService.isLoad(context);
+        if (Objects.isNull(load)) {
+            notificationManager.notifyByCtx(context, "你还未加载角色，不能进行此项操作！", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        //指令 tradeId
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
+        if (Objects.isNull(strings)) {
+            notificationManager.notifyPlayer(load, "输入的参数个数不对", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        tradeService.tradeSee(load,Long.valueOf(strings[1]));
     }
 
     private void tradeInitiate(ChannelHandlerContext context, Message message) {
@@ -62,15 +78,28 @@ public class TradeController {
             notificationManager.notifyByCtx(context, "你还未加载角色，不能进行此项操作！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        String[] strings = CheckParametersUtil.checkParameter(context, message, 1);
+        //指令 交易id
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
         if (Objects.isNull(strings)) {
             notificationManager.notifyPlayer(load, "输入的参数个数不对", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        tradeService.tradeConfirm(load);
+        tradeService.tradeConfirm(load,Long.valueOf(strings[1]));
     }
 
     private void tradeMoney(ChannelHandlerContext context, Message message) {
+        PlayerBeCache load = playerLoginService.isLoad(context);
+        if (Objects.isNull(load)) {
+            notificationManager.notifyByCtx(context, "你还未加载角色，不能进行此项操作！", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        //指令 交易id 出价金币
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 3);
+        if (Objects.isNull(strings)) {
+            notificationManager.notifyPlayer(load, "输入的参数个数不对", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        tradeService.tradeMoney(load,Long.valueOf(strings[1]),Integer.valueOf(strings[2]));
     }
 
     private void tradeTools(ChannelHandlerContext context, Message message) {
@@ -79,12 +108,13 @@ public class TradeController {
             notificationManager.notifyByCtx(context, "你还未加载角色，不能进行此项操作！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
+        //指令 交易id 物品id
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 3);
         if (Objects.isNull(strings)) {
             notificationManager.notifyPlayer(load, "输入的参数个数不对", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        tradeService.tradeTools(load,Long.valueOf(strings[1]));
+        tradeService.tradeTools(load,Long.valueOf(strings[1]),Long.valueOf(strings[2]));
     }
 
     private void tradeBegin(ChannelHandlerContext context, Message message) {
@@ -98,7 +128,7 @@ public class TradeController {
             notificationManager.notifyPlayer(load, "输入的参数个数不对", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        tradeService.tradeTools(load,Long.valueOf(strings[1]));
+        tradeService.tradeBegin(load,Long.valueOf(strings[1]));
 
     }
 

@@ -145,6 +145,10 @@ public class TeamService {
         //被邀请者
         PlayerBeCache invitee = playerLoginService.getPlayerById(playerId);
         if(Objects.isNull(invitee)){
+            notificationManager.notifyPlayer(inviter, "该玩家不存在，请检查输入id！", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        if(!playerLoginService.playerIsOnLine(playerId)){
             notificationManager.notifyPlayer(inviter, "该玩家并不在线！", RequestCode.BAD_REQUEST.getCode());
             return;
         }

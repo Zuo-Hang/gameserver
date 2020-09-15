@@ -2,6 +2,8 @@ package com.example.gameservicedemo.game.trade.bean;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -23,6 +25,8 @@ public class Trade {
      * 此次交易收取的费用（面对面交易不收取费用，拍卖行要收取费用）
      */
     private Integer cost;
+    /** 交易时间 */
+    private Date date;
     /**
      * 交易形式：面对面私下交易，进入拍卖行交易，拍卖行一口价交易。
      */

@@ -217,7 +217,16 @@ public class PlayerLoginService {
     }
 
     /**
-     * 按照id获取玩家，不保证是登录后的玩家
+     * 判断某玩家是否在线
+     * @param playerId
+     * @return
+     */
+    public boolean playerIsOnLine(Integer playerId){
+        return Objects.nonNull(playerLoginCache.getChannelByPlayerId(playerId));
+    }
+
+    /**
+     * 按照id获取玩家，不保证是登录后的玩家（判断系统中是否有这个用户注册）
      * @param playerId
      * @return
      */

@@ -75,9 +75,9 @@ public class MailService {
         playerDataService.showPlayerBag(sender);
         Integer insert = mailMapper.insert(mail);
         notificationManager.notifyPlayer(sender,"邮件已发出！",RequestCode.SUCCESS.getCode());
-        PlayerBeCache receiver = playerLoginService.getPlayerById(receiverId);
-        if(Objects.nonNull(receiver)){
-            notificationManager.notifyPlayer(receiver, MessageFormat.format("收到{0}的一封邮件!",
+        //判断玩家是否在线，在线则通知
+        if(playerLoginService.playerIsOnLine(receiverId)){
+            notificationManager.notifyPlayer(playerLoginService.getPlayerById(receiverId), MessageFormat.format("收到{0}的一封邮件!",
                     sender.getName()),RequestCode.WARNING.getCode());
         }
     }
