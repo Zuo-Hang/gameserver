@@ -6,7 +6,7 @@ import com.example.gamedatademo.bean.User;
 import com.example.gamedatademo.mapper.PlayerMapper;
 import com.example.gamedatademo.mapper.UserMapper;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
-import com.example.gameservicedemo.game.player.cache.PlayerCache;
+import com.example.gameservicedemo.game.player.cache.PlayerLoginCache;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.player.service.PlayerService;
 import com.example.gameservicedemo.game.user.cache.UserCache;
@@ -44,9 +44,9 @@ public class UserService {
     @Autowired
     UserCache userCache;
     @Autowired
-    PlayerCache playerCache;
-    @Autowired
     PlayerService playerService;
+    @Autowired
+    PlayerLoginCache playerLoginCache;
     @Autowired
     RoleTypeService roleTypeService;
     @Autowired
@@ -185,7 +185,7 @@ public class UserService {
         //校验用户是否存在
         User user = userMapper.selectByUserId(userId);
         List<Player> players = null;
-        if(Objects.isNull(user)){
+        if (Objects.isNull(user)) {
             notificationManager.notifyByCtx(context, "此用户不存在！", RequestCode.BAD_REQUEST.getCode());
             return null;
         }
@@ -200,36 +200,32 @@ public class UserService {
      * 客户端登录后只需保存userId，就可以实现断线重连。
      * 服务端接收到重连请求后，根据userId在<userId,context>中查找到旧的context，并更新新的contex。再根据旧的contex查找
      * 到player移除并重新添加。根据playerId将<playerId,context>中的contex进行更新。即实现了断线重连。
+     *
      * @param context 新的context
-     * @param userId 掉线的用户id
+     * @param userId  掉线的用户id
      */
     public void reconnection(ChannelHandlerContext context, Integer userId) {
-        ChannelHandlerContext ctxByUserId = userCache.getCtxByUserId(userId);
-        if(Objects.isNull(ctxByUserId)){
+        ChannelHandlerContext oldContext = userCache.getCtxByUserId(userId);
+        if (Objects.isNull(oldContext)) {
             //证明此用户并未在线
-            notificationManager.notifyByCtx(context,"此用户之前并未在线，你可以使用\"login\"命令进行登录",RequestCode.BAD_REQUEST.getCode());
-        }else{
-            UserBeCache userByCtx = userCache.getUserByCtx(ctxByUserId);
-            userCache.removeUserByChannelId(ctxByUserId.channel().id().asLongText());
-            userCache.putCtxUser(context,userByCtx);
-            userCache.putUserIdCtx(userId,context);
+            notificationManager.notifyByCtx(context, "此用户之前并未在线，你可以使用\"login\"命令进行登录", RequestCode.BAD_REQUEST.getCode());
+        } else {
+            UserBeCache userByCtx = userCache.getUserByCtx(oldContext);
+            userCache.removeUserByChannelId(oldContext.channel().id().asLongText());
+            userCache.putCtxUser(context, userByCtx);
+            userCache.putUserIdCtx(userId, context);
             log.info("用户缓存更新完毕");
-            PlayerBeCache player = playerLoginService.getPlayerByContext(context);
-
-            PlayerBeCache playerByCtx = playerCache.getPlayerByChannel(ctxByUserId.channel());
-            if(Objects.isNull(player)){
+            Integer playerId = playerLoginCache.getPlayerIdByChannel(oldContext.channel());
+            if (Objects.isNull(playerId)) {
                 log.info("此用户断线前并未加载角色");
-            }else{
-
-                playerCache.removePlayerByChannelId(playerCache.getCxtByPlayerId(playerByCtx.getId()).channel());
-                playerCache.putCtxPlayer(context.channel(),playerByCtx);
-                playerCache.savePlayerCtx(playerByCtx.getPlayerId(),context);
+            } else {
+                playerLoginCache.removeCache(oldContext.channel());
+                playerLoginCache.putCache(playerId, context.channel());
                 log.info("加载的角色缓存更新完毕！");
             }
-            notificationManager.notifyByCtx(context,"你的信息已经重新加载完毕，继续你的操作吧！",RequestCode.SUCCESS.getCode());
+            notificationManager.notifyByCtx(context, "你的信息已经重新加载完毕，继续你的操作吧！", RequestCode.SUCCESS.getCode());
         }
     }
-
 
 
     /**
@@ -246,14 +242,14 @@ public class UserService {
 //-----------------------------------------------------------------------------------
             } else {
                 for (Player player : players) {
-                    stringBuilder.append("角色id："+
+                    stringBuilder.append("角色id：" +
                             player.getPlayerId() + " 角色名："
-                                    + player.getPlayerName() + " "
-                                    + roleTypeService.getRoleTypeById(player.getRoleClass()).getName() + " 当前位置："
-                                    + sceneService.getScene(player.getNowAt()).getName()+"\n"
+                            + player.getPlayerName() + " "
+                            + roleTypeService.getRoleTypeById(player.getRoleClass()).getName() + " 当前位置："
+                            + sceneService.getScene(player.getNowAt()).getName() + "\n"
                     );
                 }
-                notificationManager.notifyByCtx(context, stringBuilder.toString()+"你可以使用\"load\"加载角色开始游戏", RequestCode.SUCCESS.getCode());
+                notificationManager.notifyByCtx(context, stringBuilder.toString() + "你可以使用\"load\"加载角色开始游戏", RequestCode.SUCCESS.getCode());
             }
         } else {
             notificationManager.notifyByCtx(context, "您还未登录！请使用 \" login\"进行登录后再进行此操作", RequestCode.BAD_REQUEST.getCode());

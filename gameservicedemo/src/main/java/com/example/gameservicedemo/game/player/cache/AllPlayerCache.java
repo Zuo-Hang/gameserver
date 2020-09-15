@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author: hang hang
  * @Date: 2020/09/14/10:28
- * @Description: 玩家化身缓存
+ * @Description: 玩家化身缓存（与数据库交互，从数据库取出数据）
  */
 @Slf4j
 @Component
