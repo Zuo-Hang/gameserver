@@ -306,6 +306,15 @@ public enum Command {
     /** 确定交易 **/
     TRADE_CONFIRM("trade_confirm",8540,"确定交易"),
 
+    /** 竞拍 */
+    AUCTION_BID("auction_bid",8800,"竞拍"),
+
+    /** 发布拍卖品 */
+    AUCTION_PUSH("auction_push",8810,"发布拍卖品"),
+
+    /** 查看拍卖品 */
+    AUCTION_SHOW("auction_show",8820,"查看拍卖品"),
+
 
     ;
 
