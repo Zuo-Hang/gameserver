@@ -16,7 +16,13 @@
     </insert>
 
     <update id="updateByGuildId" parameterType="com.example.gamedatademo.bean.Guild">
-        UPDATE guild SET name = #{name}, level = #{level},member = #{member},cold_num=#{coldNum},warehouse=#{warehouse},warehouse_Size=#{warehouseSize},join_Request=#{joinRequest}
+        UPDATE guild
+        <set>
+            <if test="update.contains('member')"> member = #{member},</if>
+            <if test="update.contains('goldNum')"> gold_num=#{goldNum},</if>
+            <if test="update.contains('warehouse')"> warehouse=#{warehouse},</if>
+            <if test="update.contains('joinRequest')"> join_Request=#{joinRequest}</if>
+        </set>
         WHERE id = #{id};
     </update>
 

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -119,5 +120,9 @@ public class GuildCache {
             log.debug("playerJoinRequestList {}", playerJoinRequestMap);
             Optional.ofNullable(playerJoinRequestMap).ifPresent(guild::setPlayerJoinRequestMap);
         }
+    }
+
+    public ConcurrentMap<Long, GuildBeCache> getAll(){
+         return guildCache.asMap();
     }
 }

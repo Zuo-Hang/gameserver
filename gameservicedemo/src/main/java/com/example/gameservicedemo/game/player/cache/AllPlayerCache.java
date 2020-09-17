@@ -76,7 +76,7 @@ public class AllPlayerCache {
         PlayerBeCache playerBeCache = new PlayerBeCache();
         playerBeCache.setWriteBackDB(writeBackDB);
         BeanUtils.copyProperties(player, playerBeCache);
-playerBeCache.setOver(true);
+        playerBeCache.setOver(true);
         //设置其他信息
         initPlayerInformation(playerBeCache);
         return playerBeCache;

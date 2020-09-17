@@ -48,6 +48,11 @@ public class GuildController {
         ControllerManager.add(Command.GUILD_DONATE_COLD.getRequestCode(),this::guildDonateCold);
         ControllerManager.add(Command.GUILD_DISMISS.getRequestCode(),this::guildDismiss);
         ControllerManager.add(Command.GUILD_KICK.getRequestCode(),this::guildKick);
+        ControllerManager.add(Command.GUILD_LIST.getRequestCode(),this::guildList);
+    }
+
+    private void guildList(ChannelHandlerContext context, Message message) {
+        guildService.guildList(context);
     }
 
     private void guildTakeCole(ChannelHandlerContext context, Message message) {

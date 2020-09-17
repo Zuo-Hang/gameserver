@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.game.chat.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.game.mail.bean.GameSystem;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.manager.NotificationManager;
@@ -25,6 +26,8 @@ public class ChatService {
     PlayerLoginService playerLoginService;
     @Autowired
     NotificationManager notificationManager;
+    @Autowired
+    GameSystem gameSystem;
 
     /**
      * 全服广播
@@ -61,6 +64,8 @@ public class ChatService {
         notificationManager.notifyPlayer(targetPlayer, MessageFormat.format("{0} 私信你说：{1}",
                 player.getName(),
                 string), RequestCode.WARNING.getCode());
-        notificationManager.notifyPlayer(player, MessageFormat.format("已经私信了 {0} ", targetPlayer.getName()), RequestCode.SUCCESS.getCode());
+        if(player!=gameSystem){
+            notificationManager.notifyPlayer(player, MessageFormat.format("已经私信了 {0} ", targetPlayer.getName()), RequestCode.SUCCESS.getCode());
+        }
     }
 }

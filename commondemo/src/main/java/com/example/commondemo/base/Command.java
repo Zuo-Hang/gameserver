@@ -107,11 +107,11 @@ public enum Command {
     /**
      * 使用群体攻击技能
      */
-    SKILL_TO_GROUP("skill_to_group",4400,"使用群体攻击技能"),
+    SKILL_TO_GROUP("skill_to_group", 4400, "使用群体攻击技能"),
     /**
      * 使用召唤技能
      */
-    SKILL_CALL("skill_call",4500,"使用召唤技能"),
+    SKILL_CALL("skill_call", 4500, "使用召唤技能"),
 
     /**
      * 查看背包当前情况
@@ -162,7 +162,7 @@ public enum Command {
     /**
      * 使用药品
      */
-    USE_MEDICINE("use_medicine",5800,"使用药品 use_medicine 药品uuid"),
+    USE_MEDICINE("use_medicine", 5800, "使用药品 use_medicine 药品uuid"),
 
 
     /**
@@ -240,80 +240,114 @@ public enum Command {
     DELETE_MAIL("delete_mail", 7740, "删除邮件"),
 
     /**
-     *创建公会
+     * 创建公会 ok
      */
-    GUILD_CREATE("guild_create",8000,"创建公会 guild_create 返回guildId  "),
+    GUILD_CREATE("guild_create", 8000, "创建公会 guild_create 返回guildId  "),
 
     /**
-     *查看公会
+     * 查看公会 ok
      */
-    GUILD_SHOW("guild_show",8010,"查看公会 guild_show"),
+    GUILD_SHOW("guild_show", 8010, "查看公会 guild_show"),
 
-    // 公会捐献
-    GUILD_DONATE("guild_donate",8020,"公会捐献 guild_donate 背包的index（格）"),
+    /**
+     * 公会捐献 ok
+     */
+    GUILD_DONATE("guild_donate", 8020, "公会捐献 guild_donate 背包的index（格）"),
     /**
      * 公会捐献金币
      */
-    GUILD_DONATE_COLD("guild_donate_cold",8110,"公会捐献金币 guild_donate_cold 金币数量"),
+    GUILD_DONATE_COLD("guild_donate_cold", 8110, "公会捐献金币 guild_donate_cold 金币数量"),
 
-    // 加入公会
-    GUILD_JOIN("guild_join",8030,"加入公会 guild_join 返回guildId"),
+    /**
+     * 加入公会 ok
+     */
+    GUILD_JOIN("guild_join", 8030, "加入公会 guild_join 返回guildId"),
 
-    // 授权公会成员
-    GUILD_GRANT("guild_grant",8040,"授权公会成员 guild_grant playerId 等级id"),
+    /**
+     * 授权公会成员
+     */
+    GUILD_GRANT("guild_grant", 8040, "授权公会成员 guild_grant playerId 等级id"),
 
-    // 获取公会物品
-    GUILD_TAKE("guild_take",8050,"获取公会物品  guild_take toolsId"),
+    /**
+     * 获取公会物品 ok
+     */
+    GUILD_TAKE("guild_take", 8050, "获取公会物品  guild_take toolsId"),
     /**
      * 公会获取金币
      */
-    GUILD_TAKE_COLD("GUILD_TAKE_COLD",8120,"从公会取出金币,但是每次只能获取100金币"),
+    GUILD_TAKE_COLD("guild_take_cold", 8120, "从公会取出金币,但是每次只能获取100金币"),
 
-    // 允许入会
-    GUILD_PERMIT("guild_permit", 8060,"允许入会 guild_permit playerId"),
+    /**
+     * 允许入会 ok
+     */
+    GUILD_PERMIT("guild_permit", 8060, "允许入会 guild_permit playerId"),
 
-    // 退出公会
-    GUILD_QUIT("guild_quit", 8070,"退出公会"),
+    /**
+     * 退出公会 ok
+     */
+    GUILD_QUIT("guild_quit", 8070, "退出公会"),
     /**
      * 从公会踢出会员
      */
-    GUILD_KICK("guild_kick",8080,"从公会踢出会员"),
+    GUILD_KICK("guild_kick", 8080, "从公会踢出会员"),
     /**
-     * 解散公会
+     * 解散公会 ok
      */
-    GUILD_DISMISS("guild_dismiss",8090,"解散公会"),
+    GUILD_DISMISS("guild_dismiss", 8090, "解散公会"),
     /**
-     * 查看加入请求
+     * 查看加入请求 ok
      */
-    GUILD_SHOW_REQ("guild_show_req",8100,"查看加入请求"),
+    GUILD_SHOW_REQ("guild_show_req", 8100, "查看加入请求"),
+    /**
+     * 查看公会列表 ok
+     */
+    GUILD_LIST("guild_list", 8130, "查看公会列表"),
 
     /** 交易的流程为：卖家发起交易，买家开始交易（同意交易）、卖家放入货物、卖家放入金币、卖家确认交易 */
-    /** 发起交易 **/
-    TRADE_INITIATE("trade",8500,"发起交易"),
+    /**
+     * 发起交易
+     **/
+    TRADE_INITIATE("trade", 8500, "发起交易"),
 
-    /** 开始交易 **/
-    TRADE_BEGIN("trade_begin",8510,"开始交易"),
+    /**
+     * 开始交易
+     **/
+    TRADE_BEGIN("trade_begin", 8510, "开始交易"),
 
-    /** 交易货物 **/
-    TRADE_TOOLS("trade_tools",8520,"交易货物"),
+    /**
+     * 交易货物
+     **/
+    TRADE_TOOLS("trade_tools", 8520, "交易货物"),
 
-    /** 交易金币 **/
-    TRADE_MONEY("trade_money",8530,"交易金币"),
+    /**
+     * 交易金币
+     **/
+    TRADE_MONEY("trade_money", 8530, "交易金币"),
 
-    /** 查看交易出价 */
-    TRADE_SEE("trade_see",8535,"查看交易出价  trade_see tradeId"),
+    /**
+     * 查看交易出价
+     */
+    TRADE_SEE("trade_see", 8535, "查看交易出价  trade_see tradeId"),
 
-    /** 确定交易 **/
-    TRADE_CONFIRM("trade_confirm",8540,"确定交易"),
+    /**
+     * 确定交易
+     **/
+    TRADE_CONFIRM("trade_confirm", 8540, "确定交易"),
 
-    /** 竞拍 */
-    AUCTION_BID("auction_bid",8800,"竞拍"),
+    /**
+     * 竞拍
+     */
+    AUCTION_BID("auction_bid", 8800, "竞拍"),
 
-    /** 发布拍卖品 */
-    AUCTION_PUSH("auction_push",8810,"发布拍卖品"),
+    /**
+     * 发布拍卖品
+     */
+    AUCTION_PUSH("auction_push", 8810, "发布拍卖品"),
 
-    /** 查看拍卖品 */
-    AUCTION_SHOW("auction_show",8820,"查看拍卖品"),
+    /**
+     * 查看拍卖品
+     */
+    AUCTION_SHOW("auction_show", 8820, "查看拍卖品"),
 
 
     ;

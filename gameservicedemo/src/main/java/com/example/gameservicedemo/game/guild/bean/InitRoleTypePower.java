@@ -28,6 +28,7 @@ public class InitRoleTypePower {
         RoleType.President.getPowerSet().add(Command.GUILD_QUIT.getRequestCode());
         RoleType.President.getPowerSet().add(Command.GUILD_KICK.getRequestCode());
         RoleType.President.getPowerSet().add(Command.GUILD_DISMISS.getRequestCode());
+        RoleType.President.getPowerSet().add(Command.GUILD_SHOW_REQ.getRequestCode());
         //副会长可以进行的操作 查看公会、公会捐献、授权公会成员（只能授权比自己低的）、获取公会物品、允许入会、退出公会、从公会踢出会员
         RoleType.Vice_President.getPowerSet().add(Command.GUILD_PERMIT.getRequestCode());
         RoleType.Vice_President.getPowerSet().add(Command.GUILD_SHOW.getRequestCode());
@@ -36,12 +37,14 @@ public class InitRoleTypePower {
         RoleType.Vice_President.getPowerSet().add(Command.GUILD_TAKE.getRequestCode());
         RoleType.Vice_President.getPowerSet().add(Command.GUILD_QUIT.getRequestCode());
         RoleType.Vice_President.getPowerSet().add(Command.GUILD_KICK.getRequestCode());
+        RoleType.President.getPowerSet().add(Command.GUILD_SHOW_REQ.getRequestCode());
         //精英可以进行的操作 查看公会、公会捐献、获取公会物品、允许入会、退出公会
         RoleType.Elite.getPowerSet().add(Command.GUILD_PERMIT.getRequestCode());
         RoleType.Elite.getPowerSet().add(Command.GUILD_SHOW.getRequestCode());
         RoleType.Elite.getPowerSet().add(Command.GUILD_DONATE.getRequestCode());
         RoleType.Elite.getPowerSet().add(Command.GUILD_TAKE.getRequestCode());
         RoleType.Elite.getPowerSet().add(Command.GUILD_QUIT.getRequestCode());
+        RoleType.President.getPowerSet().add(Command.GUILD_SHOW_REQ.getRequestCode());
         //会员可以进行的操作 查看公会、公会捐献、获取公会物品、退出公会
         RoleType.Ordinary_Member.getPowerSet().add(Command.GUILD_PERMIT.getRequestCode());
         RoleType.Ordinary_Member.getPowerSet().add(Command.GUILD_SHOW.getRequestCode());
