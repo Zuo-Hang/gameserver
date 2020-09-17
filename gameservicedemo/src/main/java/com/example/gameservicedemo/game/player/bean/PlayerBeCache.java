@@ -1,6 +1,7 @@
 package com.example.gameservicedemo.game.player.bean;
 
 import com.example.gamedatademo.bean.Player;
+import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.buffer.bean.Buffer;
 import com.example.gameservicedemo.base.bean.Creature;
@@ -27,9 +28,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date: 2020/08/05/17:13
  * @Description: 应当被缓存的化身信息
  */
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PlayerBeCache extends Player implements Creature {
+    WriteBackDB writeBackDB;
     private ChannelHandlerContext context;
     private Creature target;
 
@@ -165,5 +168,56 @@ public class PlayerBeCache extends Player implements Creature {
                 ", toolsInfluence=" + toolsInfluence +
                 ", teamId=" + teamId +
                 '}';
+    }
+
+    public boolean over=false;
+
+    @Override
+    public void setNowAt(Integer nowAt){
+        super.setNowAt(nowAt);
+        if(over){
+            getUpdate().add("nowAt");
+            writeBackDB.delayWriteBackPlayer(this);
+        }
+    }
+
+    @Override
+    public void setExp(Integer exp){
+        super.setExp(exp);
+        if(over){
+            getUpdate().add("exp");
+            writeBackDB.delayWriteBackPlayer(this);
+        }
+
+    }
+
+    @Override
+    public void setMoney(Integer money){
+        super.setMoney(money);
+        if(over){
+            getUpdate().add("money");
+            writeBackDB.delayWriteBackPlayer(this);
+        }
+
+    }
+
+    @Override
+    public void setGuildId(Long guildId){
+        super.setGuildId(guildId);
+        if(over){
+            getUpdate().add("guildId");
+            writeBackDB.delayWriteBackPlayer(this);
+        }
+
+    }
+
+    @Override
+    public void setGuildRoleType(Integer type){
+        super.setGuildRoleType(type);
+        if(over){
+            getUpdate().add("guildRoleType");
+            writeBackDB.delayWriteBackPlayer(this);
+        }
+
     }
 }

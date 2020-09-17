@@ -51,7 +51,7 @@ public class Player {
      */
     private Integer roleClass;
     /**
-     * 公会类型
+     * 公会角色类型
      */
     private Integer guildRoleType;
     /**
@@ -63,7 +63,7 @@ public class Player {
      */
     private Integer bagId;
 
-    private Set<Integer> update=new ConcurrentSkipListSet<>();
+    private Set<String> update=new ConcurrentSkipListSet<>();
 
 
 

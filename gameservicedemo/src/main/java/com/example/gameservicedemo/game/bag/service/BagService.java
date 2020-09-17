@@ -176,4 +176,8 @@ public class BagService {
         playerBeCache.setBagBeCache(bagBeCache);
         log.info("角色：{} 的背包初始化完毕！", playerBeCache.getName());
     }
+
+    public boolean havePlace(BagBeCache bagBeCache) {
+        return bagBeCache.getItemMap().size()<bagBeCache.getSize();
+    }
 }

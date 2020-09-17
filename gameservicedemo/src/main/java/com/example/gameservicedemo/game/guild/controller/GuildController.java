@@ -156,7 +156,18 @@ public class GuildController {
     }
 
     private void guildTake(ChannelHandlerContext context, Message message) {
-
+        PlayerBeCache load = playerLoginService.isLoad(context);
+        if(Objects.isNull(load)){
+            notificationManager.notifyByCtx(context,"你还未加载游戏角色！", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        //指令 物品id
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
+        if(Objects.isNull(strings)){
+            notificationManager.notifyByCtx(context,"输入的参数个数错误！", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        guildService.guildTake(load,Long.valueOf(strings[1]));
     }
 
     private void guildDonate(ChannelHandlerContext context, Message message) {

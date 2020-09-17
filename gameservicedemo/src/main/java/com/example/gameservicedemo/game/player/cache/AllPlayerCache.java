@@ -2,6 +2,7 @@ package com.example.gameservicedemo.game.player.cache;
 
 import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.mapper.PlayerMapper;
+import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.game.bag.service.BagService;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.bean.RoleType;
@@ -33,6 +34,8 @@ import java.util.concurrent.TimeUnit;
 public class AllPlayerCache {
     @Autowired
     RoleTypeService roleTypeService;
+    @Autowired
+    WriteBackDB writeBackDB;
     @Autowired
     BagService bagService;
     @Autowired
@@ -71,7 +74,9 @@ public class AllPlayerCache {
     public PlayerBeCache loadFromDb(Integer playerId) {
         Player player = playerMapper.selectByPlayerId(playerId);
         PlayerBeCache playerBeCache = new PlayerBeCache();
+        playerBeCache.setWriteBackDB(writeBackDB);
         BeanUtils.copyProperties(player, playerBeCache);
+playerBeCache.setOver(true);
         //设置其他信息
         initPlayerInformation(playerBeCache);
         return playerBeCache;

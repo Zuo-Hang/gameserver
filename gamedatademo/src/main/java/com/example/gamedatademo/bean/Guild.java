@@ -2,6 +2,9 @@ package com.example.gamedatademo.bean;
 
 import lombok.Data;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -19,7 +22,7 @@ public class Guild {
      * 名称
      */
     private String name;
-    /**     * 等级
+    /** 等级
      */
     private Integer level;
     /**
@@ -40,4 +43,6 @@ public class Guild {
      * 加入请求
      */
     private String joinRequest;
+
+    public Set<String> update=new ConcurrentSkipListSet<>();
 }

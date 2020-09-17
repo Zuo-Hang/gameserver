@@ -35,7 +35,7 @@ public class ChangePlayerInformationImp extends ChangeCreatureInformation{
             //更新钱数
             player.setMoney(player.getMoney() + money);
             //提交更改数据库任务
-            player.getUpdate().add(5);
+            player.getUpdate().add("money");
             writeBackDB.delayWriteBackPlayer(player);
         }
     }

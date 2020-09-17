@@ -22,16 +22,16 @@ public class DeptController {
     @Autowired
     UserMapper userMapper;
 
-    @GetMapping("/dept")
-    public User getRole(Integer id){
-        Player player = new Player();
-        player.setPlayerId(1);
-        player.setBagId(5);
-        player.getUpdate().add(4);
-        playerMapper.updateByPlayerId(player);
-        player.getUpdate().clear();
-        return userMapper.selectByUserId(id);
-    }
+//    @GetMapping("/dept")
+//    public User getRole(Integer id){
+//        Player player = new Player();
+//        player.setPlayerId(1);
+//        player.setBagId(5);
+//        player.getUpdate().add(4);
+//        playerMapper.updateByPlayerId(player);
+//        player.getUpdate().clear();
+//        return userMapper.selectByUserId(id);
+//    }
 
 
 }

@@ -1,20 +1,15 @@
 package com.example.gameservicedemo.game.guild.cache;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.example.gamedatademo.bean.Guild;
 import com.example.gamedatademo.mapper.GuildMapper;
-import com.example.gameservicedemo.game.bag.bean.Item;
+import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.game.guild.bean.GuildBeCache;
 import com.example.gameservicedemo.game.guild.bean.PlayerJoinRequest;
-import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.tools.bean.Tools;
-import com.example.gameservicedemo.game.tools.bean.ToolsProperty;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.reflect.TypeToken;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -25,9 +20,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.*;
-
-import static com.alibaba.druid.sql.ast.SQLPartitionValue.Operator.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,7 +32,12 @@ import static com.alibaba.druid.sql.ast.SQLPartitionValue.Operator.List;
 @Component
 public class GuildCache {
     @Autowired
+    WriteBackDB writeBackDB;
+    @Autowired
     GuildMapper guildMapper;
+
+    private Gson gson = new Gson();
+
     private static Cache<Long, GuildBeCache> guildCache = CacheBuilder.newBuilder()
             .removalListener(
                     notification -> log.info(notification.getKey() + "公会被移除，原因是" + notification.getCause())
@@ -76,6 +73,7 @@ public class GuildCache {
         }
         GuildBeCache guildBeCache = new GuildBeCache();
         BeanUtils.copyProperties(guild, guildBeCache);
+        guildBeCache.setWriteBackDB(writeBackDB);
         loadMember(guildBeCache);
         loadWarehouse(guildBeCache);
         loadJoinRequest(guildBeCache);
@@ -87,9 +85,8 @@ public class GuildCache {
      *
      * @param guild 公会
      */
-    private static void loadMember(GuildBeCache guild) {
+    private void loadMember(GuildBeCache guild) {
         if (!Strings.isNullOrEmpty(guild.getMember())) {
-            Gson gson = new Gson();
             ArrayList<Integer> ids = gson.fromJson(guild.getMember(), new TypeToken<ArrayList<Integer>>() {
             }.getType());
             guild.setMemberIdList(ids);
@@ -101,9 +98,8 @@ public class GuildCache {
      *
      * @param guild 公会
      */
-    private static void loadWarehouse(GuildBeCache guild) {
+    private void loadWarehouse(GuildBeCache guild) {
         if (Strings.isNullOrEmpty(guild.getWarehouse())) {
-            Gson gson = new Gson();
             Map<Long, Tools> wareHouseMap = gson.fromJson(guild.getWarehouse(), new TypeToken<Map<Long, Tools>>() {
             }.getType());
             guild.setWarehouseMap(wareHouseMap);
@@ -115,9 +111,8 @@ public class GuildCache {
      *
      * @param guild 公会
      */
-    private static void loadJoinRequest(GuildBeCache guild) {
+    private void loadJoinRequest(GuildBeCache guild) {
         if (Strings.isNullOrEmpty(guild.getJoinRequest())) {
-            Gson gson = new Gson();
             Map<Integer, PlayerJoinRequest> playerJoinRequestMap = gson.fromJson(guild.getJoinRequest(),
                     new TypeToken<Map<Integer, PlayerJoinRequest>>() {
                     }.getType());
@@ -125,45 +120,4 @@ public class GuildCache {
             Optional.ofNullable(playerJoinRequestMap).ifPresent(guild::setPlayerJoinRequestMap);
         }
     }
-
-    /**
-     * 持久化玩家任务成就进程的线程池，由于持久化不需要保证循序，所以直接用多线程的线程池。
-     * 核心线程数 为 服务器核心*2+1
-     * 最大线程数是核心线程数的2倍
-     */
-    private ThreadFactory guildThreadFactory = new ThreadFactoryBuilder()
-            .setNameFormat("guildPersistence-pool-%d").build();
-    private ExecutorService threadPool = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors() * 2 + 1, (Runtime.getRuntime().availableProcessors() * 2 + 1) * 2,
-            1000, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), guildThreadFactory);
-
-    /**
-     * 持久化插入公会
-     *
-     * @param guild 公会
-     */
-    public void insertGuild(GuildBeCache guild) {
-        threadPool.execute(() -> {
-            Gson gson = new Gson();
-            guild.setMember(gson.toJson(guild.getMemberIdList()));
-            guild.setWarehouse(gson.toJson(guild.getWarehouseMap()));
-            guild.setJoinRequest(gson.toJson(guild.getPlayerJoinRequestMap()));
-            guildMapper.insert(guild);
-        });
-    }
-
-    /**
-     * 数据库更新公会
-     *
-     * @param guild 公会
-     */
-    public void updateGuild(GuildBeCache guild) {
-        threadPool.execute(() -> {
-            Gson gson = new Gson();
-            guild.setMember(gson.toJson(guild.getMemberIdList()));
-            guild.setWarehouse(gson.toJson(guild.getWarehouseMap()));
-            guild.setJoinRequest(gson.toJson(guild.getPlayerJoinRequestMap()));
-            guildMapper.updateByGuildId(guild);
-        });
-    }
-
 }

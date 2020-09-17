@@ -2,9 +2,11 @@ package com.example.gameservicedemo.background;
 
 import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.mapper.BagMapper;
+import com.example.gamedatademo.mapper.GuildMapper;
 import com.example.gamedatademo.mapper.PlayerMapper;
 import com.example.gameservicedemo.event.Event;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
+import com.example.gameservicedemo.game.guild.bean.GuildBeCache;
 import com.example.gameservicedemo.game.hurt.ChangePlayerInformationImp;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
@@ -32,18 +34,22 @@ public class WriteBackDB{
     @Autowired
     PlayerMapper playerMapper;
     @Autowired
+    GuildMapper guildMapper;
+    @Autowired
     PlayerLoginService playerLoginService;
     @Autowired
     ChangePlayerInformationImp changePlayerInformationImp;
     @Autowired
     BagMapper bagMapper;
 
+    Gson gson = new Gson();
+
     /**
      * 以一个set标记，避免在待回写数据库的等待期间，同一个对象提交多次回写任务
      */
-    private Set<Integer> shouldWrite= new ConcurrentSkipListSet();
+    private Set<Integer> shouldWritePlayer= new ConcurrentSkipListSet();
     private Set<Integer> shouldWriteBag= new ConcurrentSkipListSet();
-    private Set<Integer> shouldWriteMail= new ConcurrentSkipListSet();
+    private Set<Long> shouldWriteGuild= new ConcurrentSkipListSet();
 
     private ThreadFactory WriteBackDBThreadPoolFactory = new ThreadFactoryBuilder()
             .setNameFormat("WriteBackDBThreadPool-%d").setUncaughtExceptionHandler((t,e) -> e.printStackTrace()).build();
@@ -56,13 +62,13 @@ public class WriteBackDB{
      * @return
      */
     public  Future<Event> delayWriteBackPlayer(Player player){
-        if(!shouldWrite.contains(player.getPlayerId())){
-            shouldWrite.add(player.getPlayerId());
+        if(!shouldWritePlayer.contains(player.getPlayerId())){
+            shouldWritePlayer.add(player.getPlayerId());
             ScheduledThreadPool.schedule(()->{
                 //写回
                 playerMapper.updateByPlayerId(player);
                 player.getUpdate().clear();
-                shouldWrite.remove(player.getPlayerId());
+                shouldWritePlayer.remove(player.getPlayerId());
                 return null;
             },1000*2, TimeUnit.MILLISECONDS);
         }
@@ -100,20 +106,37 @@ public class WriteBackDB{
         return null;
     }
 
-    public  Future<Event> delayWriteBackBag(BagBeCache bag){
-            ScheduledThreadPool.schedule(()->{
-                //写回
-                Gson gson = new Gson();
-                bag.setTools(gson.toJson(bag.getToolsMap().values()));
-                bag.setItems(gson.toJson(bag.getItemMap().values()));
-                bagMapper.updateByBagId(bag);
-                return null;
-            },0, TimeUnit.MILLISECONDS);
-        return null;
+    /**
+     * 持久化插入公会
+     * @param guild 公会
+     */
+    public void insertGuild(GuildBeCache guild) {
+        ScheduledThreadPool.execute(() -> {
+            guild.setMember(gson.toJson(guild.getMemberIdList()));
+            guild.setWarehouse(gson.toJson(guild.getWarehouseMap()));
+            guild.setJoinRequest(gson.toJson(guild.getPlayerJoinRequestMap()));
+            guildMapper.insert(guild);
+        });
     }
 
-
-
+    /**
+     * 更新公会操作
+     * @param guild
+     * @return
+     */
+    public  Future<Event> updateGuildDb(GuildBeCache guild){
+        if(!shouldWriteGuild.contains(guild.getId())){
+            shouldWriteGuild.add(guild.getId());
+            ScheduledThreadPool.schedule(()->{
+                //写回
+                guildMapper.updateByGuildId(guild);
+                guild.getUpdate().clear();
+                shouldWriteGuild.remove(guild.getId());
+                return null;
+            },1000, TimeUnit.MILLISECONDS);
+        }
+        return null;
+    }
 
 
 

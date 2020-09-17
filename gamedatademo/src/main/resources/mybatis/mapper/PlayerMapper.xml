@@ -27,11 +27,14 @@
     <update id="updateByPlayerId" parameterType="com.example.gamedatademo.bean.Player">
         UPDATE player
         <set>
-            <if test="update.contains(1)">player_name = #{playerName},</if>
-            <if test="update.contains(2)">user_id = #{userId},</if>
-            <if test="update.contains(3)">now_at = #{nowAt},</if>
-            <if test="update.contains(4)">bag_id=#{bagId},</if>
-            <if test="update.contains(5)">money=#{money}</if>
+            <if test="update.contains('playerName')">player_name = #{playerName},</if>
+            <if test="update.contains('userId')">user_id = #{userId},</if>
+            <if test="update.contains('nowAt')">now_at = #{nowAt},</if>
+            <if test="update.contains('bagId')">bag_id=#{bagId},</if>
+            <if test="update.contains('guildId')">guild_id=#{guildId},</if>
+            <if test="update.contains('exp')">exp=#{exp},</if>
+            <if test="update.contains('guildRoleType')">guild_Role_Type=#{guildRoleType},</if>
+            <if test="update.contains('money')">money=#{money}</if>
         </set>
         WHERE player_id = #{playerId};
     </update>
