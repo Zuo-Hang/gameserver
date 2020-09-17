@@ -35,7 +35,7 @@ public class Guild {
      */
     private Integer warehouseSize;
 
-    private Integer coldNum;
+    private Integer goldNum;
     /**
      * 加入请求
      */

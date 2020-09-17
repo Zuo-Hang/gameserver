@@ -1,13 +1,13 @@
 package com.example.gameservicedemo.game.guild.bean;
 
 import com.example.gamedatademo.bean.Guild;
-import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -23,7 +23,7 @@ public class GuildBeCache extends Guild {
     /**
      * 成员
      */
-    private Map<Integer, PlayerBeCache> memberMap = new ConcurrentHashMap<>();
+    private List<Integer> memberIdList = new ArrayList<>();
 
     /**
      * 公会仓库
@@ -42,7 +42,7 @@ public class GuildBeCache extends Guild {
         this.setName(guildName);
         this.setLevel(level);
         this.setWarehouseSize(wareHouseSize);
-        this.setColdNum(0);
+        this.setGoldNum(0);
     }
 
     public GuildBeCache() {
@@ -70,7 +70,7 @@ public class GuildBeCache extends Guild {
      * 捐献金币
      */
     public synchronized boolean contributionColdNum(Integer count){
-        this.setColdNum(getColdNum()+count);
+        this.setGoldNum(getGoldNum()+count);
         return true;
     }
 
@@ -78,10 +78,10 @@ public class GuildBeCache extends Guild {
      * 获取金币
      */
     public synchronized boolean takeColdNum(Integer count){
-        if(getColdNum()-count<0){
+        if(getGoldNum()-count<0){
             return false;
         }
-        this.setColdNum(getColdNum()-count);
+        this.setGoldNum(getGoldNum()-count);
         return true;
     }
 }

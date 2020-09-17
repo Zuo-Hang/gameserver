@@ -2,6 +2,9 @@ package com.example.gamedatademo.bean;
 
 import lombok.Data;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -23,4 +26,15 @@ public class Bag {
      */
     private String items;
 
+    private Set<String> update=new ConcurrentSkipListSet<>();
+
+//    public synchronized void setSize(Integer size) {
+//        this.size = size;
+//        update.add("size");
+//    }
+
+//    public synchronized void setName(String name) {
+//        this.name = name;
+//        update.add("name");
+//    }
 }

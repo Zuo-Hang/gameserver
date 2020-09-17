@@ -86,8 +86,8 @@ public class GuildController {
             notificationManager.notifyByCtx(context,"你还未加载游戏角色！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        //指令 申请人id
-        String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
+        //指令
+        String[] strings = CheckParametersUtil.checkParameter(context, message, 1);
         if(Objects.isNull(strings)){
             notificationManager.notifyByCtx(context,"输入的参数个数错误！", RequestCode.BAD_REQUEST.getCode());
             return;

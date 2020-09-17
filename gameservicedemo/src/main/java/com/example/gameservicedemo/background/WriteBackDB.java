@@ -42,10 +42,12 @@ public class WriteBackDB{
      * 以一个set标记，避免在待回写数据库的等待期间，同一个对象提交多次回写任务
      */
     private Set<Integer> shouldWrite= new ConcurrentSkipListSet();
+    private Set<Integer> shouldWriteBag= new ConcurrentSkipListSet();
+    private Set<Integer> shouldWriteMail= new ConcurrentSkipListSet();
 
-    private  ThreadFactory WriteBackDBThreadPoolFactory = new ThreadFactoryBuilder()
+    private ThreadFactory WriteBackDBThreadPoolFactory = new ThreadFactoryBuilder()
             .setNameFormat("WriteBackDBThreadPool-%d").setUncaughtExceptionHandler((t,e) -> e.printStackTrace()).build();
-    private  ScheduledExecutorService ScheduledThreadPool =
+    private ScheduledExecutorService ScheduledThreadPool =
             Executors.newScheduledThreadPool( Runtime.getRuntime().availableProcessors()*2+1,WriteBackDBThreadPoolFactory);
 
     /**
@@ -63,6 +65,25 @@ public class WriteBackDB{
                 shouldWrite.remove(player.getPlayerId());
                 return null;
             },1000*2, TimeUnit.MILLISECONDS);
+        }
+        return null;
+    }
+
+    /**
+     * 更新背包数据库
+     * @param bag
+     * @return
+     */
+    public  Future<Event> updateBagDb(BagBeCache bag){
+        if(!shouldWriteBag.contains(bag.getId())){
+            shouldWriteBag.add(bag.getId());
+            ScheduledThreadPool.schedule(()->{
+                //写回
+                bagMapper.updateByBagId(bag);
+                bag.getUpdate().clear();
+                shouldWriteBag.remove(bag.getId());
+                return null;
+            },1000, TimeUnit.MILLISECONDS);
         }
         return null;
     }

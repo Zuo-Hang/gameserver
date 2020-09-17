@@ -3,7 +3,6 @@ package com.example.gameservicedemo.game.guild.service;
 import com.example.commondemo.base.Command;
 import com.example.commondemo.base.RequestCode;
 import com.example.gamedatademo.bean.Player;
-import com.example.gamedatademo.mapper.PlayerMapper;
 import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.service.BagService;
@@ -13,6 +12,7 @@ import com.example.gameservicedemo.game.guild.bean.RoleType;
 import com.example.gameservicedemo.game.guild.cache.GuildCache;
 import com.example.gameservicedemo.game.mail.bean.GameSystem;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
+import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.manager.NotificationManager;
 import lombok.extern.slf4j.Slf4j;
@@ -41,9 +41,9 @@ public class GuildService {
     @Autowired
     GameSystem gameSystem;
     @Autowired
-    BagService bagService;
+    PlayerLoginService playerLoginService;
     @Autowired
-    PlayerMapper playerMapper;
+    BagService bagService;
 
     /**
      * 创建一个公会
@@ -56,7 +56,8 @@ public class GuildService {
             return;
         }
         GuildBeCache guildBeCache = new GuildBeCache(IdGenerator.getAnId(), name, 1, 30);
-        guildBeCache.getMemberMap().put(player.getId(), player);
+        //这里应该只保存id
+        guildBeCache.getMemberIdList().add(player.getId());
         player.setGuildId(guildBeCache.getId());
         player.setGuildRoleType(RoleType.President.getCode());
         guildCache.putInCache(guildBeCache);
@@ -81,13 +82,13 @@ public class GuildService {
             notificationManager.notifyPlayer(player, "该公会并不存在，请检查输入的公会id", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        PlayerJoinRequest playerJoinRequest = new PlayerJoinRequest(new Date(), player);
+        PlayerJoinRequest playerJoinRequest = new PlayerJoinRequest(new Date(), player.getId());
         guild.getPlayerJoinRequestMap().put(player.getId(), playerJoinRequest);
         notificationManager.notifyPlayer(player, "已经发出加入请求，等待处理中……", RequestCode.SUCCESS.getCode());
         //在这里或通知公会会长
-        guild.getMemberMap().values().forEach(p -> {
-            if (p.getGuildRoleType().equals(RoleType.President.getCode())) {
-                gameSystem.noticeSomeOne(p.getId(),
+        guild.getMemberIdList().forEach(playerId -> {
+            if (playerLoginService.getPlayerById(playerId).getGuildRoleType().equals(RoleType.President.getCode())) {
+                gameSystem.noticeSomeOne(playerId,
                         "有关公会",
                         MessageFormat.format("收到{0}加入{1}公会的申请，请注意处理!", player.getName(), guild.getName()),
                         null);
@@ -120,7 +121,8 @@ public class GuildService {
             notificationManager.notifyPlayer(admin, "该玩家并未提出申请，或申请已经处理！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        Player player = playerMapper.selectByPlayerId(playerId);
+        //获取玩家
+        Player player = playerLoginService.getPlayerById(playerId);
         Long playerGuildId = player.getGuildId();
         if (Objects.nonNull(playerGuildId)) {
             notificationManager.notifyPlayer(admin, "该玩家已经加入了其他公会，此操作无效！", RequestCode.WARNING.getCode());
@@ -129,8 +131,9 @@ public class GuildService {
         player.setGuildId(guild.getId());
         player.setGuildRoleType(RoleType.Ordinary_Member.getCode());
         guild.getPlayerJoinRequestMap().remove(playerId);
+        guild.getMemberIdList().add(playerId);
         //更新操作应该移到统一的操作--------------------------------------------------------------------------------------
-        playerMapper.updateByPlayerId(player);
+        //playerMapper.updateByPlayerId(player);
         notificationManager.notifyPlayer(admin, "已经同意该玩家加入公会！", RequestCode.SUCCESS.getCode());
         //通知加入者
         gameSystem.noticeSomeOne(player.getUserId(), "有关公会", MessageFormat.format("你已经加入公会：{0}", guild.getName()), null);
@@ -166,10 +169,11 @@ public class GuildService {
         }
         GuildBeCache guild = guildCache.getGuildByGuildId(guildId);
         StringBuilder stringBuilder = new StringBuilder("你所加入的公会的信息如下：\n");
-        stringBuilder.append(MessageFormat.format("名称：{0} 等级：{1} 成员数量：{3} \n成员列表:\n",
-                guild.getName(), guild.getLevel(), guild.getMemberMap().size()));
-        guild.getMemberMap().values().forEach(p -> {
-            stringBuilder.append(MessageFormat.format("id:{0} name:{1} 职位：{3}\n",
+        stringBuilder.append(MessageFormat.format("名称：{0} 等级：{1} 成员数量：{2} \n成员列表:\n",
+                guild.getName(), guild.getLevel(), guild.getMemberIdList().size()));
+        guild.getMemberIdList().forEach(playerId -> {
+            PlayerBeCache p = playerLoginService.getPlayerById(playerId);
+            stringBuilder.append(MessageFormat.format("id:{0} name:{1} 职位：{2}\n",
                     p.getId(), p.getName(), RoleType.getEnumByCode(p.getGuildRoleType()).getDescribe()));
         });
         stringBuilder.append(MessageFormat.format("仓库容量：{0}\n", guild.getWarehouseSize()));
@@ -200,9 +204,10 @@ public class GuildService {
         if (playerJoinRequestMap.size() == 0) {
             stringBuilder.append("还没有新的请求");
         } else {
-            playerJoinRequestMap.values().forEach(p -> {
+            playerJoinRequestMap.values().forEach(v -> {
+                PlayerBeCache p = playerLoginService.getPlayerById(v.getPlayerId());
                 stringBuilder.append(MessageFormat.format("请求人id：{0} 请求人名称:{1} 请求时间:{2}\n",
-                        p.getPlayer().getId(), p.getPlayer().getName(), p.getDate()));
+                        p.getId(), p.getName(), v.getDate()));
             });
         }
         notificationManager.notifyPlayer(player, stringBuilder.toString(), RequestCode.SUCCESS.getCode());
@@ -227,7 +232,7 @@ public class GuildService {
         }
         player.setMoney(player.getMoney() - number);
         //-----------------------------------------------------安全问题
-        guild.setColdNum(guild.getColdNum() + number);
+        guild.setGoldNum(guild.getGoldNum() + number);
         //----------------------------------------更新玩家数据库
         guildCache.updateGuild(guild);
     }
@@ -282,7 +287,7 @@ public class GuildService {
         player.setGuildRoleType(null);
         player.setGuildId(null);
         //更新player表
-        guild.getMemberMap().remove(player.getId());
+        guild.getMemberIdList().remove(player.getId());
         guildCache.updateGuild(guild);
     }
 
@@ -302,14 +307,14 @@ public class GuildService {
             return;
         }
         GuildBeCache guild = guildCache.getGuildByGuildId(guildId);
-        guild.getMemberMap().keySet().forEach(id -> {
-            Player player1 = playerMapper.selectByPlayerId(id);
+        guild.getMemberIdList().forEach(id -> {
+            PlayerBeCache player1 = playerLoginService.getPlayerById(id);
             player1.setGuildRoleType(null);
             player1.setGuildId(null);
-            playerMapper.updateByPlayerId(player1);
+            //playerMapper.updateByPlayerId(player1);
             //给玩家发送邮件说明公会解散
         });
-        guild.getMemberMap().clear();
+        guild.getMemberIdList().clear();
         guildCache.updateGuild(guild);
         notificationManager.notifyPlayer(player, "公会已解散！", RequestCode.SUCCESS.getCode());
     }
@@ -332,11 +337,11 @@ public class GuildService {
             return;
         }
         GuildBeCache guild = guildCache.getGuildByGuildId(guildId);
-        if (Objects.isNull(guild.getMemberMap().get(playerId))) {
+        if (Objects.isNull(guild.getMemberIdList().get(playerId))) {
             notificationManager.notifyPlayer(admin, "该玩家不在当前公会当中！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        Player player = playerMapper.selectByPlayerId(playerId);
+        PlayerBeCache player = playerLoginService.getPlayerById(playerId);
         if (player.getGuildRoleType() <= admin.getGuildRoleType()) {
             notificationManager.notifyPlayer(admin, "只能授权给当前权限比自己小的会员！", RequestCode.BAD_REQUEST.getCode());
             return;
@@ -366,14 +371,14 @@ public class GuildService {
             return;
         }
         GuildBeCache guild = guildCache.getGuildByGuildId(guildId);
-        if (Objects.isNull(guild.getMemberMap().get(playerId))) {
+        if (Objects.isNull(guild.getMemberIdList().get(playerId))) {
             notificationManager.notifyPlayer(admin, "该玩家不在当前公会当中！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        Player player = playerMapper.selectByPlayerId(playerId);
+        PlayerBeCache player = playerLoginService.getPlayerById(playerId);
         player.setGuildRoleType(null);
         player.setGuildId(null);
-        guild.getMemberMap().remove(playerId);
+        guild.getMemberIdList().remove(playerId);
         guildCache.updateGuild(guild);
         //---------------更新player表
     }
@@ -396,7 +401,7 @@ public class GuildService {
         }
         guildCache.updateGuild(guild);
         player.setMoney(player.getMoney() + 100);
-        playerMapper.updateByPlayerId(player);
+        //playerMapper.updateByPlayerId(player);
         //更改玩家显示
     }
 }

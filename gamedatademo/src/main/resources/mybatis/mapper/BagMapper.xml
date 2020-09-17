@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.gamedatademo.mapper.BagMapper">
+    <mapper namespace="com.example.gamedatademo.mapper.BagMapper">
 
     <select id="selectByBagId" resultType="com.example.gamedatademo.bean.Bag">
     select * from bag where id = #{id};
@@ -16,7 +16,13 @@
     </insert>
 
     <update id="updateByBagId" parameterType="com.example.gamedatademo.bean.Bag">
-        UPDATE bag SET size = #{size}, name = #{name},items = #{items},tools=#{tools}
+        UPDATE bag
+        <set>
+            <if test="update.contains('size')"> size = #{size},</if>
+            <if test="update.contains('name')"> name = #{name},</if>
+            <if test="update.contains('items')"> items = #{items},</if>
+            <if test="update.contains('tools')"> tools=#{tools}</if>
+        </set>
         WHERE id = #{id};
     </update>
 

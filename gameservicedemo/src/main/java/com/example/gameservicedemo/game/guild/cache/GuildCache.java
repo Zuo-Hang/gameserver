@@ -9,19 +9,25 @@ import com.example.gameservicedemo.game.guild.bean.GuildBeCache;
 import com.example.gameservicedemo.game.guild.bean.PlayerJoinRequest;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.tools.bean.Tools;
+import com.example.gameservicedemo.game.tools.bean.ToolsProperty;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.*;
+
+import static com.alibaba.druid.sql.ast.SQLPartitionValue.Operator.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -77,16 +83,16 @@ public class GuildCache {
     }
 
     /**
-     * 加载公会成员
+     * 加载公会成员(从json获取到玩家的id，然后转化为列表)
      *
      * @param guild 公会
      */
     private static void loadMember(GuildBeCache guild) {
-        if (Strings.isNullOrEmpty(guild.getWarehouse())) {
-            Map<Integer, PlayerBeCache> memberMap = JSON.parseObject(guild.getMember(),
-                    new TypeReference<Map<Integer, PlayerBeCache>>() {
-                    });
-            guild.setMemberMap(memberMap);
+        if (!Strings.isNullOrEmpty(guild.getMember())) {
+            Gson gson = new Gson();
+            ArrayList<Integer> ids = gson.fromJson(guild.getMember(), new TypeToken<ArrayList<Integer>>() {
+            }.getType());
+            guild.setMemberIdList(ids);
         }
     }
 
@@ -97,9 +103,9 @@ public class GuildCache {
      */
     private static void loadWarehouse(GuildBeCache guild) {
         if (Strings.isNullOrEmpty(guild.getWarehouse())) {
-            Map<Long, Tools> wareHouseMap = JSON.parseObject(guild.getWarehouse(),
-                    new TypeReference<Map<Long, Tools>>() {
-                    });
+            Gson gson = new Gson();
+            Map<Long, Tools> wareHouseMap = gson.fromJson(guild.getWarehouse(), new TypeToken<Map<Long, Tools>>() {
+            }.getType());
             guild.setWarehouseMap(wareHouseMap);
         }
     }
@@ -111,9 +117,10 @@ public class GuildCache {
      */
     private static void loadJoinRequest(GuildBeCache guild) {
         if (Strings.isNullOrEmpty(guild.getJoinRequest())) {
-            Map<Integer, PlayerJoinRequest> playerJoinRequestMap = JSON.parseObject(guild.getJoinRequest(),
-                    new TypeReference<Map<Integer, PlayerJoinRequest>>() {
-                    });
+            Gson gson = new Gson();
+            Map<Integer, PlayerJoinRequest> playerJoinRequestMap = gson.fromJson(guild.getJoinRequest(),
+                    new TypeToken<Map<Integer, PlayerJoinRequest>>() {
+                    }.getType());
             log.debug("playerJoinRequestList {}", playerJoinRequestMap);
             Optional.ofNullable(playerJoinRequestMap).ifPresent(guild::setPlayerJoinRequestMap);
         }
@@ -136,9 +143,10 @@ public class GuildCache {
      */
     public void insertGuild(GuildBeCache guild) {
         threadPool.execute(() -> {
-            guild.setMember(JSON.toJSONString(guild.getMemberMap()));
-            guild.setWarehouse(JSON.toJSONString(guild.getWarehouseMap()));
-            guild.setJoinRequest(JSON.toJSONString(guild.getPlayerJoinRequestMap()));
+            Gson gson = new Gson();
+            guild.setMember(gson.toJson(guild.getMemberIdList()));
+            guild.setWarehouse(gson.toJson(guild.getWarehouseMap()));
+            guild.setJoinRequest(gson.toJson(guild.getPlayerJoinRequestMap()));
             guildMapper.insert(guild);
         });
     }
@@ -150,9 +158,10 @@ public class GuildCache {
      */
     public void updateGuild(GuildBeCache guild) {
         threadPool.execute(() -> {
-            guild.setMember(JSON.toJSONString(guild.getMemberMap()));
-            guild.setWarehouse(JSON.toJSONString(guild.getWarehouseMap()));
-            guild.setJoinRequest(JSON.toJSONString(guild.getPlayerJoinRequestMap()));
+            Gson gson = new Gson();
+            guild.setMember(gson.toJson(guild.getMemberIdList()));
+            guild.setWarehouse(gson.toJson(guild.getWarehouseMap()));
+            guild.setJoinRequest(gson.toJson(guild.getPlayerJoinRequestMap()));
             guildMapper.updateByGuildId(guild);
         });
     }

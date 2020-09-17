@@ -18,14 +18,14 @@ public class PlayerJoinRequest {
 
     private Date date;
 
-    PlayerBeCache player;
+    Integer playerId;
 
     public PlayerJoinRequest() {
     }
 
-    public PlayerJoinRequest(Date date, PlayerBeCache player) {
+    public PlayerJoinRequest(Date date, Integer playerId) {
         this.isAgree = false;
         this.date = date;
-        this.player = player;
+        this.playerId = playerId;
     }
 }
