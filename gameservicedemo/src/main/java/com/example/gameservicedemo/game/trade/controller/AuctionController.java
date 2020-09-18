@@ -57,6 +57,7 @@ public class AuctionController {
             notificationManager.notifyByCtx(context,"你还未加载角色，不能进行此项操作！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
+        //指令
         String[] strings = CheckParametersUtil.checkParameter(context, message, 1);
         if(Objects.isNull(strings)){
             notificationManager.notifyPlayer(player,"输入的参数个数不对！",RequestCode.BAD_REQUEST.getCode());

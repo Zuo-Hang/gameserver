@@ -63,19 +63,22 @@ public class MailService {
             return;
         }
         Mail mail = new Mail(subject, content, sender.getId(), receiverId, 0);
-        BagBeCache bagBeCache = sender.getBagBeCache();
-        if (Objects.nonNull(toolsUuid)&& toolsUuid != 0) {
-            Tools tools = bagService.containsTools(bagBeCache, toolsUuid);
-            if(Objects.isNull(tools)){
-                notificationManager.notifyPlayer(sender,"你的背包中不存在这个装备", RequestCode.BAD_REQUEST.getCode());
-                return;
+
+        if(sender!=gameSystem){
+            BagBeCache bagBeCache = sender.getBagBeCache();
+            if (Objects.nonNull(toolsUuid)&& toolsUuid != 0) {
+                Tools tools = bagService.containsTools(bagBeCache, toolsUuid);
+                if(Objects.isNull(tools)){
+                    notificationManager.notifyPlayer(sender,"你的背包中不存在这个装备", RequestCode.BAD_REQUEST.getCode());
+                    return;
+                }
+                bagService.removeFromBag(bagBeCache,toolsUuid);
+                Gson gson = new Gson();
+                String toolsJson = gson.toJson(tools);
+                mail.setAttachment(toolsJson);
             }
-            bagService.removeFromBag(bagBeCache,toolsUuid);
-            Gson gson = new Gson();
-            String toolsJson = gson.toJson(tools);
-            mail.setAttachment(toolsJson);
+            playerDataService.showPlayerBag(sender);
         }
-        playerDataService.showPlayerBag(sender);
         Integer insert = mailMapper.insert(mail);
         if(!sender.equals(gameSystem)){
             notificationManager.notifyPlayer(sender,"邮件已发出！",RequestCode.SUCCESS.getCode());

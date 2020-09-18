@@ -11,6 +11,7 @@ import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -65,11 +66,11 @@ public class AuctionCache {
         //定时查看这些拍卖是否结束了
         TimedTaskManager.scheduleAtFixedRate(5000, 500, () -> {
                     try {
-                        auctionCache.values().forEach(auction -> {
+                        auctionCache.forEach((k,auction) -> {
                                     log.debug("拍卖品{}", auction);
                                     // 如果拍卖品被拍卖超过一天，结束拍卖
                                     if (System.currentTimeMillis() - auction.getPublishTime().getTime() >
-                                            Duration.ofMinutes(2).toMillis()) {
+                                            2*60*1000) {
                                         //执行拍卖结束的相关事宜
                                         auctionService.finishAuction(auction);
                                     }

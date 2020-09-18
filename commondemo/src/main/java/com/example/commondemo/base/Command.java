@@ -307,7 +307,7 @@ public enum Command {
     /**
      * 发起交易  ok
      **/
-    TRADE_INITIATE("trade", 8500, "发起交易 格式：指令 买家的id"),
+    TRADE_INITIATE("trade", 8500, "发起交易 格式：指令 想与之交易玩家的id"),
 
     /**
      * 开始交易  ok
@@ -327,7 +327,7 @@ public enum Command {
     /**
      * 查看交易出价  ok
      */
-    TRADE_SEE("trade_see", 8535, "查看交易出价 格式： trade_see tradeId"),
+    TRADE_SEE("trade_see", 8535, "查看交易出价 格式： 指令 交易id"),
 
     /**
      * 确定交易
@@ -337,17 +337,17 @@ public enum Command {
     /**
      * 竞拍
      */
-    AUCTION_BID("auction_bid", 8800, "竞拍"),
+    AUCTION_BID("auction_bid", 8800, "竞拍  格式：指令 拍卖序号 出价"),
 
     /**
      * 发布拍卖品
      */
-    AUCTION_PUSH("auction_push", 8810, "发布拍卖品"),
+    AUCTION_PUSH("auction_push", 8810, "发布拍卖品 格式：指令 拍卖模式 物品id  起拍价格\n（注：拍卖模式：1->竞价拍卖模式,2->一口价模式）"),
 
     /**
      * 查看拍卖品
      */
-    AUCTION_SHOW("auction_show", 8820, "查看拍卖品"),
+    AUCTION_SHOW("auction_show", 8820, "查看拍卖品 格式：指令"),
 
 
     ;

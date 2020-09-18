@@ -7,6 +7,7 @@ import com.example.gameservicedemo.game.bag.service.BagService;
 import com.example.gameservicedemo.game.mail.bean.GameSystem;
 import com.example.gameservicedemo.game.mail.service.MailService;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
+import com.example.gameservicedemo.game.player.service.PlayerDataService;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.tools.service.ToolsService;
@@ -47,6 +48,8 @@ public class AuctionService {
     @Autowired
     PlayerLoginService playerLoginService;
     @Autowired
+    PlayerDataService playerDataService;
+    @Autowired
     NotificationManager notificationManager;
 
     /**
@@ -58,21 +61,27 @@ public class AuctionService {
         Collection<Auction> allAuction = auctionCache.getAllAuction();
         log.info("拍卖列表{}", allAuction);
         StringBuilder string = new StringBuilder("正在进行拍卖的列表如下：\n");
+        if(allAuction.isEmpty()){
+            notificationManager.notifyPlayer(player,"还没有进行拍卖的物品，请稍后查看！",RequestCode.SUCCESS.getCode());
+            return;
+        }
         allAuction.forEach(auction -> {
             if (auction.getAuctionMode().equals(TradeForm.SHELL_NOW.getCode())) {
-                string.append(MessageFormat.format("名称：{0} 竞拍模式：一口价模式,先到先得 售价：{1} 发布人id{2} 发布时间:{3}",
+                string.append(MessageFormat.format("id:{4}\n  名称：{0} 竞拍模式：一口价模式,先到先得 售价：{1} 发布人id{2} 发布时间:{3}",
                         toolsService.getToolsById(auction.getToolsId()).getName(),
                         auction.getBasePrice(),
                         auction.getPublisherId(),
-                        auction.getPublishTime()
+                        auction.getPublishTime(),
+                        auction.getId()
                 ));
             } else {
-                string.append(MessageFormat.format("名称：{0} 竞拍模式：价高者得 起拍价：{1} 当前最高价:{2} 发布人id{3} 发布时间:{4}",
+                string.append(MessageFormat.format("id:{5}\n  名称：{0} 竞拍模式：价高者得 起拍价：{1} 当前最高价:{2} 发布人id{3} 发布时间:{4}",
                         toolsService.getToolsById(auction.getToolsId()).getName(),
                         auction.getBasePrice(),
                         auction.getAuctionPrice(),
                         auction.getPublisherId(),
-                        auction.getPublishTime()
+                        auction.getPublishTime(),
+                        auction.getId()
                 ));
             }
         });
@@ -86,20 +95,26 @@ public class AuctionService {
      * @param auction
      */
     public void finishAuction(Auction auction) {
+        auctionCache.removeCache(auction.getId());
         Map<Integer, Integer> bidding = auction.getBidding();
         Tools toolsInCache = toolsService.getToolsById(auction.getToolsId());
         Tools tools = new Tools();
         BeanUtils.copyProperties(toolsInCache, tools);
+        tools.setUuid(IdGenerator.getAnId());
         PlayerBeCache publisher = playerLoginService.getPlayerById(auction.getPublisherId());
         if (bidding.isEmpty()) {
+            bagService.putInBag(publisher,tools);
             notificationManager.notifyPlayer(publisher, "物品发布时间结束，未有人参加交易，物品返还至你的邮箱，请注意查收", RequestCode.WARNING.getCode());
-            mailService.sendMail(gameSystem, publisher.getId(), "有关拍卖", "拍卖物品返还", tools.getUuid());
+            mailService.sendMail(gameSystem, publisher.getId(), "有关拍卖", "拍卖物品返还",null);
             return;
         }
+        mailService.sendMail(gameSystem, publisher.getId(), "有关拍卖", MessageFormat.format("此次拍卖成功,{0}卖出了{1}金币",
+                tools.getName(),auction.getAuctionPrice()),null);
         bidding.forEach((playerId, bid) -> {
             publisher.setMoney(publisher.getMoney() + auction.getAuctionPrice());
             if (bid.equals(auction.getAuctionPrice())) {
-                mailService.sendMail(gameSystem, playerId, "有关拍卖", "恭喜你，竞拍成功！", tools.getUuid());
+                bagService.putInBag(playerLoginService.getPlayerById(playerId),tools);
+                gameSystem.noticeSomeOne(playerId, "有关拍卖", "恭喜你，竞拍成功!", null);
             } else {
                 PlayerBeCache bidders = playerLoginService.getPlayerById(playerId);
                 //需要安全的
@@ -129,7 +144,8 @@ public class AuctionService {
         Auction auction = new Auction(IdGenerator.getAnId(), tools.getId(), basePrice, form, player.getId());
         auctionCache.putInCache(auction);
         log.info("{}发布了新的竞拍", player.getName());
-        notificationManager.notifyPlayer(player, "你的物品已经成功委托到拍卖行，一天后会通知交易结果。", RequestCode.SUCCESS.getCode());
+        playerDataService.showPlayerBag(player);
+        notificationManager.notifyPlayer(player, "你的物品已经成功委托到拍卖行，最晚一天后会通知交易结果。", RequestCode.SUCCESS.getCode());
     }
 
     /**
@@ -160,6 +176,7 @@ public class AuctionService {
         if (auction.getAuctionMode().equals(TradeForm.SHELL_NOW.getCode())) {
             //线程安全的改变值
             buyer.setMoney(buyer.getMoney() - bid);
+            playerDataService.showPlayerInfo(buyer);
             Tools toolsInCache = toolsService.getToolsById(auction.getToolsId());
             Tools tools = new Tools();
             BeanUtils.copyProperties(toolsInCache, tools);
@@ -180,6 +197,7 @@ public class AuctionService {
                 //只扣除这次加的差价
                 buyer.setMoney(buyer.getMoney() - (bid - had));
             }
+            playerDataService.showPlayerInfo(buyer);
             auction.getBidding().put(buyer.getId(), bid);
             auction.setAuctionPrice(bid);
             notificationManager.notifyPlayer(buyer, "竞拍模式！需等到拍卖结束才能得知花落谁家", RequestCode.WARNING.getCode());
