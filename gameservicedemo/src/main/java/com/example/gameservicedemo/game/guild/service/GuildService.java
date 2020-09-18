@@ -2,6 +2,7 @@ package com.example.gameservicedemo.game.guild.service;
 
 import com.example.commondemo.base.Command;
 import com.example.commondemo.base.RequestCode;
+import com.example.commondemo.message.Message;
 import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.base.IdGenerator;
@@ -185,8 +186,11 @@ public class GuildService {
         });
         stringBuilder.append(MessageFormat.format("仓库容量：{0}\n", guild.getWarehouseSize()));
         guild.getWarehouseMap().values().forEach((tools) -> {
-            stringBuilder.append(MessageFormat.format("toolsId:{0} 名称:{1}", tools.getUuid(), tools.getName()));
+            stringBuilder.append(MessageFormat.format("toolsId:{0} 名称:{1}\n", tools.getUuid(), tools.getName()));
         });
+        if(Objects.nonNull(guild.getGoldNum())&&guild.getGoldNum()>0){
+            stringBuilder.append(MessageFormat.format("公会含有金币:{0}",guild.getGoldNum()));
+        }
         notificationManager.notifyPlayer(player, stringBuilder.toString(), RequestCode.SUCCESS.getCode());
     }
 
@@ -238,7 +242,11 @@ public class GuildService {
             return;
         }
         player.setMoney(player.getMoney() - number);
+        //更改显示
+        playerDataService.showPlayerInfo(player);
         guild.contributionGoldNum(number);
+        notificationManager.notifyPlayer(player,MessageFormat.format("向公会{0}贡献{1}金币成功!",
+                guild.getName(),number),RequestCode.SUCCESS.getCode());
     }
 
     /**
@@ -342,7 +350,7 @@ public class GuildService {
             return;
         }
         GuildBeCache guild = guildCache.getGuildByGuildId(guildId);
-        if (Objects.isNull(guild.getMemberIdList().get(playerId))) {
+        if (!guild.getMemberIdList().contains(playerId)) {
             notificationManager.notifyPlayer(admin, "该玩家不在当前公会当中！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
@@ -356,7 +364,14 @@ public class GuildService {
             return;
         }
         player.setGuildRoleType(roleTypeCode);
-        //更新数据库
+        RoleType enumByCode = RoleType.getEnumByCode(player.getGuildRoleType());
+        if(Objects.nonNull(enumByCode)){
+            notificationManager.notifyPlayer(admin, MessageFormat.format("授权{0}为{1}成功！",
+                    player.getName(),enumByCode.getDescribe()), RequestCode.SUCCESS.getCode());
+            notificationManager.notifyPlayer(player,MessageFormat.format("{0}将你在公会{1}的权限更改为{2}",
+                    admin.getName(),enumByCode.getDescribe()),RequestCode.WARNING.getCode());
+        }
+
     }
 
     /**
@@ -376,7 +391,7 @@ public class GuildService {
             return;
         }
         GuildBeCache guild = guildCache.getGuildByGuildId(guildId);
-        if (Objects.isNull(guild.getMemberIdList().get(playerId))) {
+        if (!guild.getMemberIdList().contains(playerId)) {
             notificationManager.notifyPlayer(admin, "该玩家不在当前公会当中！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
@@ -384,7 +399,8 @@ public class GuildService {
         player.setGuildRoleType(null);
         player.setGuildId(null);
         guild.removePlayer(playerId);
-        //---------------更新player表
+        notificationManager.notifyPlayer(admin, MessageFormat.format("已经将玩家{0}踢出公会！",player.getName()), RequestCode.BAD_REQUEST.getCode());
+        gameSystem.noticeSomeOne(playerId,"有关公会",MessageFormat.format("你被{0}踢出公会{1}",admin.getName(),guild.getName()),null);
     }
 
     /**
@@ -405,6 +421,8 @@ public class GuildService {
         }
         player.setMoney(player.getMoney() + 100);
         //更改玩家显示
+        playerDataService.showPlayerInfo(player);
+        notificationManager.notifyPlayer(player,MessageFormat.format("从{0}公会获取100金币成功!",guild.getName()),RequestCode.SUCCESS.getCode());
     }
 
     /**

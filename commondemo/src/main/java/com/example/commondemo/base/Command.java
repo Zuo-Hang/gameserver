@@ -254,7 +254,7 @@ public enum Command {
      */
     GUILD_DONATE("guild_donate", 8020, "公会捐献 guild_donate 背包的index（格）"),
     /**
-     * 公会捐献金币
+     * 公会捐献金币 ok
      */
     GUILD_DONATE_COLD("guild_donate_cold", 8110, "公会捐献金币 guild_donate_cold 金币数量"),
 
@@ -264,7 +264,7 @@ public enum Command {
     GUILD_JOIN("guild_join", 8030, "加入公会 guild_join 返回guildId"),
 
     /**
-     * 授权公会成员
+     * 授权公会成员 ok
      */
     GUILD_GRANT("guild_grant", 8040, "授权公会成员 guild_grant playerId 等级id"),
 
@@ -273,7 +273,7 @@ public enum Command {
      */
     GUILD_TAKE("guild_take", 8050, "获取公会物品  guild_take toolsId"),
     /**
-     * 公会获取金币
+     * 公会获取金币 ok
      */
     GUILD_TAKE_COLD("guild_take_cold", 8120, "从公会取出金币,但是每次只能获取100金币"),
 
@@ -287,7 +287,7 @@ public enum Command {
      */
     GUILD_QUIT("guild_quit", 8070, "退出公会"),
     /**
-     * 从公会踢出会员
+     * 从公会踢出会员 ok
      */
     GUILD_KICK("guild_kick", 8080, "从公会踢出会员"),
     /**

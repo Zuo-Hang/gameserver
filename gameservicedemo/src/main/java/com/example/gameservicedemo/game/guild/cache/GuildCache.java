@@ -100,7 +100,7 @@ public class GuildCache {
      * @param guild 公会
      */
     private void loadWarehouse(GuildBeCache guild) {
-        if (Strings.isNullOrEmpty(guild.getWarehouse())) {
+        if (!Strings.isNullOrEmpty(guild.getWarehouse())) {
             Map<Long, Tools> wareHouseMap = gson.fromJson(guild.getWarehouse(), new TypeToken<Map<Long, Tools>>() {
             }.getType());
             guild.setWarehouseMap(wareHouseMap);

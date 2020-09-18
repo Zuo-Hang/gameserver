@@ -7,6 +7,7 @@ import com.example.gamedatademo.mapper.MailMapper;
 import com.example.gamedatademo.mapper.PlayerMapper;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.service.BagService;
+import com.example.gameservicedemo.game.mail.bean.GameSystem;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerDataService;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
@@ -40,6 +41,8 @@ public class MailService {
     @Autowired
     PlayerDataService playerDataService;
     @Autowired
+    GameSystem gameSystem;
+    @Autowired
     BagService bagService;
     @Autowired
     NotificationManager notificationManager;
@@ -61,7 +64,7 @@ public class MailService {
         }
         Mail mail = new Mail(subject, content, sender.getId(), receiverId, 0);
         BagBeCache bagBeCache = sender.getBagBeCache();
-        if (toolsUuid != 0) {
+        if (Objects.nonNull(toolsUuid)&& toolsUuid != 0) {
             Tools tools = bagService.containsTools(bagBeCache, toolsUuid);
             if(Objects.isNull(tools)){
                 notificationManager.notifyPlayer(sender,"你的背包中不存在这个装备", RequestCode.BAD_REQUEST.getCode());
@@ -74,7 +77,9 @@ public class MailService {
         }
         playerDataService.showPlayerBag(sender);
         Integer insert = mailMapper.insert(mail);
-        notificationManager.notifyPlayer(sender,"邮件已发出！",RequestCode.SUCCESS.getCode());
+        if(!sender.equals(gameSystem)){
+            notificationManager.notifyPlayer(sender,"邮件已发出！",RequestCode.SUCCESS.getCode());
+        }
         //判断玩家是否在线，在线则通知
         if(playerLoginService.playerIsOnLine(receiverId)){
             notificationManager.notifyPlayer(playerLoginService.getPlayerById(receiverId), MessageFormat.format("收到{0}的一封邮件!",
