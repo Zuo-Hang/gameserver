@@ -111,6 +111,17 @@ public class MainView extends JFrame {
                     }
                     System.out.println("客户端输入： " + text);
                     String[] array = text.split("\\s+");
+                    //如果是帮助，调用帮助
+                    String help = "help";
+                    if(help.equals(array[0])){
+                        if(array.length==1){
+                            Help.helpAll();
+                        }else if(array.length==2){
+                            Help.help(Command.findByCommand(array[1], Command.UNKNOWN));
+                        }
+                        INPUT.setText("");
+                        return;
+                    }
                     Command byCommand = Command.findByCommand(array[0], Command.UNKNOWN);
                     Message message = new Message();
                     message.setRequestCode(byCommand.getRequestCode());

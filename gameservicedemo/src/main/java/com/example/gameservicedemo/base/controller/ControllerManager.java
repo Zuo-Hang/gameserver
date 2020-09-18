@@ -66,7 +66,7 @@ public class ControllerManager {
                             try {
                                 controller.handle(ctx,message);
                             } catch (Exception e) {
-                                notificationManager.notifyByCtx(ctx,"这个功能暂时无法使用，请忽略本功能", RequestCode.BAD_REQUEST.getCode());
+                                notificationManager.notifyByCtx(ctx,"指令格式有误！", RequestCode.BAD_REQUEST.getCode());
                                 e.printStackTrace();
                             }
                         })

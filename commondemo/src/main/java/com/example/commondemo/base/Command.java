@@ -416,4 +416,8 @@ public enum Command {
     public String getExplain() {
         return explain;
     }
+
+    public String getCommand() {
+        return command;
+    }
 }

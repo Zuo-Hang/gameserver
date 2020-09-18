@@ -194,7 +194,7 @@ public class PlayerLoginService {
     public PlayerBeCache getPlayerByContext(ChannelHandlerContext context) {
         Integer playerIdByChannel = playerLoginCache.getPlayerIdByChannel(context.channel());
         if(Objects.isNull(playerIdByChannel)){
-            notificationManager.notifyByCtx(context,"此操作之前未登录！",RequestCode.BAD_REQUEST.getCode());
+            log.info("此操作之前未登录！");
             return null;
         }
         PlayerBeCache playerById = allPlayerCache.getPlayerById(playerIdByChannel);
