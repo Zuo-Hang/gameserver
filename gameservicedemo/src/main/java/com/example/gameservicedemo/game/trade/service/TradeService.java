@@ -5,6 +5,7 @@ import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.service.BagService;
 import com.example.gameservicedemo.game.mail.bean.GameSystem;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
+import com.example.gameservicedemo.game.player.service.PlayerDataService;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.trade.bean.TradeBoard;
@@ -36,6 +37,8 @@ public class TradeService {
     @Autowired
     BagService bagService;
     @Autowired
+    PlayerDataService playerDataService;
+    @Autowired
     TradeCache tradeCache;
     @Autowired
     NotificationManager notificationManager;
@@ -58,9 +61,11 @@ public class TradeService {
         boolean[] confirm = tradeBoard.getConfirm();
         if(player.equals(tradeBoard.getInitiator())){
             confirm[0]=true;
+            notificationManager.notifyPlayer(tradeBoard.getInitiator(),"已确认当前交易！",RequestCode.WARNING.getCode());
         }
         if(player.equals(tradeBoard.getAccepter())){
             confirm[1]=true;
+            notificationManager.notifyPlayer(tradeBoard.getAccepter(),"已确认当前交易！",RequestCode.WARNING.getCode());
         }
         //如果双方都同意,执行交易
         if(confirm[0]&&confirm[1]){
@@ -91,6 +96,10 @@ public class TradeService {
         tradeBoard.getInitiator().setMoney(tradeBoard.getInitiator().getMoney()+tradeBoard.getMoneyMap().get(tradeBoard.getAccepter().getId()));
         tradeBoard.getAccepter().setMoney(tradeBoard.getAccepter().getMoney()+tradeBoard.getMoneyMap().get(tradeBoard.getInitiator().getId()));
         tradeBoard.setState(TradeState.FINISH.getCode());
+        playerDataService.showPlayerBag(tradeBoard.getInitiator());
+        playerDataService.showPlayerBag(tradeBoard.getAccepter());
+        playerDataService.showPlayerInfo(tradeBoard.getInitiator());
+        playerDataService.showPlayerInfo(tradeBoard.getAccepter());
         return true;
     }
     /**
@@ -108,9 +117,9 @@ public class TradeService {
         TradeBoard tradeBoard = new TradeBoard(seller, buyer);
         //将交易缓存
         tradeCache.putCache(tradeBoard);
-        notificationManager.notifyPlayer(seller, MessageFormat.format("你已经向{0}发起了交易请求，请在三分钟内完成交易流程\n",
-                buyer.getName()), RequestCode.SUCCESS.getCode());
-        gameSystem.noticeSomeOne(buyerId, "交易相关", MessageFormat.format("收到{0}交易请求,交易id为：{1}。如果同意开始交易，请回复 `begin_trade 交易id`，并在三分钟内完成交易流程\n",
+        notificationManager.notifyPlayer(seller, MessageFormat.format("你已经向{0}发起了交易请求,交易id为：{1}。请在三分钟内完成交易流程\n",
+                buyer.getName(),tradeBoard.getId()), RequestCode.SUCCESS.getCode());
+        gameSystem.noticeSomeOne(buyerId, "交易相关", MessageFormat.format("收到{0}交易请求,交易id为：{1}。如果同意开始交易，请回复 `trade_begin 交易id`，并在三分钟内完成交易流程\n",
                 seller.getName(), tradeBoard.getId()), null);
     }
 
@@ -134,6 +143,7 @@ public class TradeService {
         }
         tradeBoard.getPlayerTools().get(player.getId()).put(toolsId,tools);
         bagService.removeFromBag(player.getBagBeCache(),toolsId);
+        playerDataService.showPlayerBag(player);
         notificationManager.notifyPlayer(player,"出价成功！",RequestCode.SUCCESS.getCode());
         PlayerBeCache anotherPlayer=player.equals(tradeBoard.getInitiator())?tradeBoard.getAccepter():tradeBoard.getInitiator();
         notificationManager.notifyPlayer(anotherPlayer,MessageFormat.format("交易{0}另一方出价成功，使用'trade_see'查看详情",
@@ -155,7 +165,7 @@ public class TradeService {
         tradeBoard.setState(TradeState.TRADING.getCode());
         PlayerBeCache seller = tradeBoard.getInitiator();
         notificationManager.notifyPlayer(seller,
-                MessageFormat.format("{0} 同意了你的交易请求，请用`trade_goods`指令来开价愿意交易的货物\n",
+                MessageFormat.format("{0} 同意了你的交易请求，请用`trade_tools`指令来开价愿意交易的货物\n",
                         buyer.getName()),RequestCode.WARNING.getCode());
         notificationManager.notifyPlayer(buyer,"你已同意交易,请用`trade_money`指令来开价此次交易愿意支付的金币\n",RequestCode.SUCCESS.getCode());
     }
@@ -179,6 +189,7 @@ public class TradeService {
         tradeBoard.getMoneyMap().put(player.getId(),tradeBoard.getMoneyMap().get(player.getId())+count);
         //使用线程安全的方式扣除金币
         player.setMoney(player.getMoney()-count);
+        playerDataService.showPlayerInfo(player);
         notificationManager.notifyPlayer(player,"出价成功！",RequestCode.SUCCESS.getCode());
         PlayerBeCache anotherPlayer=player.equals(tradeBoard.getInitiator())?tradeBoard.getAccepter():tradeBoard.getInitiator();
         notificationManager.notifyPlayer(anotherPlayer,MessageFormat.format("交易{0}另一方出价成功，使用'trade_see'查看详情",

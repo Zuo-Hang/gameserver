@@ -2,6 +2,7 @@ package com.example.gameservicedemo.game.trade.cache;
 
 import com.example.gameservicedemo.game.bag.service.BagService;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
+import com.example.gameservicedemo.game.player.service.PlayerDataService;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.trade.bean.TradeBoard;
 import com.example.gameservicedemo.game.trade.bean.TradeState;
@@ -26,6 +27,8 @@ public class TradeCache {
     @Autowired
     PlayerLoginService playerLoginService;
     @Autowired
+    PlayerDataService playerDataService;
+    @Autowired
     BagService bagService;
     /**
      * 交易栏缓存(<交易id,交易板>)
@@ -39,11 +42,13 @@ public class TradeCache {
                     tradeBoard.getMoneyMap().forEach((playerId,count)->{
                         PlayerBeCache playerById = playerLoginService.getPlayerById(playerId);
                         playerById.setMoney(playerById.getMoney()+count);//应该用线程安全的方式
+                        playerDataService.showPlayerInfo(playerById);
                     });
                     tradeBoard.getPlayerTools().forEach((playerId,toolsMap)->{
                         toolsMap.values().forEach(tools -> {
                             PlayerBeCache playerById = playerLoginService.getPlayerById(playerId);
                             bagService.putInBag(playerById,tools);
+                            playerDataService.showPlayerBag(playerById);
                         });
                     });
                 }

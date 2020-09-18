@@ -123,6 +123,7 @@ public class TradeController {
             notificationManager.notifyByCtx(context, "你还未加载角色，不能进行此项操作！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
+        //指令 交易id
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
         if (Objects.isNull(strings)) {
             notificationManager.notifyPlayer(load, "输入的参数个数不对", RequestCode.BAD_REQUEST.getCode());

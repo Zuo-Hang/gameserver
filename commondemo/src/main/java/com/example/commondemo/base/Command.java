@@ -305,34 +305,34 @@ public enum Command {
 
     /** 交易的流程为：卖家发起交易，买家开始交易（同意交易）、卖家放入货物、卖家放入金币、卖家确认交易 */
     /**
-     * 发起交易
+     * 发起交易  ok
      **/
-    TRADE_INITIATE("trade", 8500, "发起交易"),
+    TRADE_INITIATE("trade", 8500, "发起交易 格式：指令 买家的id"),
 
     /**
-     * 开始交易
+     * 开始交易  ok
      **/
-    TRADE_BEGIN("trade_begin", 8510, "开始交易"),
+    TRADE_BEGIN("trade_begin", 8510, "开始交易 格式：指令 交易id"),
 
     /**
-     * 交易货物
+     * 交易货物  ok
      **/
-    TRADE_TOOLS("trade_tools", 8520, "交易货物"),
+    TRADE_TOOLS("trade_tools", 8520, "交易货物 :指令 交易id 物品id"),
 
     /**
-     * 交易金币
+     * 交易金币  ok
      **/
-    TRADE_MONEY("trade_money", 8530, "交易金币"),
+    TRADE_MONEY("trade_money", 8530, "交易金币 格式：指令 交易id 出价金币"),
 
     /**
-     * 查看交易出价
+     * 查看交易出价  ok
      */
-    TRADE_SEE("trade_see", 8535, "查看交易出价  trade_see tradeId"),
+    TRADE_SEE("trade_see", 8535, "查看交易出价 格式： trade_see tradeId"),
 
     /**
      * 确定交易
      **/
-    TRADE_CONFIRM("trade_confirm", 8540, "确定交易"),
+    TRADE_CONFIRM("trade_confirm", 8540, "确定交易  格式：指令 交易id"),
 
     /**
      * 竞拍
