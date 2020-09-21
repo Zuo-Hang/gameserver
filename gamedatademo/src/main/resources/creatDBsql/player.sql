@@ -11,7 +11,7 @@
  Target Server Version : 80013
  File Encoding         : 65001
 
- Date: 12/08/2020 17:30:32
+ Date: 21/09/2020 18:33:04
 */
 
 SET NAMES utf8mb4;
@@ -29,11 +29,12 @@ CREATE TABLE `player`  (
   `exp` int(255) NOT NULL COMMENT '经验值',
   `state` int(255) NOT NULL COMMENT '状态',
   `money` int(255) NULL DEFAULT NULL COMMENT '金币',
-  `guild_id` int(255) NULL DEFAULT NULL COMMENT '公会id',
+  `guild_id` bigint(255) NULL DEFAULT NULL COMMENT '公会id',
   `role_class` int(255) NOT NULL COMMENT '角色类型',
-  `guild_class` int(255) NULL DEFAULT NULL COMMENT '公会类型',
+  `guild_role_type` int(255) NULL DEFAULT NULL COMMENT '公会类型',
   `friends` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '好友',
+  `bag_Id` int(11) NOT NULL COMMENT '背包id',
   PRIMARY KEY (`player_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

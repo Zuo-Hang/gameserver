@@ -11,6 +11,7 @@ import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.tools.bean.ToolsProperty;
 import com.example.gameservicedemo.game.skill.bean.Skill;
 import com.example.gameservicedemo.game.tools.bean.ToolsPropertyInfo;
+import com.google.gson.Gson;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -64,6 +65,8 @@ public class PlayerBeCache extends Player implements Creature {
 
     Pet pet=null;
 
+    Map<Integer,Long> task=new ConcurrentHashMap<>();
+
     /**
      * 是否可以使用技能  （某些情况下不能使用技能，如修理装备的时候，使用金身的时候）
      */
@@ -91,6 +94,9 @@ public class PlayerBeCache extends Player implements Creature {
      * 需要被修理的装备的id列表
      */
     private List<Long> needFix = new ArrayList<Long>();
+
+    private List<Integer> friendList =new ArrayList<>();
+
     // 背包栏
     private BagBeCache bagBeCache = null;
     /**
@@ -219,5 +225,23 @@ public class PlayerBeCache extends Player implements Creature {
             writeBackDB.delayWriteBackPlayer(this);
         }
 
+    }
+
+    public void addFriend(Integer playerId){
+        if(over){
+            getFriendList().add(playerId);
+            getUpdate().add("friends");
+            writeBackDB.delayWriteBackPlayer(this);
+        }
+    }
+
+    public  void removeFriend(Integer playerId){
+        if(over){
+            getFriendList().remove(playerId);
+            Gson gson = new Gson();
+            setFriends(gson.toJson(getFriendList()));
+            getUpdate().add("friends");
+            writeBackDB.delayWriteBackPlayer(this);
+        }
     }
 }

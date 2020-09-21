@@ -73,6 +73,9 @@ public class AllPlayerCache {
 
     public PlayerBeCache loadFromDb(Integer playerId) {
         Player player = playerMapper.selectByPlayerId(playerId);
+        if (Objects.isNull(player)) {
+            return null;
+        }
         PlayerBeCache playerBeCache = new PlayerBeCache();
         playerBeCache.setWriteBackDB(writeBackDB);
         BeanUtils.copyProperties(player, playerBeCache);

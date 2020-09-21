@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.gamedatademo.mapper.TaskProgressMapper">
+
+    <select id="selectByTaskProgressId" resultType="com.example.gamedatademo.bean.TaskProgress">
+    select * from task_progress where id = #{id};
+    </select>
+
+    <insert id="insert" parameterType="com.example.gamedatademo.bean.TaskProgress" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO task_progress
+    (id, task_Id,task_State,begin_Time,end_Time,progress_Json)
+    VALUES
+    (#{id},#{taskId}, #{taskState},#{beginTime},#{endTime},#{progressJson});
+    </insert>
+
+    <update id="updateByTaskProgressId" parameterType="com.example.gamedatademo.bean.TaskProgress">
+        UPDATE task_progress
+        <set>
+            <if test="update.contains('taskState')"> task_State = #{taskState},</if>
+            <if test="update.contains('endTime')"> end_Time = #{endTime},</if>
+            <if test="update.contains('progressJson')"> progress_Json = #{progressJson}</if>
+        </set>
+        WHERE id = #{id};
+    </update>
+
+</mapper>

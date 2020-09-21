@@ -19,7 +19,9 @@ import java.util.Map;
  * 7. 7000 - 7499 之间为和副本有关
  * 8. 7500 - 7999 之间为和游戏中的通讯有关
  * 9. 8000 - 8499 之间为和公会有关
- * 10.8500 - 9000 之间为和交易有关
+ * 10.8500 - 8999 之间为和交易有关
+ * 11.9000 - 9499 之间为和任务有关
+ * 12.9500 - 9999 之间为与好友有关
  */
 public enum Command {
     /**
@@ -349,6 +351,61 @@ public enum Command {
      */
     AUCTION_SHOW("auction_show", 8820, "查看拍卖品 格式：指令"),
 
+    /**
+     * 显示已接任务
+     **/
+    TASK_SHOW("task", 9000, "显示已接任务"),
+
+    /**
+     * 显示已接任务
+     **/
+    ACHIEVEMENT_SHOW("achievement", 9010, "显示成就进展"),
+
+    /**
+     * 显示所有任务和成就
+     **/
+    TASK_ALL("task_all", 9020, "显示游戏内所有任务和成就"),
+
+    /**
+     * 接受的任务
+     **/
+    TASK_ACCEPT("accept", 9030, "接受任务"),
+
+    /**
+     * 查看任务详情
+     **/
+    TASK_DESCRIBE("task_describe", 9040, "查看任务详情 "),
+
+    /**
+     * 放弃任务
+     **/
+    TASK_GIVE_UP("task_give_up", 9050, "放弃任务"),
+
+    /**
+     * 交付完成任务
+     **/
+    TASK_FINISH("task_finish", 9060, "交付完成任务"),
+    /**
+     * 好友列表 ok
+     */
+    FRIEND_LIST("friend_list",9500,"好友列表"),
+    /**
+     * 添加好友 ok
+     */
+    FRIEND_ADD("friend_add",9510,"添加好友"),
+    /**
+     * 删除好友 ok
+     */
+    FRIEND_DELETE("friend_delete",9520,"删除好友"),
+    /**
+     * 同意好友请求 ok
+     */
+    FRIEND_AGREE("friend_agree",9530,"同意好友请求"),
+
+    /**
+     * 查找用户 ok
+     */
+    PLAYER_SEARCH("player_search",9540,"查找用户"),
 
     ;
 

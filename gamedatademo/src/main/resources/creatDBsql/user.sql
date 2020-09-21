@@ -11,7 +11,7 @@
  Target Server Version : 80013
  File Encoding         : 65001
 
- Date: 12/08/2020 17:31:10
+ Date: 21/09/2020 18:33:29
 */
 
 SET NAMES utf8mb4;
@@ -30,6 +30,6 @@ CREATE TABLE `user`  (
   `last_Login_Time` datetime(0) NULL DEFAULT NULL COMMENT 'last_Login_Time',
   `phone_Number` varchar(11) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'phoneNumber',
   PRIMARY KEY (`user_Id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'user' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'user' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
