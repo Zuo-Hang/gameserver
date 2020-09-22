@@ -230,6 +230,8 @@ public class PlayerBeCache extends Player implements Creature {
     public void addFriend(Integer playerId){
         if(over){
             getFriendList().add(playerId);
+            Gson gson = new Gson();
+            setFriends(gson.toJson(getFriendList()));
             getUpdate().add("friends");
             writeBackDB.delayWriteBackPlayer(this);
         }

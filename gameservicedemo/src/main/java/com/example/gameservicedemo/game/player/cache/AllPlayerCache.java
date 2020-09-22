@@ -13,6 +13,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -116,5 +117,12 @@ public class AllPlayerCache {
         }
         //初始化背包
         bagService.initSomeOneBag(playerBeCache);
+        //初始化好友列表
+        if(Objects.nonNull(playerBeCache.getFriends())&&Strings.isNotEmpty(playerBeCache.getFriends())){
+            ArrayList<Integer> list = gson1.fromJson(playerBeCache.getFriends(), new TypeToken<ArrayList<Integer>>() {
+            }.getType());
+            playerBeCache.setFriendList(list);
+        }
     }
+
 }

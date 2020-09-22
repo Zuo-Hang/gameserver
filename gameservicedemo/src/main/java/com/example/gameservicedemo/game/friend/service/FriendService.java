@@ -143,7 +143,7 @@ public class FriendService {
             string.append(MessageFormat.format("id:{0} name:{1} 是否在线：{2}\n",
                     friend.getId(),
                     friend.getName(),
-                    playerLoginService.playerIsOnLine(player.getId())==true?"是":"否"));
+                    playerLoginService.playerIsOnLine(friend.getId())?"是":"否"));
         });
         notificationManager.notifyPlayer(player, string, RequestCode.SUCCESS.getCode());
     }
