@@ -1,12 +1,14 @@
 package com.example.gameservicedemo.game.player.bean;
 
 import com.example.gamedatademo.bean.Player;
+import com.example.gamedatademo.bean.TaskProgress;
 import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.buffer.bean.Buffer;
 import com.example.gameservicedemo.base.bean.Creature;
 import com.example.gameservicedemo.game.scene.bean.Pet;
 import com.example.gameservicedemo.game.scene.bean.Scene;
+import com.example.gameservicedemo.game.task.bean.Task;
 import com.example.gameservicedemo.game.tools.bean.Tools;
 import com.example.gameservicedemo.game.tools.bean.ToolsProperty;
 import com.example.gameservicedemo.game.skill.bean.Skill;
@@ -18,6 +20,7 @@ import lombok.EqualsAndHashCode;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,7 +68,7 @@ public class PlayerBeCache extends Player implements Creature {
 
     Pet pet=null;
 
-    Map<Integer,Long> task=new ConcurrentHashMap<>();
+    //Map<Integer,Long> task=new ConcurrentHashMap<>();
 
     /**
      * 是否可以使用技能  （某些情况下不能使用技能，如修理装备的时候，使用金身的时候）
@@ -97,7 +100,9 @@ public class PlayerBeCache extends Player implements Creature {
 
     private List<Integer> friendList =new ArrayList<>();
 
-    // 背包栏
+    /** 背包栏
+     *
+     */
     private BagBeCache bagBeCache = null;
     /**
      * 这个集合的元素应该在用户加入缓存之前就初始化
@@ -106,6 +111,16 @@ public class PlayerBeCache extends Player implements Creature {
     private Map<Integer, ToolsProperty> toolsInfluence = new ConcurrentHashMap<>();
 
     Long teamId=null;
+
+    /**
+     * 任务集合<任务id，任务进度id>
+     */
+    private Map<Integer,Long> taskProgressMap=new HashMap<>();
+
+    /**
+     * 已完成的任务或成就的列表
+     */
+    private List<Long> taskAcquireList=new ArrayList<>() ;
 
     @Override
     public Integer getId() {
@@ -245,5 +260,41 @@ public class PlayerBeCache extends Player implements Creature {
             getUpdate().add("friends");
             writeBackDB.delayWriteBackPlayer(this);
         }
+    }
+
+    /**
+     * 添加新的任务
+     * @param taskProgress
+     */
+    public void addTaskProgressMap(TaskProgress taskProgress){
+        taskProgressMap.put(taskProgress.getTaskId(),taskProgress.getId());
+        Gson gson = new Gson();
+        setTaskProgressJson(gson.toJson(getTaskProgressMap()));
+        getUpdate().add("taskProgressJson");
+        writeBackDB.delayWriteBackPlayer(this);
+    }
+
+    /**
+     * 从任务列表移除
+     * @param taskProgress
+     */
+    public void deleteTaskProgressFromMap(TaskProgress taskProgress){
+        taskProgressMap.remove(taskProgress.getTaskId(),taskProgress.getId());
+        Gson gson = new Gson();
+        setTaskProgressJson(gson.toJson(getTaskProgressMap()));
+        getUpdate().add("taskProgressJson");
+        writeBackDB.delayWriteBackPlayer(this);
+    }
+
+    /**
+     * 将某任务完成
+     * @param taskProgress
+     */
+    public void addTaskAcquireList(TaskProgress taskProgress){
+        taskAcquireList.add(taskProgress.getId());
+        Gson gson = new Gson();
+        setTaskProgressJson(gson.toJson(getTaskAcquireList()));
+        getUpdate().add("taskAcquireJson");
+        writeBackDB.delayWriteBackPlayer(this);
     }
 }

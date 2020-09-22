@@ -11,7 +11,6 @@ import com.example.gameservicedemo.manager.NotificationManager;
 import com.example.gameservicedemo.util.CheckParametersUtil;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,22 +41,7 @@ public class TaskController {
         ControllerManager.add(Command.TASK_ACCEPT.getRequestCode(), this::taskAccept);
         ControllerManager.add(Command.TASK_DESCRIBE.getRequestCode(), this::taskDescribe);
         ControllerManager.add(Command.TASK_GIVE_UP.getRequestCode(), this::taskGaveUp);
-        ControllerManager.add(Command.TASK_FINISH.getRequestCode(), this::taskFinish);
-    }
-
-    private void taskFinish(ChannelHandlerContext context, Message message) {
-        PlayerBeCache player = playerLoginService.isLoad(context);
-        if(Objects.isNull(player)){
-            notificationManager.notifyByCtx(context,"你还未登录", RequestCode.BAD_REQUEST.getCode());
-            return;
-        }
-        String[] parameter = CheckParametersUtil.checkParameter(context, message, 1);
-        if (Objects.isNull(parameter)){
-            notificationManager.notifyPlayer(player,"你还未登录",RequestCode.BAD_REQUEST.getCode());
-            return;
-        }
-        taskService.taskFinish(player,Long.valueOf(parameter[1]));
-
+        //ControllerManager.add(Command.TASK_FINISH.getRequestCode(), this::taskFinish);
     }
 
     private void taskGaveUp(ChannelHandlerContext context, Message message) {
@@ -65,6 +49,18 @@ public class TaskController {
     }
 
     private void taskDescribe(ChannelHandlerContext context, Message message) {
+        PlayerBeCache player = playerLoginService.isLoad(context);
+        if(Objects.isNull(player)){
+            notificationManager.notifyByCtx(context,"你还未登录", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        //指令 任务id
+        String[] parameter = CheckParametersUtil.checkParameter(context, message, 2);
+        if (Objects.isNull(parameter)){
+            notificationManager.notifyPlayer(player,"你还未登录",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        taskService.taskDescribe(player,Integer.valueOf(parameter[1]));
     }
 
     private void taskAccept(ChannelHandlerContext context, Message message) {
@@ -97,8 +93,30 @@ public class TaskController {
     }
 
     private void achievementShow(ChannelHandlerContext context, Message message) {
+        PlayerBeCache player = playerLoginService.isLoad(context);
+        if(Objects.isNull(player)){
+            notificationManager.notifyByCtx(context,"你还未登录", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        String[] parameter = CheckParametersUtil.checkParameter(context, message, 1);
+        if (Objects.isNull(parameter)){
+            notificationManager.notifyPlayer(player,"你还未登录",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        taskService.achievementShow(player);
     }
 
     private void taskShow(ChannelHandlerContext context, Message message) {
+        PlayerBeCache player = playerLoginService.isLoad(context);
+        if(Objects.isNull(player)){
+            notificationManager.notifyByCtx(context,"你还未登录", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        String[] parameter = CheckParametersUtil.checkParameter(context, message, 1);
+        if (Objects.isNull(parameter)){
+            notificationManager.notifyPlayer(player,"你还未登录",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        taskService.taskShow(player);
     }
 }

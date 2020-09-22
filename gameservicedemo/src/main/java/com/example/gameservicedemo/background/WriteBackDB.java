@@ -1,15 +1,18 @@
 package com.example.gameservicedemo.background;
 
 import com.example.gamedatademo.bean.Player;
+import com.example.gamedatademo.bean.TaskProgress;
 import com.example.gamedatademo.mapper.BagMapper;
 import com.example.gamedatademo.mapper.GuildMapper;
 import com.example.gamedatademo.mapper.PlayerMapper;
+import com.example.gamedatademo.mapper.TaskProgressMapper;
 import com.example.gameservicedemo.event.Event;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.guild.bean.GuildBeCache;
 import com.example.gameservicedemo.game.hurt.ChangePlayerInformationImp;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
+import com.example.gameservicedemo.game.task.bean.TaskProgressBeCache;
 import com.example.gameservicedemo.manager.TimedTaskManager;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
@@ -40,6 +43,8 @@ public class WriteBackDB{
     @Autowired
     ChangePlayerInformationImp changePlayerInformationImp;
     @Autowired
+    TaskProgressMapper taskProgressMapper;
+    @Autowired
     BagMapper bagMapper;
 
     Gson gson = new Gson();
@@ -50,6 +55,7 @@ public class WriteBackDB{
     private Set<Integer> shouldWritePlayer= new ConcurrentSkipListSet();
     private Set<Integer> shouldWriteBag= new ConcurrentSkipListSet();
     private Set<Long> shouldWriteGuild= new ConcurrentSkipListSet();
+    private Set<Long> shouldWriteTaskProgress = new ConcurrentSkipListSet();
 
     private ThreadFactory WriteBackDBThreadPoolFactory = new ThreadFactoryBuilder()
             .setNameFormat("WriteBackDBThreadPool-%d").setUncaughtExceptionHandler((t,e) -> e.printStackTrace()).build();
@@ -138,7 +144,24 @@ public class WriteBackDB{
         return null;
     }
 
-
+    /**
+     * 更新任务进度数据库表
+     * @param taskProgress
+     * @return
+     */
+    public  Future<Event> updateTaskProgress(TaskProgress taskProgress){
+        if(!shouldWriteTaskProgress.contains(taskProgress.getId())){
+            shouldWriteTaskProgress.add(taskProgress.getId());
+            ScheduledThreadPool.schedule(()->{
+                //写回
+                taskProgressMapper.updateByTaskProgressId(taskProgress);
+                taskProgress.getUpdate().clear();
+                shouldWriteTaskProgress.remove(taskProgress.getId());
+                return null;
+            },1000, TimeUnit.MILLISECONDS);
+        }
+        return null;
+    }
 
     /**
      * 五秒回蓝回血机制,自动金币增长
@@ -155,5 +178,16 @@ public class WriteBackDB{
             });
             log.info("-------每五秒自动恢复机制执行完毕----------");
         });
+    }
+
+    /**
+     * 插入一个新的任务进度
+     * @param taskProgressBeCache
+     */
+    public Future<Event> insertTaskProgress(TaskProgressBeCache taskProgressBeCache) {
+        ScheduledThreadPool.schedule(()->{
+            taskProgressMapper.insert(taskProgressBeCache);
+        },0,TimeUnit.MILLISECONDS);
+        return null;
     }
 }

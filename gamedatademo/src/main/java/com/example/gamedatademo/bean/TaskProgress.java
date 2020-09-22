@@ -35,8 +35,10 @@ public class TaskProgress {
      * 结束任务的时间
      */
     Date endTime;
-
-    String progressJson;
+    /**
+     * 当前进度
+     */
+    Integer nowAt;
 
     Set<String> update=new HashSet<>();
 }

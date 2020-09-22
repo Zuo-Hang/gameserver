@@ -6,19 +6,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  *
  * @author: hang hang
  * @Date: 2020/08/25/16:37
- * @Description: 等级事件
+ * @Description: 组队事件
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public class LevelEvent extends Event {
+public class TeamEvent extends Event {
 
-    private PlayerBeCache player;
+    private List<PlayerBeCache> teammate;
 
-    private Integer level;
+
 }

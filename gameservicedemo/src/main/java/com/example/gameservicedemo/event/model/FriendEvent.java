@@ -11,14 +11,13 @@ import lombok.EqualsAndHashCode;
  *
  * @author: hang hang
  * @Date: 2020/08/25/16:37
- * @Description: 等级事件
+ * @Description: 好友事件
  */
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public class LevelEvent extends Event {
+public class FriendEvent extends Event {
+    PlayerBeCache player;
 
-    private PlayerBeCache player;
-
-    private Integer level;
 }

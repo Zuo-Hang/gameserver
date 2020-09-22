@@ -1,7 +1,7 @@
 package com.example.gameservicedemo.event.handler;
 
 import com.example.gameservicedemo.event.EventBus;
-import com.example.gameservicedemo.event.model.TalkWithEvent;
+import com.example.gameservicedemo.event.model.FriendEvent;
 import com.example.gameservicedemo.game.task.bean.TaskType;
 import com.example.gameservicedemo.game.task.service.TaskService;
 import org.springframework.stereotype.Component;
@@ -13,16 +13,17 @@ import javax.annotation.Resource;
  *
  * @author: hang hang
  * @Date: 2020/08/25/16:37
- * @Description: 与NPC对话事件处理器
+ * @Description: 好友事件处理器
  */
 @Component
-public class TalkWithEventHandler {
+public class FriendEventHandler {
     {
-        EventBus.subscribe(TalkWithEvent.class,this::talkWithNPC);
+        EventBus.subscribe(FriendEvent.class,this::addFriend);
     }
     @Resource
     private TaskService taskService;
-    private  void talkWithNPC(TalkWithEvent event) {
-        taskService.checkTaskProgressByNumber(TaskType.TALK_WITH,event.getPlayer(), event.getSceneObjectId(),1);
+
+    private  void addFriend(FriendEvent guildEvent) {
+        taskService.checkTaskProgressByNumber(TaskType.FRIEND,guildEvent.getPlayer(), 0,1);
     }
 }

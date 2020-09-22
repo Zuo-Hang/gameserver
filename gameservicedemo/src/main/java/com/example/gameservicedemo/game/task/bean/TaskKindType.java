@@ -5,7 +5,7 @@ package com.example.gameservicedemo.game.task.bean;
  *
  * @author: hang hang
  * @Date: 2020/09/21/14:52
- * @Description: 任务类型种类
+ * @Description: 任务类型种类  ----------目前只有成就和新手任务，后期可以扩展其他任务类型
  */
 public enum  TaskKindType {
     /** 成就 **/
@@ -16,7 +16,6 @@ public enum  TaskKindType {
 
     /** 主线 **/
     MAIN(2,"主线"),
-
 
     SIDE(3,"支线"),
 

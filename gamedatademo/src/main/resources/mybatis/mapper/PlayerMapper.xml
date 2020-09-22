@@ -34,6 +34,8 @@
             <if test="update.contains('guildId')">guild_id=#{guildId},</if>
             <if test="update.contains('friends')">friends=#{friends},</if>
             <if test="update.contains('exp')">exp=#{exp},</if>
+            <if test="update.contains('taskAcquireJson')">task_Acquire_Json=#{taskAcquireJson},</if>
+            <if test="update.contains('taskProgressJson')">task_progress_json=#{taskProgressJson},</if>
             <if test="update.contains('guildRoleType')">guild_Role_Type=#{guildRoleType},</if>
             <if test="update.contains('money')">money=#{money}</if>
         </set>

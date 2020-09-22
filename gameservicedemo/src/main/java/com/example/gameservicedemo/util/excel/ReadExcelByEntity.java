@@ -70,7 +70,7 @@ public class ReadExcelByEntity<T>{
         } catch (IOException e) {
             log.error("IOException", e);
         }
-        tClass = (Class<T>)((ParameterizedType)this.getClass().getGenericSuperclass())
+        tClass = (Class<T>)((ParameterizedType)this.getClass().getGenericSuperclass())//---------------------------
                 .getActualTypeArguments()[0];
         try {
             @SuppressWarnings("unused")

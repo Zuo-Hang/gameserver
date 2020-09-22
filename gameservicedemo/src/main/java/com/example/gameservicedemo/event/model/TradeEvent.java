@@ -11,14 +11,13 @@ import lombok.EqualsAndHashCode;
  *
  * @author: hang hang
  * @Date: 2020/08/25/16:37
- * @Description: 等级事件
+ * @Description: 交易事件
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public class LevelEvent extends Event {
+public class TradeEvent extends Event {
 
-    private PlayerBeCache player;
-
-    private Integer level;
+    private PlayerBeCache initiator ;
+    private PlayerBeCache accepter ;
 }

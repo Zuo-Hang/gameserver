@@ -1,15 +1,10 @@
 package com.example.gameservicedemo.game.task.bean;
 
 import com.example.gameservicedemo.util.excel.EntityName;
-import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,7 +14,6 @@ import java.util.Objects;
  * @Description:
  */
 @Data
-@Slf4j
 public class Task {
     @EntityName(column = "id")
     Integer id;
@@ -62,10 +56,10 @@ public class Task {
     /**
      * 完成条件
      */
-    private Map<String, Integer> conditionsMap = new HashMap<>();
+    private TaskCondition taskCondition;
 
     /**
-     * 装备奖励
+     * 装备奖励<装备id，数量>
      */
     private Map<Integer, Integer> rewardToolsMap = new HashMap<>();
 

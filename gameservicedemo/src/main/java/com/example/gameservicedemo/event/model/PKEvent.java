@@ -11,14 +11,16 @@ import lombok.EqualsAndHashCode;
  *
  * @author: hang hang
  * @Date: 2020/08/25/16:37
- * @Description: 等级事件
+ * @Description: 对战事件
  */
+
 @Data
-@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public class LevelEvent extends Event {
+@EqualsAndHashCode(callSuper = true)
+public class PKEvent extends Event {
 
     private PlayerBeCache player;
 
-    private Integer level;
+    private boolean isWin;
+
 }

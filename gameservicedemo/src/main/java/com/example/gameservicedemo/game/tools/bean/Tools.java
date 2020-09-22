@@ -31,6 +31,8 @@ public class Tools extends BeUse {
     @EntityName(column = "可叠加数量")
     private Integer repeat;
 
+    private Integer level;
+
     /**
      * 加成的json格式
      */

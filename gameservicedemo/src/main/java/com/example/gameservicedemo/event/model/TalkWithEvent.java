@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
  *
  * @author: hang hang
  * @Date: 2020/08/25/16:37
- * @Description:
+ * @Description: 与NPC谈话事件
  */
 @Data
 @AllArgsConstructor

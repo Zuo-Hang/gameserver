@@ -58,6 +58,15 @@ public class Player {
      * 好友
      */
     private String friends;
+
+    /**
+     * 已经完成的任务或成就
+     */
+    private String taskAcquireJson;
+    /**
+     * 任务进度ids
+     */
+    private String taskProgressJson;
     /**
      * 该角色对应的背包
      */
