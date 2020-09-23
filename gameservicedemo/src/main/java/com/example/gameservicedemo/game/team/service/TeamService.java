@@ -170,7 +170,7 @@ public class TeamService {
         notificationManager.notifyPlayer(inviter, MessageFormat.format("已经向{0}发出了组队邀请",
                 invitee.getName()
         ), RequestCode.SUCCESS.getCode());
-        notificationManager.notifyPlayer(invitee, MessageFormat.format("收到了{0}的组队邀请,邀请id为：{1},接受使用\"accept 邀请id\"",
+        notificationManager.notifyPlayer(invitee, MessageFormat.format("收到了{0}的组队邀请,邀请id为：{1},接受使用\"accept_team_request 邀请id\"",
                 inviter.getName(),
                 teamRequest.getId()
         ), RequestCode.SUCCESS.getCode());

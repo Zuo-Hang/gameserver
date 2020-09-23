@@ -300,7 +300,7 @@ public class PlayerBeCache extends Player implements Creature {
     public void addTaskAcquireList(TaskProgress taskProgress){
         taskAcquireList.add(taskProgress.getId());
         Gson gson = new Gson();
-        setTaskProgressJson(gson.toJson(getTaskAcquireList()));
+        setTaskAcquireJson(gson.toJson(getTaskAcquireList()));
         getUpdate().add("taskAcquireJson");
         writeBackDB.delayWriteBackPlayer(this);
     }

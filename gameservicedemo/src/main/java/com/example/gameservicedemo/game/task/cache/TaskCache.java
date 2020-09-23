@@ -1,6 +1,8 @@
 package com.example.gameservicedemo.game.task.cache;
 
 import com.example.gamedatademo.bean.TaskProgress;
+import com.example.gamedatademo.mapper.TaskProgressMapper;
+import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.game.task.bean.Task;
 import com.example.gameservicedemo.game.task.bean.TaskCondition;
 import com.example.gameservicedemo.game.task.bean.TaskProgressBeCache;
@@ -11,6 +13,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -29,6 +34,12 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class TaskCache {
+
+    @Autowired
+    TaskProgressMapper taskProgressMapper;
+    @Autowired
+    WriteBackDB writeBackDB;
+
     Map<Integer, Task> taskCache = new ConcurrentHashMap<>();
 
     Cache<Long, TaskProgressBeCache> taskProgressCache = CacheBuilder.newBuilder()
@@ -72,8 +83,23 @@ public class TaskCache {
 
     public TaskProgressBeCache getTaskProgressById(Long id) {
         //---------------------------------------需要写成懒加载
-        return taskProgressCache.getIfPresent(id);
+        TaskProgressBeCache present = taskProgressCache.getIfPresent(id);
+        if(Objects.isNull(present)){
+            TaskProgress taskProgress = taskProgressMapper.selectByTaskProgressId(id);
+            if(Objects.isNull(taskProgress)){
+                return null;
+            }
+            present =new TaskProgressBeCache();
+            BeanUtils.copyProperties(taskProgress,present);
+            present.setTag(true);
+            present.setWriteBackDB(writeBackDB);
+            taskProgressCache.put(present.getId(),present);
+        }
+        return present;
     }
 
+    public void putInProgress(TaskProgressBeCache taskProgressBeCache){
+        taskProgressCache.put(taskProgressBeCache.getId(),taskProgressBeCache);
+    }
 
 }

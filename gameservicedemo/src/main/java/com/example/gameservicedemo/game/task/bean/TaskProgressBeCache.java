@@ -25,6 +25,7 @@ public class TaskProgressBeCache extends TaskProgress {
         setTaskState(taskState);
         setBeginTime(beginTime);
         setNowAt(nowAt);
+        setTag(true);
         writeBackDB.insertTaskProgress(this);
     }
 
@@ -48,6 +49,14 @@ public class TaskProgressBeCache extends TaskProgress {
             getUpdate().add("endTime");
             writeBackDB.updateTaskProgress(this);
         }
+    }
 
+    @Override
+    public void setTaskState(Integer taskState){
+        super.setTaskState(taskState);
+        if (tag) {
+            getUpdate().add("taskState");
+            writeBackDB.updateTaskProgress(this);
+        }
     }
 }

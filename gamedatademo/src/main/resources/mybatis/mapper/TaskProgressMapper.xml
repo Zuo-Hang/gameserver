@@ -10,9 +10,9 @@
 
     <insert id="insert" parameterType="com.example.gamedatademo.bean.TaskProgress" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO task_progress
-    (id, task_Id,task_State,begin_Time,end_Time,progress_Json)
+    (id, task_Id,task_State,begin_Time,end_Time,now_At)
     VALUES
-    (#{id},#{taskId}, #{taskState},#{beginTime},#{endTime},#{progressJson});
+    (#{id},#{taskId},#{taskState},#{beginTime},#{endTime},#{nowAt});
     </insert>
 
     <update id="updateByTaskProgressId" parameterType="com.example.gamedatademo.bean.TaskProgress">
@@ -20,7 +20,7 @@
         <set>
             <if test="update.contains('taskState')"> task_State = #{taskState},</if>
             <if test="update.contains('endTime')"> end_Time = #{endTime},</if>
-            <if test="update.contains('progressJson')"> progress_Json = #{progressJson}</if>
+            <if test="update.contains('nowAt')"> now_At = #{nowAt}</if>
         </set>
         WHERE id = #{id};
     </update>

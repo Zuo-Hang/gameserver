@@ -180,7 +180,7 @@ public enum Command {
     /**
      * 加入队伍 accept Team request
      **/
-    ACCEPT_TEAM_REQUEST("accept", 6010, "接受组队请求->加入队伍  accept 请求id"),
+    ACCEPT_TEAM_REQUEST("accept_team_request", 6010, "接受组队请求->加入队伍  accept_team_request 请求id"),
     /**
      * 离开队伍
      **/
@@ -352,39 +352,35 @@ public enum Command {
     AUCTION_SHOW("auction_show", 8820, "查看拍卖品 格式：指令"),
 
     /**
-     * 显示已接任务
+     * 显示已接任务 ok
      **/
-    TASK_SHOW("task", 9000, "显示已接任务"),
+    TASK_SHOW("task_show", 9000, "显示已接任务"),
 
     /**
-     * 显示已接任务
+     * 显示成就进展
      **/
     ACHIEVEMENT_SHOW("achievement", 9010, "显示成就进展"),
 
     /**
-     * 显示所有任务和成就
+     * 显示系统所有任务和成就 ok
      **/
     TASK_ALL("task_all", 9020, "显示游戏内所有任务和成就"),
 
     /**
-     * 接受的任务
+     * 接受的任务 ok
      **/
-    TASK_ACCEPT("accept", 9030, "接受任务"),
+    TASK_ACCEPT("accept_task", 9030, "接受任务"),
 
     /**
-     * 查看任务详情
+     * 查看任务详情 ok
      **/
     TASK_DESCRIBE("task_describe", 9040, "查看任务详情 "),
 
     /**
-     * 放弃任务
+     * 放弃任务 ok
      **/
     TASK_GIVE_UP("task_give_up", 9050, "放弃任务"),
 
-    /**
-     * 交付完成任务
-     **/
-    TASK_FINISH("task_finish", 9060, "交付完成任务"),
     /**
      * 好友列表 ok
      */

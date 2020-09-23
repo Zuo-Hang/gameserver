@@ -41,11 +41,21 @@ public class TaskController {
         ControllerManager.add(Command.TASK_ACCEPT.getRequestCode(), this::taskAccept);
         ControllerManager.add(Command.TASK_DESCRIBE.getRequestCode(), this::taskDescribe);
         ControllerManager.add(Command.TASK_GIVE_UP.getRequestCode(), this::taskGaveUp);
-        //ControllerManager.add(Command.TASK_FINISH.getRequestCode(), this::taskFinish);
     }
 
     private void taskGaveUp(ChannelHandlerContext context, Message message) {
-
+        PlayerBeCache player = playerLoginService.isLoad(context);
+        if(Objects.isNull(player)){
+            notificationManager.notifyByCtx(context,"你还未登录", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        //指令 任务id
+        String[] parameter = CheckParametersUtil.checkParameter(context, message, 2);
+        if (Objects.isNull(parameter)){
+            notificationManager.notifyPlayer(player,"你还未登录",RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        taskService.taskGaveUp(player,Integer.valueOf(parameter[1]));
     }
 
     private void taskDescribe(ChannelHandlerContext context, Message message) {

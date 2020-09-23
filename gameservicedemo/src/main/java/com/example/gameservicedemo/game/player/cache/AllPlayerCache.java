@@ -125,6 +125,12 @@ public class AllPlayerCache {
         }
         //初始化等级
         playerBeCache.setLevel(playerBeCache.getExp()/10);
+        //初始化任务列表
+        if(Strings.isNotEmpty(playerBeCache.getTaskProgressJson())){
+            Map<Integer, Long> map = gson1.fromJson(playerBeCache.getTaskProgressJson(), new TypeToken<Map<Integer, Long>>() {
+            }.getType());
+            playerBeCache.setTaskProgressMap(map);
+        }
     }
 
 }

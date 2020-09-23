@@ -55,11 +55,11 @@ public class TaskService {
     public void taskAll(PlayerBeCache player) {
         StringBuilder sb = new StringBuilder();
         sb.append("所有的任务：\n");
-        taskCache.allTask().values().stream().filter(mission -> mission.getType().equals(TaskKindType.NOVICE.getCode()))
+        taskCache.allTask().values().stream().filter(mission -> mission.getKind().equals(TaskKindType.NOVICE.getCode()))
                 .forEach(mission -> sb.append(MessageFormat.format("id:{0}  name:{1}  等级：{2}  描述：{3}\n",
                         mission.getId(), mission.getName(), mission.getLevel(), mission.getDescribe())));
         sb.append("\n").append("所有的成就：\n");
-        taskCache.allTask().values().stream().filter(mission -> mission.getType().equals(TaskKindType.ACHIEVEMENT.getCode()))
+        taskCache.allTask().values().stream().filter(mission -> mission.getKind().equals(TaskKindType.ACHIEVEMENT.getCode()))
                 .forEach(mission -> sb.append(MessageFormat.format("id:{0}  name:{1}  等级：{2}  描述：{3}\n",
                         mission.getId(), mission.getName(), mission.getLevel(), mission.getDescribe())));
         notificationManager.notifyPlayer(player, sb, RequestCode.SUCCESS.getCode());
@@ -80,7 +80,7 @@ public class TaskService {
         Long taskProgressId = player.getTaskProgressMap().get(taskId);
         //存在即正在进行中
         if (Objects.nonNull(taskProgressId)) {
-            notificationManager.notifyPlayer(player, "该任务正在进行中，使用''查看当前正在进行的任务", RequestCode.BAD_REQUEST.getCode());
+            notificationManager.notifyPlayer(player, "该任务正在进行中，使用'task_show'查看当前正在进行的任务", RequestCode.BAD_REQUEST.getCode());
             return null;
         }
         for (Long id : player.getTaskAcquireList()) {
@@ -99,8 +99,8 @@ public class TaskService {
                 new Date(),
                 0);
         player.addTaskProgressMap(newTaskProgress);
-        //--------------------------------------------持久化进度
-        notificationManager.notifyPlayer(player, "已经接收了这个进度，可以使用''查看当前正在进行的任务", RequestCode.SUCCESS.getCode());
+        taskCache.putInProgress(newTaskProgress);
+        notificationManager.notifyPlayer(player, "已经接收了这个进度，可以使用'task_show'查看当前正在进行的任务", RequestCode.SUCCESS.getCode());
         return newTaskProgress.getId();
     }
 
@@ -122,7 +122,7 @@ public class TaskService {
             Tools toolsById = toolsService.getToolsById(k);
             tools.append(MessageFormat.format("{0}*{1}  ", toolsById.getName(), v));
         });
-        String format = MessageFormat.format("id:{0}\nname:{1}\n任务详情:{2}\n奖励:\n金币:{3}\n装备:{4}\n",
+        String format = MessageFormat.format("id:{0}\nname:{1}\n任务详情:{2}\n奖励:  金币:{3}  物品:{4}\n",
                 task.getId(),
                 task.getName(),
                 task.getDescribe(),
@@ -138,9 +138,9 @@ public class TaskService {
      * @param player
      */
     public void taskShow(PlayerBeCache player) {
-        StringBuilder string = new StringBuilder("所完成的任务如下：\n");
+        StringBuilder string = new StringBuilder("待完成的任务如下：\n");
         if (player.getTaskProgressMap().isEmpty()) {
-            notificationManager.notifyPlayer(player, "你目前还没有正在进行的任务！使用''添加新的任务！", RequestCode.WARNING.getCode());
+            notificationManager.notifyPlayer(player, "你目前还没有正在进行的任务！使用'accept_task'添加新的任务！", RequestCode.WARNING.getCode());
             return;
         }
         player.getTaskProgressMap().forEach((taskId, progressId) -> {
@@ -164,7 +164,7 @@ public class TaskService {
     public void achievementShow(PlayerBeCache player) {
         StringBuilder string = new StringBuilder("所完成的任务如下：\n");
         if (player.getTaskAcquireList().isEmpty()) {
-            notificationManager.notifyPlayer(player, "你还没有已经完成的任务！使用''查看当前正在进行的任务", RequestCode.WARNING.getCode());
+            notificationManager.notifyPlayer(player, "你还没有已经完成的任务！使用'task_show'查看当前正在进行的任务", RequestCode.WARNING.getCode());
             return;
         }
         player.getTaskAcquireList().forEach(id -> {
@@ -177,40 +177,24 @@ public class TaskService {
     }
 
     /**
-     * 检查是否达成任务完成条件
-     *
-     * @param taskProgress
-     * @return
-     */
-    public boolean checkIsComplete(TaskProgressBeCache taskProgress) {
-        Task task = taskCache.getTaskById(taskProgress.getTaskId());
-        // 当前进度的数目指标大于或等于目标数目指标
-        if (taskProgress.getNowAt() >= task.getTaskCondition().getAim()) {
-            taskProgress.setTaskState(TaskState.FINISH.getCode());
-            //调用任务完成的方法
-
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * 任务完成后进行奖励
      *
      * @param task
      */
     public void taskReward(PlayerBeCache player ,Task task) {
         player.setMoney(player.getMoney()+task.getRewardMoney());
+        playerDataService.showPlayerInfo(player);
         task.getRewardToolsMap().forEach((id,num)->{
             Tools toolsById = toolsService.getToolsById(id);
-            Tools tools = new Tools();
-            BeanUtils.copyProperties(toolsById,tools);
-            tools.setUuid(IdGenerator.getAnId());
-            bagService.putInBag(player,tools);
+            for(int i=0;i<num;i++){
+                Tools tools = new Tools();
+                BeanUtils.copyProperties(toolsById,tools);
+                tools.setUuid(IdGenerator.getAnId());
+                bagService.putInBag(player,tools);
+            }
         });
-        gameSystem.noticeSomeOne(player.getId(),"奖励相关","任务奖励已发放！",null);
-        playerDataService.showPlayerInfo(player);
         playerDataService.showPlayerBag(player);
+        gameSystem.noticeSomeOne(player.getId(),"奖励相关","任务奖励已发放！",null);
     }
 
     /**
@@ -271,8 +255,8 @@ public class TaskService {
                 }else if(number>taskProgressById.getNowAt()){
                     taskProgressById.setNowAt(number);
                 }
-                //进行检测是否达成目标
-                if(checkIsComplete(taskProgressById)){
+                //检查是否达成任务完成条件
+                if(taskProgressById.getNowAt() >= task.getTaskCondition().getAim()){
                     taskFinish(player,taskProgressById);
                 }
             }
@@ -290,9 +274,33 @@ public class TaskService {
         gameSystem.noticeSomeOne(player.getId(),"任务相关",MessageFormat.format("恭喜你完成了{0}任务",task.getName()),null);
         //移除
         taskProgress.setTaskState(TaskState.FINISH.getCode());
+        taskProgress.setEndTime(new Date());
         player.deleteTaskProgressFromMap(taskProgress);
         player.addTaskAcquireList(taskProgress);
         //进行奖励
         taskReward(player,task);
+    }
+
+    /**
+     * 放弃某个任务
+     * @param player
+     * @param taskId
+     */
+    public void taskGaveUp(PlayerBeCache player, Integer taskId) {
+        Task task = taskCache.getTaskById(taskId);
+        if (Objects.isNull(task)) {
+            notificationManager.notifyPlayer(player, "该任务不存在，请检查输入的taskId", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        Long progressId = player.getTaskProgressMap().get(taskId);
+        if(Objects.isNull(progressId)){
+            notificationManager.notifyPlayer(player, "该任务不在你的待做任务中", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        TaskProgressBeCache taskProgressById = taskCache.getTaskProgressById(progressId);
+        taskProgressById.setEndTime(new Date());
+        taskProgressById.setTaskState(TaskState.COMPLETE.getCode());
+        player.deleteTaskProgressFromMap(taskProgressById);
+        notificationManager.notifyPlayer(player, "已经放弃该任务", RequestCode.WARNING.getCode());
     }
 }

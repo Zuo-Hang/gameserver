@@ -30,26 +30,26 @@ public class MoneyEventHandler {
     private NotificationManager notificationManager;
 
     private  void moneyNumber(MoneyEvent moneyEvent) {
-        taskService.checkTaskProgressByNumber(TaskType.MONEY,moneyEvent.getPlayer(),
-                0,moneyEvent.getPlayer().getMoney());
+//        taskService.checkTaskProgressByNumber(TaskType.MONEY,moneyEvent.getPlayer(),
+//                0,moneyEvent.getPlayer().getMoney());
     }
     /**
      *  金币变化监听
      * @param moneyEvent 金币事件
      */
     private void moneyChange(MoneyEvent moneyEvent) {
-        if (moneyEvent.getMoney() > moneyEvent.getPlayer().getMoney()) {
-            moneyEvent.getPlayer().setMoney(0);
-            notificationManager.notifyPlayer(moneyEvent.getPlayer(),"你身上没钱了", RequestCode.WARNING.getCode());
-        }
-        if (moneyEvent.getMoney() > 0) {
-            notificationManager.notifyPlayer(moneyEvent.getPlayer(),
-                    MessageFormat.format("你的金币增加了{0}",moneyEvent.getMoney()),RequestCode.WARNING.getCode());
-        }
-
-        if (moneyEvent.getMoney() < 0) {
-            notificationManager.notifyPlayer(moneyEvent.getPlayer(),
-                    MessageFormat.format("你的金币减少了{0}",moneyEvent.getMoney()),RequestCode.WARNING.getCode());
-        }
+//        if (moneyEvent.getMoney() > moneyEvent.getPlayer().getMoney()) {
+//            moneyEvent.getPlayer().setMoney(0);
+//            notificationManager.notifyPlayer(moneyEvent.getPlayer(),"你身上没钱了", RequestCode.WARNING.getCode());
+//        }
+//        if (moneyEvent.getMoney() > 0) {
+//            notificationManager.notifyPlayer(moneyEvent.getPlayer(),
+//                    MessageFormat.format("你的金币增加了{0}",moneyEvent.getMoney()),RequestCode.WARNING.getCode());
+//        }
+//
+//        if (moneyEvent.getMoney() < 0) {
+//            notificationManager.notifyPlayer(moneyEvent.getPlayer(),
+//                    MessageFormat.format("你的金币减少了{0}",moneyEvent.getMoney()),RequestCode.WARNING.getCode());
+//        }
     }
 }
