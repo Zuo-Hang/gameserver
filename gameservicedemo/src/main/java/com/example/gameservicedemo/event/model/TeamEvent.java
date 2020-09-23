@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TeamEvent extends Event {
 
-    private List<PlayerBeCache> teammate;
+    private PlayerBeCache player;
 
 
 }

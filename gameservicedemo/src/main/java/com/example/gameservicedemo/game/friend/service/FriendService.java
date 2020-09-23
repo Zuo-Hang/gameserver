@@ -2,6 +2,8 @@ package com.example.gameservicedemo.game.friend.service;
 
 import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.base.IdGenerator;
+import com.example.gameservicedemo.event.EventBus;
+import com.example.gameservicedemo.event.model.FriendEvent;
 import com.example.gameservicedemo.game.friend.bean.FriendAddRequest;
 import com.example.gameservicedemo.game.friend.cache.FriendCache;
 import com.example.gameservicedemo.game.mail.bean.GameSystem;
@@ -10,6 +12,7 @@ import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.player.service.RoleTypeService;
 import com.example.gameservicedemo.manager.NotificationManager;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.Even;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -104,6 +107,8 @@ public class FriendService {
                 "好友相关",
                 MessageFormat.format("{0}已经是你的好友了,快去打个招呼吧", player.getName()),
                 null);
+        EventBus.publish(new FriendEvent(player));
+        EventBus.publish(new FriendEvent(proposer));
     }
 
     /**

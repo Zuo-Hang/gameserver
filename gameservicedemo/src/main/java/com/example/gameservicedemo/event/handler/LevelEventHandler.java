@@ -21,14 +21,11 @@ import java.text.MessageFormat;
 
 @Component
 public class LevelEventHandler {
-
     {
         EventBus.subscribe(LevelEvent.class, this::levelUp);
     }
-
     @Resource
     private TaskService taskService;
-
     @Resource
     private NotificationManager notificationManager;
 

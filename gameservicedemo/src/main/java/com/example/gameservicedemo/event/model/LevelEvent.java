@@ -17,8 +17,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 public class LevelEvent extends Event {
-
     private PlayerBeCache player;
-
     private Integer level;
 }

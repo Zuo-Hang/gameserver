@@ -5,6 +5,8 @@ import com.example.gamedatademo.bean.Bag;
 import com.example.gamedatademo.mapper.BagMapper;
 import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.base.IdGenerator;
+import com.example.gameservicedemo.event.EventBus;
+import com.example.gameservicedemo.event.model.CollectThingEvent;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.bean.Item;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
@@ -69,6 +71,7 @@ public class BagService {
                     notificationManager.notifyPlayer(player, "放入成功", RequestCode.SUCCESS.getCode());
                     packBag(bagBeCache);
                     playerDataService.showPlayerBag(player);
+                    EventBus.publish(new CollectThingEvent(player,newTools));
                     return true;
                 }
             }
@@ -82,6 +85,7 @@ public class BagService {
             bagBeCache.putInItemMap(item.getIndexInBag(), item);
             packBag(bagBeCache);
             playerDataService.showPlayerBag(player);
+            EventBus.publish(new CollectThingEvent(player,newTools));
             return true;
         } else {
             //背包容量不足

@@ -20,27 +20,19 @@ import java.text.MessageFormat;
 
 @Component
 public class MoneyEventHandler {
-
     {
         EventBus.subscribe(MoneyEvent.class, this::moneyNumber);
         EventBus.subscribe(MoneyEvent.class, this::moneyChange);
     }
-
-
-
     @Resource
     private TaskService taskService;
-
     @Resource
     private NotificationManager notificationManager;
-
 
     private  void moneyNumber(MoneyEvent moneyEvent) {
         taskService.checkTaskProgressByNumber(TaskType.MONEY,moneyEvent.getPlayer(),
                 0,moneyEvent.getPlayer().getMoney());
     }
-
-
     /**
      *  金币变化监听
      * @param moneyEvent 金币事件
@@ -60,5 +52,4 @@ public class MoneyEventHandler {
                     MessageFormat.format("你的金币减少了{0}",moneyEvent.getMoney()),RequestCode.WARNING.getCode());
         }
     }
-
 }

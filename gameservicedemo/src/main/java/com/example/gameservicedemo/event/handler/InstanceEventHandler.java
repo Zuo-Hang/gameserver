@@ -28,6 +28,6 @@ public class InstanceEventHandler {
                 TaskType.GAME_COPY,
                 gameCopyEvent.getPlayer(),
                 gameCopyEvent.getGameCopyScene().getId(),
-                1);
+                0);
     }
 }

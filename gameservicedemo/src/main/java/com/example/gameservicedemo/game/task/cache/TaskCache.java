@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -46,12 +47,11 @@ public class TaskCache {
         map.values().forEach(task -> {
             Gson gson = new Gson();
             if (!Strings.isNullOrEmpty(task.getCompletionConditions())) {
-                TaskCondition conditionsMap = gson.fromJson(task.getCompletionConditions(), new TypeToken<TaskCondition>() {
-                }.getType());
+                TaskCondition conditionsMap = gson.fromJson(task.getCompletionConditions(), TaskCondition.class);
                 task.setTaskCondition(conditionsMap);
             }
             log.info("任务{}的完成条件已加载", task.getId());
-            if (task.getRewardToolsMap().isEmpty() && Strings.isNullOrEmpty(task.getRewardTools())) {
+            if (!Strings.isNullOrEmpty(task.getRewardTools())) {
                 Map<Integer, Integer> rewardToolsMap = gson.fromJson(task.getRewardTools(), new TypeToken<Map<Integer, Integer>>() {
                 }.getType());
                 task.setRewardToolsMap(rewardToolsMap);
@@ -59,6 +59,7 @@ public class TaskCache {
             log.info("加载了id={}的任务奖励", task.getId());
             taskCache.put(task.getId(), task);
         });
+        return;
     }
 
     public Map<Integer, Task> allTask() {

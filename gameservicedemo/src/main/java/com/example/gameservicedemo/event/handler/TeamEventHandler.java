@@ -24,13 +24,9 @@ public class TeamEventHandler {
         EventBus.subscribe(TeamEvent.class,this::firstTeam);
     }
     @Resource
-    private NotificationManager notificationManager;
-    @Resource
     private TaskService taskService;
     private  void firstTeam(TeamEvent teamEvent) {
         // 检测队伍是否是第一次组队
-        teamEvent.getTeammate().forEach(
-                p -> taskService.checkTaskProgressByNumber(TaskType.TEAM,p, 0,1)
-        );
+        taskService.checkTaskProgressByNumber(TaskType.TEAM,teamEvent.getPlayer(), 0,1);
     }
 }

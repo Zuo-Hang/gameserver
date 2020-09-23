@@ -50,21 +50,21 @@ public class ToolsController {
         ControllerManager.add(Command.REPLACE_TOOLS.getRequestCode(), this::replaceTools);
         ControllerManager.add(Command.FIX_TOOLS.getRequestCode(), this::fixTools);
         ControllerManager.add(Command.SELL_TOOLS.getRequestCode(), this::sellTools);
-ControllerManager.add(Command.USE_MEDICINE.getRequestCode(),this::useMedicine);
+        ControllerManager.add(Command.USE_MEDICINE.getRequestCode(), this::useMedicine);
     }
 
     private void useMedicine(ChannelHandlerContext context, Message message) {
         String[] parameter = CheckParametersUtil.checkParameter(context, message, 2);
         PlayerBeCache load = playerLoginService.isLoad(context);
-        if(Objects.isNull(load)){
-            notificationManager.notifyByCtx(context,"你还未加载化身！",RequestCode.BAD_REQUEST.getCode());
+        if (Objects.isNull(load)) {
+            notificationManager.notifyByCtx(context, "你还未加载化身！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        if(Objects.isNull(parameter)){
-            notificationManager.notifyPlayer(load,"你输入的参数个数错误！",RequestCode.BAD_REQUEST.getCode());
+        if (Objects.isNull(parameter)) {
+            notificationManager.notifyPlayer(load, "你输入的参数个数错误！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        toolsService.useMedicine(load,Long.valueOf(parameter[1]));
+        toolsService.useMedicine(load, Long.valueOf(parameter[1]));
     }
 
     /**
@@ -108,13 +108,15 @@ ControllerManager.add(Command.USE_MEDICINE.getRequestCode(),this::useMedicine);
      */
     public void wearTools(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
-        if(Objects.isNull(strings)){return;}
+        if (Objects.isNull(strings)) {
+            return;
+        }
         //从用户获取背包后从背包中再获取到装备
         PlayerBeCache playerByContext = playerLoginService.getPlayerByContext(context);
         Tools tools = playerByContext.getBagBeCache().getToolsMap().get(Long.valueOf(strings[1]));
         if (Objects.isNull(tools)) {
             notificationManager.notifyPlayer(playerByContext, "你的背包中还没有这件装备哦", RequestCode.BAD_REQUEST.getCode());
-            return ;
+            return;
         }
         toolsService.wearTools(playerByContext, tools);
     }
@@ -127,12 +129,14 @@ ControllerManager.add(Command.USE_MEDICINE.getRequestCode(),this::useMedicine);
      */
     public void takeOffTools(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
-        if(Objects.isNull(strings)){return;}
+        if (Objects.isNull(strings)) {
+            return;
+        }
         PlayerBeCache playerByContext = playerLoginService.getPlayerByContext(context);
         Tools tools = playerByContext.getEquipmentBar().get(Long.valueOf(strings[1]));
         if (Objects.isNull(tools)) {
             notificationManager.notifyPlayer(playerByContext, "你的装备栏并没有这件装备哦", RequestCode.BAD_REQUEST.getCode());
-            return ;
+            return;
         }
         toolsService.takeOffTools(playerByContext, tools);
     }
@@ -147,7 +151,7 @@ ControllerManager.add(Command.USE_MEDICINE.getRequestCode(),this::useMedicine);
         String[] strings = CheckParametersUtil.checkParameter(context, message, 3);
         Tools toolsOut = toolsService.getToolsById(Integer.valueOf(strings[1]));
         Tools toolsIn = toolsService.getToolsById(Integer.valueOf(strings[2]));
-        toolsService.replaceTools(playerLoginService.getPlayerByContext(context), toolsOut,toolsIn);
+        toolsService.replaceTools(playerLoginService.getPlayerByContext(context), toolsOut, toolsIn);
     }
 
     /**
@@ -159,7 +163,7 @@ ControllerManager.add(Command.USE_MEDICINE.getRequestCode(),this::useMedicine);
     public void fixTools(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
         Long toolsUuid = Long.valueOf(strings[1]);
-        toolsService.fixTools(playerLoginService.getPlayerByContext(context),toolsUuid);
+        toolsService.fixTools(playerLoginService.getPlayerByContext(context), toolsUuid);
     }
 
     /**
@@ -171,6 +175,6 @@ ControllerManager.add(Command.USE_MEDICINE.getRequestCode(),this::useMedicine);
     public void sellTools(ChannelHandlerContext context, Message message) {
         String[] strings = CheckParametersUtil.checkParameter(context, message, 2);
         Long tollsUuid = Long.valueOf(strings[1]);
-        toolsService.sellTools(playerLoginService.getPlayerByContext(context),tollsUuid);
+        toolsService.sellTools(playerLoginService.getPlayerByContext(context), tollsUuid);
     }
 }

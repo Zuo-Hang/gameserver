@@ -21,12 +21,9 @@ import javax.annotation.Resource;
 @Component
 @Slf4j
 public class PKEventHandler {
-
     {
         EventBus.subscribe(PKEvent.class,this::firstPKWin);
     }
-
-
     @Resource
     private TaskService taskService;
 
@@ -37,6 +34,4 @@ public class PKEventHandler {
             taskService.checkTaskProgressByNumber(TaskType.PK,player, 0,1);
         }
     }
-
-
 }

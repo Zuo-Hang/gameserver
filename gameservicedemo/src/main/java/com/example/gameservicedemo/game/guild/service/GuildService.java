@@ -6,6 +6,8 @@ import com.example.commondemo.message.Message;
 import com.example.gamedatademo.bean.Player;
 import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.base.IdGenerator;
+import com.example.gameservicedemo.event.EventBus;
+import com.example.gameservicedemo.event.model.GuildEvent;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.service.BagService;
 import com.example.gameservicedemo.game.guild.bean.GuildBeCache;
@@ -73,6 +75,8 @@ public class GuildService {
         guildCache.putInCache(guildBeCache);
         writeBackDB.insertGuild(guildBeCache);
         notificationManager.notifyPlayer(player, "公会已经创建完毕！", RequestCode.SUCCESS.getCode());
+        //加入公会事件
+        EventBus.publish(new GuildEvent(player,guildBeCache));
     }
 
     /**
@@ -131,7 +135,7 @@ public class GuildService {
             return;
         }
         //获取玩家
-        Player player = playerLoginService.getPlayerById(playerId);
+        PlayerBeCache player = playerLoginService.getPlayerById(playerId);
         Long playerGuildId = player.getGuildId();
         if (Objects.nonNull(playerGuildId)) {
             notificationManager.notifyPlayer(admin, "该玩家已经加入了其他公会，此操作无效！", RequestCode.WARNING.getCode());
@@ -145,6 +149,7 @@ public class GuildService {
         notificationManager.notifyPlayer(admin, "已经同意该玩家加入公会！", RequestCode.SUCCESS.getCode());
         //通知加入者
         gameSystem.noticeSomeOne(player.getUserId(), "有关公会", MessageFormat.format("你已经加入公会：{0}", guild.getName()), null);
+        EventBus.publish(new GuildEvent(player,guild));
     }
 
     /**

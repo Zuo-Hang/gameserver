@@ -2,12 +2,14 @@ package com.example.gameservicedemo.event.handler;
 
 import com.example.gameservicedemo.event.EventBus;
 import com.example.gameservicedemo.event.model.CollectThingEvent;
+import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.task.bean.TaskType;
 import com.example.gameservicedemo.game.task.service.TaskService;
+import com.example.gameservicedemo.game.tools.bean.Tools;
+import com.example.gameservicedemo.game.tools.bean.ToolsLevel;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,7 +22,6 @@ import java.util.Optional;
 @Component
 public class CollectThingEventHandler {
     {
-        EventBus.subscribe(CollectThingEvent.class,this::getEquipment);
         EventBus.subscribe(CollectThingEvent.class,this::getMissionThing);
     }
 
@@ -34,21 +35,16 @@ public class CollectThingEventHandler {
      * @param collectThingEvent 收集物品事件
      */
     private  void getMissionThing(CollectThingEvent collectThingEvent) {
-        //---------------------------------------------------------------------------------
+        //计算背包中有几件顶级装备
         Integer num=0;
-        // 任务物品的获取加一
+        BagBeCache bagBeCache = collectThingEvent.getPlayer().getBagBeCache();
+        for (Tools tools : bagBeCache.getToolsMap().values()) {
+            if (tools.getLevel().equals(ToolsLevel.TOP.getCode())) {
+                num++;
+            }
+        }
+        //调用任务进度检测器
         taskService.checkTaskProgressByNumber(TaskType.COLLECT_TOOLS,collectThingEvent.getPlayer(),
-                collectThingEvent.getThingInfo().getId(),num+1);
-    }
-
-
-
-    // 获取装备
-    private  void getEquipment(CollectThingEvent collectThingEvent) {
-//        // 筛选出装备，计算装备的等级事件
-//        Optional<Integer> level = Optional.ofNullable(collectThingEvent.getThingInfo())
-//                .filter(things -> things.getKind() == 1).map(ThingInfo::getLevel);
-//        questService.checkMissionProgressByNumber(QuestType.COLLECT_THINGS,collectThingEvent.getPlayer(),
-//                QuestCondition.FIRST_ACHIEVEMENT,level.orElse(0));
+                collectThingEvent.getThingInfo().getId(),num);
     }
 }

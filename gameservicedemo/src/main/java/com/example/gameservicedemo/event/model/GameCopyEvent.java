@@ -21,5 +21,4 @@ import lombok.EqualsAndHashCode;
 public class GameCopyEvent extends Event {
     PlayerBeCache player;
     GameCopyScene gameCopyScene;
-
 }

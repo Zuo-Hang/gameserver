@@ -19,5 +19,4 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 public class FriendEvent extends Event {
     PlayerBeCache player;
-
 }

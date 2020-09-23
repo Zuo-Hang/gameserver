@@ -1,6 +1,8 @@
 package com.example.gameservicedemo.game.scene.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.event.EventBus;
+import com.example.gameservicedemo.event.model.MonsterEventDeadEvent;
 import com.example.gameservicedemo.game.hurt.ChangePlayerInformationImp;
 import com.example.gameservicedemo.game.hurt.MakeHurt;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
@@ -109,6 +111,8 @@ public class MonsterAiService {
                         monster.getName(),player.getName()),RequestCode.WARNING.getCode());
                 // 结算掉落，这里暂时直接放到背包里
                 monsterDropsService.dropItem(player,monster);
+                //发布怪物死亡事件
+                EventBus.publish(new MonsterEventDeadEvent(player,monster,gameScene));
             }
         }
     }

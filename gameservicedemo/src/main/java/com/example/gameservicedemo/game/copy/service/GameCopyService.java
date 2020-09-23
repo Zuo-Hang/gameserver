@@ -2,6 +2,8 @@ package com.example.gameservicedemo.game.copy.service;
 
 import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.base.IdGenerator;
+import com.example.gameservicedemo.event.EventBus;
+import com.example.gameservicedemo.event.model.GameCopyEvent;
 import com.example.gameservicedemo.game.copy.bean.BOSS;
 import com.example.gameservicedemo.game.copy.bean.GameCopyScene;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
@@ -180,7 +182,11 @@ public class GameCopyService {
                 notificationManager.notifyScene(gameCopyScene,MessageFormat.format(
                         "恭喜你挑战副本{0}成功 ", gameCopyScene.getName()),RequestCode.SUCCESS.getCode());
                 // 退出副本
-                gameCopyScene.getPlayers().values().forEach(p -> exitGameCopy(p, gameCopyScene));
+                gameCopyScene.getPlayers().values().forEach(p -> {
+                    exitGameCopy(p, gameCopyScene);
+                    //发布副本通关事件
+                    EventBus.publish(new GameCopyEvent(p,gameCopyScene));
+                });
             }
             Optional.ofNullable(guardBoss).ifPresent(
                     boss -> {

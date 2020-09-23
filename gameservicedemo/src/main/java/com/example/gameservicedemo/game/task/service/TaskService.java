@@ -232,9 +232,9 @@ public class TaskService {
      * @param taskType 任务类型
      * @param player 玩家
      * @param targetId  与任务相关的目标id
-     * @param nowNumber 达成的数量
+     * @param number 达成的数量/改变的数量  为null代表在当前数值上+1  为数值则进行set操作
      */
-    public void checkTaskProgressByNumber(TaskType taskType, PlayerBeCache player, Integer targetId, Integer nowNumber) {
+    public void checkTaskProgressByNumber(TaskType taskType, PlayerBeCache player, Integer targetId, Integer number) {
         getMissionByType(taskType).filter(task->
             task.getTaskCondition().getCondition().equals(targetId)
         ).forEach(task->{
@@ -266,7 +266,11 @@ public class TaskService {
             if(Objects.nonNull(progressId)){
                 //进行数量增加
                 TaskProgressBeCache taskProgressById = taskCache.getTaskProgressById(progressId);
-                taskProgressById.setNowAt(nowNumber);
+                if(Objects.isNull(number)){
+                    taskProgressById.setNowAt(taskProgressById.getNowAt()+1);
+                }else if(number>taskProgressById.getNowAt()){
+                    taskProgressById.setNowAt(number);
+                }
                 //进行检测是否达成目标
                 if(checkIsComplete(taskProgressById)){
                     taskFinish(player,taskProgressById);

@@ -1,10 +1,11 @@
 package com.example.gameservicedemo.game.scene.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.event.EventBus;
+import com.example.gameservicedemo.event.model.TalkWithEvent;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
 import com.example.gameservicedemo.game.scene.bean.NPC;
-import com.example.gameservicedemo.game.scene.bean.SceneObject;
 import com.example.gameservicedemo.manager.NotificationManager;
 import io.netty.channel.ChannelHandlerContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ public class NPCService {
             return;
         }
         sceneObjectService.talk(playerByCtx, npc);
-        //创建一个事件
+        //发布一个事件
+        EventBus.publish(new TalkWithEvent(playerByCtx,npc.getId()));
     }
 }

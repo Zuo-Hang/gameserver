@@ -1,6 +1,10 @@
 package com.example.gameservicedemo.game.player.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gamedatademo.bean.Player;
+import com.example.gameservicedemo.event.EventBus;
+import com.example.gameservicedemo.event.model.LevelEvent;
+import com.example.gameservicedemo.event.model.PKEvent;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.bean.Item;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
@@ -82,6 +86,9 @@ public class PlayerDataService {
                 sceneService.moveToScene(playerBeCache, sceneService.getScene(1));
                 notificationManager.notifyPlayer(playerBeCache, playerBeCache.getName() + "  你已经复活 \n", RequestCode.SUCCESS.getCode());
             });
+            if(murderer instanceof PlayerBeCache){
+                EventBus.publish(new PKEvent((PlayerBeCache)murderer,true));
+            }
             return true;
         } else {
             return false;

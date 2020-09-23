@@ -23,24 +23,18 @@ import javax.annotation.Resource;
 @Component
 @Slf4j
 public class KillMonsterEventHandler {
-
     {
         EventBus.subscribe(MonsterEventDeadEvent.class,this::killMonsterNumber);
     }
-
     @Resource
     private TaskService taskService;
-
-
     /**
      *  按杀死怪物标记任务进度的任务
      * @param deadEvent  怪物死亡事件
      */
     private void killMonsterNumber(MonsterEventDeadEvent deadEvent) {
-        int num=0;
         Integer id = deadEvent.getTarget().getId();
         PlayerBeCache player = deadEvent.getPlayer();
-        taskService.checkTaskProgressByNumber(TaskType.KILL_MONSTER,player, id,num);
-
+        taskService.checkTaskProgressByNumber(TaskType.KILL_MONSTER,player, id,0);
     }
 }

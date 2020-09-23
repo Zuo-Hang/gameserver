@@ -3,6 +3,9 @@ package com.example.gameservicedemo.game.player.bean;
 import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.bean.TaskProgress;
 import com.example.gameservicedemo.background.WriteBackDB;
+import com.example.gameservicedemo.event.EventBus;
+import com.example.gameservicedemo.event.model.LevelEvent;
+import com.example.gameservicedemo.event.model.MoneyEvent;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.buffer.bean.Buffer;
 import com.example.gameservicedemo.base.bean.Creature;
@@ -112,6 +115,8 @@ public class PlayerBeCache extends Player implements Creature {
 
     Long teamId=null;
 
+    Integer level;
+
     /**
      * 任务集合<任务id，任务进度id>
      */
@@ -208,6 +213,7 @@ public class PlayerBeCache extends Player implements Creature {
         if(over){
             getUpdate().add("exp");
             writeBackDB.delayWriteBackPlayer(this);
+            checkUpLevel();
         }
 
     }
@@ -218,6 +224,7 @@ public class PlayerBeCache extends Player implements Creature {
         if(over){
             getUpdate().add("money");
             writeBackDB.delayWriteBackPlayer(this);
+            EventBus.publish(new MoneyEvent(this,this.getMoney()));
         }
 
     }
@@ -296,5 +303,16 @@ public class PlayerBeCache extends Player implements Creature {
         setTaskProgressJson(gson.toJson(getTaskAcquireList()));
         getUpdate().add("taskAcquireJson");
         writeBackDB.delayWriteBackPlayer(this);
+    }
+
+    /**
+     * 检测是否发生等级变化
+     */
+    public void checkUpLevel(){
+        int nowLevel = this.getExp() / 10;
+        if(nowLevel>this.getLevel()){
+            this.setLevel(nowLevel);
+            EventBus.publish(new LevelEvent(this,nowLevel));
+        }
     }
 }

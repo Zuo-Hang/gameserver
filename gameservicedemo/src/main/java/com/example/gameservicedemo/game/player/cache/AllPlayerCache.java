@@ -123,6 +123,8 @@ public class AllPlayerCache {
             }.getType());
             playerBeCache.setFriendList(list);
         }
+        //初始化等级
+        playerBeCache.setLevel(playerBeCache.getExp()/10);
     }
 
 }

@@ -18,9 +18,9 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class PKEvent extends Event {
-
     private PlayerBeCache player;
-
+    /**
+     * 后期可以再出一个常败将军
+     */
     private boolean isWin;
-
 }

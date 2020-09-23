@@ -1,6 +1,8 @@
 package com.example.gameservicedemo.game.trade.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.event.EventBus;
+import com.example.gameservicedemo.event.model.TradeEvent;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.service.BagService;
 import com.example.gameservicedemo.game.mail.bean.GameSystem;
@@ -13,6 +15,7 @@ import com.example.gameservicedemo.game.trade.bean.TradeState;
 import com.example.gameservicedemo.game.trade.cache.TradeCache;
 import com.example.gameservicedemo.manager.NotificationManager;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.Even;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -73,6 +76,8 @@ public class TradeService {
             notificationManager.notifyPlayer(tradeBoard.getInitiator(),"交易成功",RequestCode.SUCCESS.getCode());
             notificationManager.notifyPlayer(tradeBoard.getAccepter(),"交易成功",RequestCode.SUCCESS.getCode());
             //更新数据库----------------插入一条新的交易信息
+            //发布一项交易事件
+            EventBus.publish(new TradeEvent(tradeBoard.getInitiator(),tradeBoard.getAccepter()));
         }
     }
 

@@ -2,6 +2,8 @@ package com.example.gameservicedemo.game.tools.service;
 
 import com.example.commondemo.base.RequestCode;
 import com.example.gameservicedemo.background.WriteBackDB;
+import com.example.gameservicedemo.event.EventBus;
+import com.example.gameservicedemo.event.model.EquipmentEvent;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.bag.service.BagService;
 import com.example.gameservicedemo.game.buffer.bean.Buffer;
@@ -154,6 +156,7 @@ public class ToolsService {
         playerDataService.showPlayerEqu(player);
         playerDataService.showPlayerBag(player);
         playerDataService.showPlayerInfo(player);
+        EventBus.publish(new EquipmentEvent(player,tools));
         return true;
     }
 

@@ -1,6 +1,8 @@
 package com.example.gameservicedemo.game.team.service;
 
 import com.example.commondemo.base.RequestCode;
+import com.example.gameservicedemo.event.EventBus;
+import com.example.gameservicedemo.event.model.TeamEvent;
 import com.example.gameservicedemo.game.copy.bean.GameCopyScene;
 import com.example.gameservicedemo.game.copy.service.GameCopyService;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
@@ -206,6 +208,8 @@ public class TeamService {
         team.getTeamPlayer().put(Long.valueOf(playerByContext.getId()), playerByContext);
         playerByContext.setTeamId(team.getId());
         notificationManager.notifyTeam(team, MessageFormat.format("{0}加入了队伍！", playerByContext.getName()), RequestCode.SUCCESS.getCode());
+        //发布一个组队事件
+        EventBus.publish(new TeamEvent(playerByContext));
     }
 
 
