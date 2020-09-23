@@ -24,6 +24,6 @@ public class GuildEventHandler {
     @Resource
     private TaskService taskService;
     private  void joinGuild(GuildEvent guildEvent) {
-        taskService.checkTaskProgressByNumber(TaskType.GUILD,guildEvent.getPlayer(), 0,1);
+        taskService.checkTaskProgressByNumber(TaskType.GUILD,guildEvent.getPlayer(), 0,null);
     }
 }

@@ -188,13 +188,17 @@ public enum Command {
     /**
      * 查看队伍
      **/
-    TEAM_SHOW("team", 6030, "查看队伍"),
+    TEAM_SHOW("team_show", 6030, "查看队伍"),
     /**
      * 创建队伍，开房间。默认自己是房主
      */
     CREAT_TEAM("creat_team", 6040, "创建队伍，开房间。默认自己是房主"),
 
+    /**
+     * 将某一成员踢出自己的队伍
+     */
     KICK_FROM_TEAM("kick", 6050, "将某一成员踢出自己的队伍  tick playerId"),
+
     /**
      * 队长令队伍进入副本
      */

@@ -45,6 +45,6 @@ public class CollectThingEventHandler {
         }
         //调用任务进度检测器
         taskService.checkTaskProgressByNumber(TaskType.COLLECT_TOOLS,collectThingEvent.getPlayer(),
-                collectThingEvent.getThingInfo().getId(),num);
+                0,num);
     }
 }

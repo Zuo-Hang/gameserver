@@ -13,7 +13,7 @@ import javax.annotation.Resource;
  *
  * @author: hang hang
  * @Date: 2020/08/25/16:37
- * @Description: 好友事件处理器
+ * @Description: 好友事件处理器  ok
  */
 @Component
 public class FriendEventHandler {
@@ -24,6 +24,6 @@ public class FriendEventHandler {
     private TaskService taskService;
 
     private  void addFriend(FriendEvent guildEvent) {
-        taskService.checkTaskProgressByNumber(TaskType.FRIEND,guildEvent.getPlayer(), 0,1);
+        taskService.checkTaskProgressByNumber(TaskType.FRIEND,guildEvent.getPlayer(), 0,null);
     }
 }

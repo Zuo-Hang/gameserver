@@ -63,6 +63,7 @@ public class TeamService {
         notificationManager.notifyPlayer(playerByContext,
                 MessageFormat.format("你已经创建了队伍，并且身处其中，队伍id：{0} ，使用\"team_show\"查看当前队伍情况", team.getId()),
                 RequestCode.SUCCESS.getCode());
+        EventBus.publish(new TeamEvent(playerByContext));
     }
 
     /**

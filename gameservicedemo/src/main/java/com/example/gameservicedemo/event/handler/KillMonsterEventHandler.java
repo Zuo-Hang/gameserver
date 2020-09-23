@@ -35,6 +35,6 @@ public class KillMonsterEventHandler {
     private void killMonsterNumber(MonsterEventDeadEvent deadEvent) {
         Integer id = deadEvent.getTarget().getId();
         PlayerBeCache player = deadEvent.getPlayer();
-        taskService.checkTaskProgressByNumber(TaskType.KILL_MONSTER,player, id,0);
+        taskService.checkTaskProgressByNumber(TaskType.KILL_MONSTER,player, id,null);
     }
 }

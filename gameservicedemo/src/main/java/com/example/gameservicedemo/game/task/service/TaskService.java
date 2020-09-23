@@ -85,8 +85,10 @@ public class TaskService {
         }
         for (Long id : player.getTaskAcquireList()) {
             TaskProgressBeCache taskProgressById = taskCache.getTaskProgressById(id);
-            Integer kind = taskCache.getTaskById(taskProgressById.getTaskId()).getKind();
-            if (kind.equals(TaskKindType.ACHIEVEMENT.getCode()) || kind.equals(TaskKindType.NOVICE.getCode())) {
+            Task taskById = taskCache.getTaskById(taskProgressById.getTaskId());
+            boolean b = task.getId().equals(taskById.getId()) && taskById.getKind().equals(TaskKindType.ACHIEVEMENT.getCode());
+            boolean b1 = task.getId().equals(taskById.getId()) && taskById.getKind().equals(TaskKindType.NOVICE.getCode());
+            if (b1 ||b ) {
                 notificationManager.notifyPlayer(player, "该任务属于一次性任务并已经接收过了，不可重复接收", RequestCode.BAD_REQUEST.getCode());
                 return null;
             }

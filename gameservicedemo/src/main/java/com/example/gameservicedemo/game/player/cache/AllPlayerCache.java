@@ -131,6 +131,11 @@ public class AllPlayerCache {
             }.getType());
             playerBeCache.setTaskProgressMap(map);
         }
+        if(Strings.isNotEmpty(playerBeCache.getTaskAcquireJson())){
+            ArrayList<Long> list = gson1.fromJson(playerBeCache.getTaskAcquireJson(), new TypeToken<ArrayList<Long>>() {
+            }.getType());
+            playerBeCache.setTaskAcquireList(list);
+        }
     }
 
 }

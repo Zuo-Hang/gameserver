@@ -193,4 +193,11 @@ public class SceneService {
             notificationManager.notifyScene(formScene,"有玩家离开",RequestCode.WARNING.getCode());
         }
     }
+
+    /**
+     * 获取所有场景
+     */
+    public Collection<Scene> getAllScene(){
+        return  sceneCache.getAllScene();
+    }
 }

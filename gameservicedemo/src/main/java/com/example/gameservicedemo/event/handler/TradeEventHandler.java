@@ -25,7 +25,7 @@ public class TradeEventHandler {
 
     private void firstTrade(TradeEvent tradeEvent) {
         // 分别检测交易发起者和交易被动者
-        taskService.checkTaskProgressByNumber(TaskType.TRADE,tradeEvent.getInitiator(), 0,1);
-        taskService.checkTaskProgressByNumber(TaskType.TRADE,tradeEvent.getAccepter(), 0,1);
+        taskService.checkTaskProgressByNumber(TaskType.TRADE,tradeEvent.getInitiator(), 0,null);
+        taskService.checkTaskProgressByNumber(TaskType.TRADE,tradeEvent.getAccepter(), 0,null);
     }
 }

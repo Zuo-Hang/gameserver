@@ -31,7 +31,7 @@ public class PKEventHandler {
         PlayerBeCache player = event.getPlayer();
         // 玩家pk胜利
         if (event.isWin()) {
-            taskService.checkTaskProgressByNumber(TaskType.PK,player, 0,1);
+            taskService.checkTaskProgressByNumber(TaskType.PK,player, 0,null);
         }
     }
 }

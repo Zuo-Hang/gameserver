@@ -31,6 +31,7 @@ public class Tools extends BeUse {
     @EntityName(column = "可叠加数量")
     private Integer repeat;
 
+    @EntityName(column = "等级")
     private Integer level;
 
     /**

@@ -23,6 +23,6 @@ public class TalkWithEventHandler {
     @Resource
     private TaskService taskService;
     private  void talkWithNPC(TalkWithEvent event) {
-        taskService.checkTaskProgressByNumber(TaskType.TALK_WITH,event.getPlayer(), event.getSceneObjectId(),1);
+        taskService.checkTaskProgressByNumber(TaskType.TALK_WITH,event.getPlayer(), event.getSceneObjectId(),null);
     }
 }

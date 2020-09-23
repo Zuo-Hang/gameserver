@@ -27,6 +27,6 @@ public class TeamEventHandler {
     private TaskService taskService;
     private  void firstTeam(TeamEvent teamEvent) {
         // 检测队伍是否是第一次组队
-        taskService.checkTaskProgressByNumber(TaskType.TEAM,teamEvent.getPlayer(), 0,1);
+        taskService.checkTaskProgressByNumber(TaskType.TEAM,teamEvent.getPlayer(), 0,null);
     }
 }

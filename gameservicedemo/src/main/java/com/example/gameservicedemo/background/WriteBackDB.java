@@ -6,12 +6,15 @@ import com.example.gamedatademo.mapper.BagMapper;
 import com.example.gamedatademo.mapper.GuildMapper;
 import com.example.gamedatademo.mapper.PlayerMapper;
 import com.example.gamedatademo.mapper.TaskProgressMapper;
+import com.example.gameservicedemo.base.IdGenerator;
 import com.example.gameservicedemo.event.Event;
 import com.example.gameservicedemo.game.bag.bean.BagBeCache;
 import com.example.gameservicedemo.game.guild.bean.GuildBeCache;
 import com.example.gameservicedemo.game.hurt.ChangePlayerInformationImp;
 import com.example.gameservicedemo.game.player.bean.PlayerBeCache;
 import com.example.gameservicedemo.game.player.service.PlayerLoginService;
+import com.example.gameservicedemo.game.scene.bean.Scene;
+import com.example.gameservicedemo.game.scene.service.SceneService;
 import com.example.gameservicedemo.game.task.bean.TaskProgressBeCache;
 import com.example.gameservicedemo.manager.TimedTaskManager;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -21,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -40,6 +44,8 @@ public class WriteBackDB{
     GuildMapper guildMapper;
     @Autowired
     PlayerLoginService playerLoginService;
+    @Autowired
+    SceneService sceneService;
     @Autowired
     ChangePlayerInformationImp changePlayerInformationImp;
     @Autowired
@@ -179,6 +185,27 @@ public class WriteBackDB{
             log.info("-------每五秒自动恢复机制执行完毕----------");
         });
     }
+    /**
+     * 怪物刷新机制
+     */
+    @PostConstruct
+    public void resetSceneObject(){
+        TimedTaskManager.scheduleAtFixedRate(0,1000*5,()->{
+            Collection<Scene> allScene = sceneService.getAllScene();
+            for (Scene scene:allScene){
+                scene.getMonsters().forEach((uuid,monster)->{
+                    if(monster.getState().equals(-1)){
+                        scene.getMonsters().remove(uuid);
+                        monster.setUuid(IdGenerator.getAnId());
+                        monster.setState(1);
+                        scene.getMonsters().put(monster.getUuid(),monster);
+                    }
+                });
+            }
+            log.info("-------每五秒重置怪物完成----------");
+        });
+    }
+
 
     /**
      * 插入一个新的任务进度
