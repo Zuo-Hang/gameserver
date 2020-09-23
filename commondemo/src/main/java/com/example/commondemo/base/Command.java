@@ -105,7 +105,7 @@ public enum Command {
     /**
      * 技能攻击玩家
      **/
-    SKILL_TO_PVP("skill_to_pvp", 4300, "技能攻击玩家"),
+    SKILL_TO_PVP("skill_to_pvp", 4300, "技能攻击玩家 "),
     /**
      * 使用群体攻击技能
      */

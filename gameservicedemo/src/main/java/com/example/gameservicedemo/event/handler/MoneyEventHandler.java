@@ -30,8 +30,8 @@ public class MoneyEventHandler {
     private NotificationManager notificationManager;
 
     private  void moneyNumber(MoneyEvent moneyEvent) {
-//        taskService.checkTaskProgressByNumber(TaskType.MONEY,moneyEvent.getPlayer(),
-//                0,moneyEvent.getPlayer().getMoney());
+        taskService.checkTaskProgressByNumber(TaskType.MONEY,moneyEvent.getPlayer(),
+                0,moneyEvent.getPlayer().getMoney());
     }
     /**
      *  金币变化监听
