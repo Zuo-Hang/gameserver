@@ -71,7 +71,7 @@ public class BagService {
                     notificationManager.notifyPlayer(player, "放入成功", RequestCode.SUCCESS.getCode());
                     packBag(bagBeCache);
                     playerDataService.showPlayerBag(player);
-                    EventBus.publish(new CollectThingEvent(player,newTools));
+                    EventBus.publish(new CollectThingEvent(player, newTools));
                     return true;
                 }
             }
@@ -85,7 +85,7 @@ public class BagService {
             bagBeCache.putInItemMap(item.getIndexInBag(), item);
             packBag(bagBeCache);
             playerDataService.showPlayerBag(player);
-            EventBus.publish(new CollectThingEvent(player,newTools));
+            EventBus.publish(new CollectThingEvent(player, newTools));
             return true;
         } else {
             //背包容量不足
@@ -177,11 +177,12 @@ public class BagService {
                 bagBeCache.putInItemMap(v.getIndexInBag(), v);
             });
         }
+        bagBeCache.setTag(true);
         playerBeCache.setBagBeCache(bagBeCache);
         log.info("角色：{} 的背包初始化完毕！", playerBeCache.getName());
     }
 
     public boolean havePlace(BagBeCache bagBeCache) {
-        return bagBeCache.getItemMap().size()<bagBeCache.getSize();
+        return bagBeCache.getItemMap().size() < bagBeCache.getSize();
     }
 }

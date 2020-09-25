@@ -183,7 +183,7 @@ public class TeamService {
      * @param context
      * @param teamRequestId
      */
-    public void acceptTeamRequest(ChannelHandlerContext context, Long teamRequestId) {
+    public synchronized void  acceptTeamRequest(ChannelHandlerContext context, Long teamRequestId) {
         PlayerBeCache playerByContext = playerLoginService.isLoad(context);
         if (Objects.isNull(playerByContext)) {
             return;

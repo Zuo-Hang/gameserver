@@ -109,7 +109,7 @@ public enum Command {
     /**
      * 使用群体攻击技能
      */
-    SKILL_TO_GROUP("skill_to_group", 4400, "使用群体攻击技能"),
+    SKILL_TO_GROUP("skill_to_group", 4400, "使用群体攻击技能 skill_to_group skillId 目标1,目标2,……  注:只能向玩家使用"),
     /**
      * 使用召唤技能
      */

@@ -53,7 +53,6 @@ public class PlayerService {
      */
     public void aoi(ChannelHandlerContext context) {
         //获取当前场景的所有实体信息
-        //PlayerBeCache playerByCtx = playerCache.getPlayerByChannel(context.channel());
         PlayerBeCache playerByCtx = playerLoginService.getPlayerByContext(context);
         Scene sceneNowAt = playerByCtx.getSceneNowAt();
         Map<Long, NPC> npcs = sceneNowAt.getNpcs();

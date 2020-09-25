@@ -8,6 +8,10 @@
     select * from guild where id = #{id};
     </select>
 
+    <select id="selectAll" resultType="com.example.gamedatademo.bean.Guild">
+    select * from guild;
+    </select>
+
     <insert id="insert" parameterType="com.example.gamedatademo.bean.Guild" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO guild
     (id,name, level,member,warehouse,warehouse_Size,join_Request,gold_num)

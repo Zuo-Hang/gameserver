@@ -96,6 +96,10 @@ public class GuildService {
             notificationManager.notifyPlayer(player, "该公会并不存在，请检查输入的公会id", RequestCode.BAD_REQUEST.getCode());
             return;
         }
+        if(guild.getMemberIdList().size()>=guild.getMaxNum()){
+            notificationManager.notifyPlayer(player, "该公会人数已经达到了上限！", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
         PlayerJoinRequest playerJoinRequest = new PlayerJoinRequest(new Date(), player.getId());
         guild.addJoinRequest(player.getId(), playerJoinRequest);
         notificationManager.notifyPlayer(player, "已经发出加入请求，等待处理中……", RequestCode.SUCCESS.getCode());
@@ -116,7 +120,7 @@ public class GuildService {
      * @param admin
      * @param playerId
      */
-    public void guildPermit(PlayerBeCache admin, Integer playerId) {
+    public synchronized void guildPermit(PlayerBeCache admin, Integer playerId) {
         //判断权限、判断请求是否存在、判断请求者当前是否已加入公会（当前公会|其他公会）、执行操作、通知已加入
         Long guildId = admin.getGuildId();
         if (Objects.isNull(guildId) || guildId == 0) {
@@ -132,6 +136,10 @@ public class GuildService {
         PlayerJoinRequest playerJoinRequest = guild.getPlayerJoinRequestMap().get(playerId);
         if (Objects.isNull(playerJoinRequest)) {
             notificationManager.notifyPlayer(admin, "该玩家并未提出申请，或申请已经处理！", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        if(guild.getMemberIdList().size()>=guild.getMaxNum()){
+            notificationManager.notifyPlayer(admin, "目前公会人数已经达到了上限！", RequestCode.BAD_REQUEST.getCode());
             return;
         }
         //获取玩家

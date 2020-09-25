@@ -238,8 +238,8 @@ public class UserService {
         if (!Objects.isNull(userByCtx)) {
             List<Player> players = findPlayers(context, userByCtx.getUserId());
             StringBuilder stringBuilder = new StringBuilder("您的角色信息如下：\n");
-            if (players == null) {
-//-----------------------------------------------------------------------------------
+            if (players.isEmpty()) {
+                stringBuilder.append("你还没有创建角色！\n");
             } else {
                 for (Player player : players) {
                     stringBuilder.append("角色id：" +
@@ -249,8 +249,8 @@ public class UserService {
                             + sceneService.getScene(player.getNowAt()).getName() + "\n"
                     );
                 }
-                notificationManager.notifyByCtx(context, stringBuilder.toString() + "你可以使用\"load\"加载角色开始游戏", RequestCode.SUCCESS.getCode());
             }
+            notificationManager.notifyByCtx(context, stringBuilder.toString() + "你可以使用\"load\"加载角色开始游戏", RequestCode.SUCCESS.getCode());
         } else {
             notificationManager.notifyByCtx(context, "您还未登录！请使用 \" login\"进行登录后再进行此操作", RequestCode.BAD_REQUEST.getCode());
         }

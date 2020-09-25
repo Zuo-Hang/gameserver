@@ -2,6 +2,8 @@ package com.example.gamedatademo.mapper;
 
 import com.example.gamedatademo.bean.Guild;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -13,4 +15,5 @@ public interface GuildMapper {
     Integer insert(Guild guild);
     Guild selectByGuildId(Long GuildId);
     Integer updateByGuildId(Guild guild);
+    List<Guild> selectAll();
 }

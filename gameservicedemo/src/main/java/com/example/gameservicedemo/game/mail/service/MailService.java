@@ -58,7 +58,7 @@ public class MailService {
     public void sendMail(PlayerBeCache sender, Integer receiverId, String subject, String content, Long toolsUuid) {
         //检查收件人是否存在
         Player player = playerMapper.selectByPlayerId(receiverId);
-        if(Objects.isNull(player)){
+        if(Objects.isNull(player)&&(!sender.equals(gameSystem))){
             notificationManager.notifyPlayer(sender,"收件人不存在，请检查输入的id", RequestCode.BAD_REQUEST.getCode());
             return;
         }

@@ -21,6 +21,8 @@ public class BagBeCache extends Bag {
 
     private WriteBackDB writeBackDB;
 
+    public boolean tag;
+
     private Integer playerId;
     /**
      * 背包中的所有物品物品  <uuid,tools>
@@ -38,9 +40,11 @@ public class BagBeCache extends Bag {
      */
     public synchronized void putInToolsMap(Tools tools) {
         toolsMap.put(tools.getUuid(), tools);
-        setTools(new Gson().toJson(this.getToolsMap().values()));
-        getUpdate().add("tools");
-        writeBackDB.updateBagDb(this);
+        if(tag){
+            setTools(new Gson().toJson(this.getToolsMap().values()));
+            getUpdate().add("tools");
+            writeBackDB.updateBagDb(this);
+        }
     }
 
     /**
@@ -61,9 +65,12 @@ public class BagBeCache extends Bag {
      */
     public synchronized void putInItemMap(Integer bagIndex, Item item) {
         itemMap.put(bagIndex, item);
-        setItems(new Gson().toJson(this.getItemMap().values()));
-        getUpdate().add("items");
-        writeBackDB.updateBagDb(this);
+        //初始化的时候不应该回写
+        if(tag){
+            setItems(new Gson().toJson(this.getItemMap().values()));
+            getUpdate().add("items");
+            writeBackDB.updateBagDb(this);
+        }
     }
 
     /**

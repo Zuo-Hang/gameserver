@@ -61,6 +61,10 @@ public class TradeService {
             notificationManager.notifyPlayer(player,"该交易与你无关，无权确认！",RequestCode.BAD_REQUEST.getCode());
             return;
         }
+        if(!tradeBoard.getInitiator().getSceneNowAt().equals(tradeBoard.getAccepter().getSceneNowAt()))){
+            notificationManager.notifyPlayer(player, "另一玩家与你不在同一场景内，确认失败", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
         boolean[] confirm = tradeBoard.getConfirm();
         if(player.equals(tradeBoard.getInitiator())){
             confirm[0]=true;
@@ -116,6 +120,10 @@ public class TradeService {
         PlayerBeCache buyer = playerLoginService.getPlayerById(buyerId);
         if (Objects.isNull(buyer)) {
             notificationManager.notifyPlayer(seller, "该玩家不存在，请检查输入id", RequestCode.BAD_REQUEST.getCode());
+            return;
+        }
+        if(!buyer.getSceneNowAt().equals(seller.getSceneNowAt())){
+            notificationManager.notifyPlayer(seller, "该玩家与你不在同一场景内，不能进行面对面交易", RequestCode.BAD_REQUEST.getCode());
             return;
         }
         //创建一场新的交易

@@ -8,10 +8,10 @@ import com.google.gson.Gson;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,13 +29,14 @@ public class GuildBeCache extends Guild {
     /**
      * 成员
      */
-    private List<Integer> memberIdList = new ArrayList<>();
+    private List<Integer> memberIdList = new CopyOnWriteArrayList<>();
 
     /**
      * 公会仓库
      */
     private Map<Long, Tools> warehouseMap = new ConcurrentSkipListMap<>();
 
+    Integer maxNum=10;
 
     /**
      * 请求加入公会的列表

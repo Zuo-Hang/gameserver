@@ -160,7 +160,7 @@ public class PlayerDataService {
                     item.getToolsUuidS().size()));
             item.getToolsUuidS().forEach(uuid -> {
                 stringBuilder.append(MessageFormat.format("uuid:{0} 名称：{1} ",
-                        toolsMap.get(uuid).getUuid(),
+                        uuid,
                         toolsMap.get(uuid).getName()));
                 if (toolsMap.get(uuid).getType() < 4) {
                     stringBuilder.append("当前耐久度：" + toolsMap.get(uuid).getDurability());

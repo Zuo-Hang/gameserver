@@ -111,11 +111,11 @@ public class WriteBackDB{
      * @param player 待插入数据
      * @return
      */
-    public Future<Event> insertPlayer(Player player){
+    public Integer insertPlayer(Player player){
         ScheduledThreadPool.schedule(()->{
             playerMapper.insert(player);
         },0,TimeUnit.MILLISECONDS);
-        return null;
+        return player.getPlayerId();
     }
 
     /**

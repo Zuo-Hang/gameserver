@@ -137,6 +137,7 @@ public class SceneService {
             log.info(playerByCtx1.toString());
             //在新场景中加入化身
             whileGo.getPlayers().put(playerByCtx.getPlayerId(), playerByCtx);
+            playerByCtx1.setSceneNowAt(whileGo);
             notificationManager.notifyByCtx(context, "你已在场景：" + whileGo.getName(), RequestCode.ABOUT_SCENE.getCode());
         } else {
             notificationManager.notifyByCtx(context, "输入的场景名称错误", RequestCode.BAD_REQUEST.getCode());

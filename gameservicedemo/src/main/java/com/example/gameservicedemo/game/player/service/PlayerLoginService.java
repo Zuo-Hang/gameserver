@@ -4,6 +4,7 @@ import com.example.commondemo.base.RequestCode;
 import com.example.gamedatademo.bean.Bag;
 import com.example.gamedatademo.bean.Player;
 import com.example.gamedatademo.mapper.BagMapper;
+import com.example.gamedatademo.mapper.PlayerMapper;
 import com.example.gameservicedemo.background.WriteBackDB;
 import com.example.gameservicedemo.game.copy.bean.GameCopyScene;
 import com.example.gameservicedemo.game.copy.service.GameCopyService;
@@ -44,6 +45,8 @@ public class PlayerLoginService {
     @Autowired
     BagMapper bagMapper;
     @Autowired
+    PlayerMapper playerMapper;
+    @Autowired
     PlayerLoginCache playerLoginCache;
     @Autowired
     GameCopyService gameCopyService;
@@ -79,9 +82,11 @@ public class PlayerLoginService {
         bag.setSize(16);
         Integer insert1 = bagMapper.insert(bag);
         player.setBagId(bag.getId());
-        writeBackDB.insertPlayer(player);
+        Integer playerId = playerMapper.insert(player);
         log.info("成功创建角色{}", player.toString());
-        notificationManager.notifyByCtx(context, "你已成功创建角色：" + playerName + "，快使用 load 命令去登录吧", RequestCode.SUCCESS.getCode());
+        notificationManager.notifyByCtx(context, MessageFormat.format(
+                "你已成功创建角色：{0} ，唯一id：{1}快使用 'load' 命令去登录吧",playerName,player.getPlayerId()
+        ), RequestCode.SUCCESS.getCode());
     }
 
     /**

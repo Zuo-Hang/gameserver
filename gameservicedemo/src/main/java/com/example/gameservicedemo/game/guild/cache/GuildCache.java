@@ -16,11 +16,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import javax.annotation.PostConstruct;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -59,12 +58,26 @@ public class GuildCache {
         if (Objects.nonNull(cache)) {
             return cache;
         }
-        GuildBeCache guildBeCache = loadFromDB(guildId);
-        if (Objects.nonNull(guildBeCache)) {
-            putInCache(guildBeCache);
-            return guildBeCache;
-        }
+//        GuildBeCache guildBeCache = loadFromDB(guildId);
+//        if (Objects.nonNull(guildBeCache)) {
+//            putInCache(guildBeCache);
+//            return guildBeCache;
+//        }
         return null;
+    }
+
+    @PostConstruct
+    public void init() {
+        List<Guild> guilds = guildMapper.selectAll();
+        guilds.forEach(guild -> {
+            GuildBeCache guildBeCache = new GuildBeCache();
+            BeanUtils.copyProperties(guild, guildBeCache);
+            guildBeCache.setWriteBackDB(writeBackDB);
+            loadMember(guildBeCache);
+            loadWarehouse(guildBeCache);
+            loadJoinRequest(guildBeCache);
+            putInCache(guildBeCache);
+        });
     }
 
     public GuildBeCache loadFromDB(Long guildId) {
@@ -88,7 +101,7 @@ public class GuildCache {
      */
     private void loadMember(GuildBeCache guild) {
         if (!Strings.isNullOrEmpty(guild.getMember())) {
-            ArrayList<Integer> ids = gson.fromJson(guild.getMember(), new TypeToken<ArrayList<Integer>>() {
+            CopyOnWriteArrayList<Integer> ids = gson.fromJson(guild.getMember(), new TypeToken<CopyOnWriteArrayList<Integer>>() {
             }.getType());
             guild.setMemberIdList(ids);
         }
@@ -122,7 +135,7 @@ public class GuildCache {
         }
     }
 
-    public ConcurrentMap<Long, GuildBeCache> getAll(){
-         return guildCache.asMap();
+    public ConcurrentMap<Long, GuildBeCache> getAll() {
+        return guildCache.asMap();
     }
 }
