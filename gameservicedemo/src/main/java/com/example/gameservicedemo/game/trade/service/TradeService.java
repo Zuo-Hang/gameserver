@@ -61,7 +61,7 @@ public class TradeService {
             notificationManager.notifyPlayer(player,"该交易与你无关，无权确认！",RequestCode.BAD_REQUEST.getCode());
             return;
         }
-        if(!tradeBoard.getInitiator().getSceneNowAt().equals(tradeBoard.getAccepter().getSceneNowAt()))){
+        if(!tradeBoard.getInitiator().getSceneNowAt().equals(tradeBoard.getAccepter().getSceneNowAt())){
             notificationManager.notifyPlayer(player, "另一玩家与你不在同一场景内，确认失败", RequestCode.BAD_REQUEST.getCode());
             return;
         }
